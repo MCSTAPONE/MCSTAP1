@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flow Details</title>
+
+    <link rel="stylesheet" href="/static/css/pm.css">
+</head>
+
+<body>
+
+<div class="header">
+
+    <h1>Flow Details</h1>
+
+</div>
+
+<div class="container">
+
+    <a href="/flow-library" class="back-btn">
+            ← Back
+        </a>
+
+    <div class="card">
+
+        <h2>{{ flow[1] }}</h2>
+
+        <p>
+				<strong>Description:</strong>
+			</p>
+
+			<pre>{{ flow[2] }}</pre>
+
+        <p>
+
+            <strong>Module:</strong>
+
+            {{ flow[3] }}
+
+        </p>
+
+        <p>
+
+            <strong>Status:</strong>
+
+            {{ flow[4] }}
+
+        </p>
+	</div>
+
+        <br>
+		
+		<!-- Business Steps -->
+
+        <div class="card">
+
+            <h2>Business Steps</h2>
+
+            {% if not steps %}
+
+                <p>
+                    No Steps Defined
+                </p>
+
+            {% else %}
+
+                {% for step in steps %}
+
+                    <div class="card">
+
+                        <strong>
+                            Step {{ step[1] }}
+                        </strong>
+
+                        <br><br>
+
+                        <strong>Transaction:</strong>
+                        {{ step[2] }}
+
+                        <br>
+
+                        <strong>Description:</strong>
+                        {{ step[3] }}
+
+                    </div>
+
+                    <br>
+
+                {% endfor %}
+
+            {% endif %}
+
+            <br>
+
+            <a href="/flow-library/{{ flow_id }}/new-step" class="back-btn">
+				+ Add Step
+			</a>
+
+        </div>
+
+</div>
+
+</body>
+
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Execution Result</title>
+
+    <link rel="stylesheet" href="/static/css/pm.css">
+</head>
+
+<body>
+
+<div class="header">
+
+    Script Execution Result
+
+</div>
+
+
+	<a href="/script-studio/script/{{ script_id }}" class="back-btn">
+		← Back
+	</a>
+
+<div class="table-container">
+
+    <h2>Execution Log</h2>
+
+    <table class="test-table">
+
+        <tr>
+            <th>Message</th>
+        </tr>
+
+        {% for log in logs %}
+
+        <tr>
+            <td>{{ log }}</td>
+        </tr>
+
+        {% endfor %}
+
+    </table>
+
+</div>
+
+</body>
+
+</html>

@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Coverage Dashboard</title>
+
+    <link rel="stylesheet" href="static/css/pm.css">
+</head>
+
+
+<body>
+
+    <div class="header">
+
+        Coverage Dashboard
+
+    </div>
+
+    <a href="/dashboard" class="back-btn">
+		← Dashboard
+	</a>
+
+    <div id="coverage-content">
+
+        Loading Coverage...
+
+    </div>
+
+<script>
+
+fetch("/coverage/summary")
+.then(response => response.json())
+.then(data => {
+
+    document.getElementById(
+    "coverage-content"
+	).innerHTML = `
+
+	<div class="summary-container">
+
+		<div class="summary-card">
+
+			<div class="summary-title">
+				Total Test Steps
+			</div>
+
+			<div class="summary-value">
+				${data.total_steps}
+			</div>
+
+		</div>
+
+		<div class="summary-card">
+
+			<div class="summary-title">
+				Automated Steps
+			</div>
+
+			<div class="summary-value">
+				${data.automated}
+			</div>
+
+		</div>
+
+		<div class="summary-card">
+
+			<div class="summary-title">
+				Coverage %
+			</div>
+
+			<div class="summary-value">
+				${data.coverage_percent}%
+			</div>
+
+		</div>
+
+		<div class="summary-card">
+
+			<div class="summary-title">
+				SAP Modules
+			</div>
+
+			<div class="summary-value">
+				${data.modules}
+			</div>
+
+		</div>
+
+	</div>
+
+	<div class="module-container">
+
+		<h2>Coverage by Module</h2>
+
+		<div class="module-row">
+
+			<div class="module-header">
+				<span>Plant Maintenance (PM)</span>
+				<span>92%</span>
+			</div>
+
+			<div class="progress-bar">
+				<div class="progress-fill" style="width:92%;"></div>
+			</div>
+
+		</div>
+
+		<div class="module-row">
+
+			<div class="module-header">
+				<span>Material Management (MM)</span>
+				<span>78%</span>
+			</div>
+
+			<div class="progress-bar">
+				<div class="progress-fill" style="width:78%;"></div>
+			</div>
+
+		</div>
+
+		<div class="module-row">
+
+			<div class="module-header">
+				<span>Finance & Accounting(FI)</span>
+				<span>65%</span>
+			</div>
+
+			<div class="progress-bar">
+				<div class="progress-fill" style="width:65%;"></div>
+			</div>
+
+		</div>
+
+		<div class="module-row">
+
+			<div class="module-header">
+				<span>Controlling (CO)</span>
+				<span>87%</span>
+			</div>
+
+			<div class="progress-bar">
+				<div class="progress-fill" style="width:87%;"></div>
+			</div>
+
+		</div>
+
+		<div class="module-row">
+
+			<div class="module-header">
+				<span>Sales & Distribution (SD)</span>
+				<span>48%</span>
+			</div>
+
+			<div class="progress-bar">
+				<div class="progress-fill" style="width:48%;"></div>
+			</div>
+
+		</div>
+
+		<div class="module-row">
+
+			<div class="module-header">
+				<span>Warehouse Management (WM)</span>
+				<span>60%</span>
+			</div>
+
+			<div class="progress-bar">
+				<div class="progress-fill" style="width:60%;"></div>
+			</div>
+
+		</div>
+		
+		<div class="module-row">
+
+			<div class="module-header">
+				<span>Treasury (TR)</span>
+				<span>60%</span>
+			</div>
+
+			<div class="progress-bar">
+				<div class="progress-fill" style="width:60%;"></div>
+			</div>
+
+		</div>
+		
+		<div class="module-row">
+
+			<div class="module-header">
+				<span>Logistics (LO)</span>
+				<span>60%</span>
+			</div>
+
+			<div class="progress-bar">
+				<div class="progress-fill" style="width:60%;"></div>
+			</div>
+
+		</div>
+		
+		<div class="module-row">
+
+			<div class="module-header">
+				<span>Production Planning (PP)</span>
+				<span>60%</span>
+			</div>
+
+			<div class="progress-bar">
+				<div class="progress-fill" style="width:60%;"></div>
+			</div>
+
+		</div>
+		
+		<div class="module-row">
+
+			<div class="module-header">
+				<span>Product Lifecycle Management (PLM)</span>
+				<span>60%</span>
+			</div>
+
+			<div class="progress-bar">
+				<div class="progress-fill" style="width:60%;"></div>
+			</div>
+
+		</div>
+		
+		<div class="module-row">
+
+			<div class="module-header">
+				<span>Quality Management (QM)</span>
+				<span>60%</span>
+			</div>
+
+			<div class="progress-bar">
+				<div class="progress-fill" style="width:60%;"></div>
+			</div>
+
+		</div>
+		
+		<div class="module-row">
+
+			<div class="module-header">
+				<span>Supply Chain Management (SCM)</span>
+				<span>60%</span>
+			</div>
+
+			<div class="progress-bar">
+				<div class="progress-fill" style="width:60%;"></div>
+			</div>
+
+		</div>
+
+	</div>
+
+	`;
+
+});
+
+</script>
+
+</body>
+
+</html>

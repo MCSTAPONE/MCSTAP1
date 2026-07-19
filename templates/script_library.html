@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Script Library</title>
+
+    <link rel="stylesheet" href="/static/css/pm.css">
+</head>
+
+<body>
+
+<div class="header">
+
+    Script Library
+
+</div>
+
+	<a href="/script-studio" class="back-btn">
+			← Script Studio
+	</a>
+
+<div class="section">
+
+    <a href="/script-studio/builder">
+        <button type="button">
+            Create New Script
+        </button>
+    </a>
+
+</div>
+
+<div class="table-container">
+
+    <h2>Available Scripts</h2>
+
+    <table class="test-table">
+
+        <thead>
+
+            <tr>
+
+                <th>Script ID</th>
+                <th>Name</th>
+                <th>Module</th>
+                <th>T-Code</th>
+                <th>Status</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+        {% for row in scripts %}
+
+            <tr>
+
+                <td>{{ row[0] }}</td>
+				<td>
+					<a href="/script-studio/script/{{ row[0] }}" class="script-link">
+						{{ row[1] }}
+					</a>
+				</td>
+                <td>{{ row[2] }}</td>
+                <td>{{ row[3] }}</td>
+                <td>{{ row[4] }}</td>
+
+            </tr>
+
+        {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+</body>
+
+</html>

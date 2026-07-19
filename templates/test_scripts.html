@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Test Script Library</title>
+
+    <link rel="stylesheet" href="static/css/pm.css">
+</head>
+
+<body>
+
+    <div class="header">
+        Test Script Library
+    </div>
+
+    <a href="/dashboard" class="back-btn">
+		← Dashboard
+	</a>
+
+    <div class="table-container">
+
+        <h2>Available Automation Scripts</h2>
+
+        <table class="test-table">
+
+            <thead>
+
+                <tr>
+                    <th>Script Name</th>
+                    <th>Module</th>
+                    <th>Transaction</th>
+                    <th>Status</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for script in scripts %}
+
+                <tr>
+
+                    <td>{{ script[0] }}</td>
+                    <td>{{ script[1] }}</td>
+                    <td>{{ script[2] }}</td>
+                    <td>{{ script[3] }}</td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</body>
+
+</html>

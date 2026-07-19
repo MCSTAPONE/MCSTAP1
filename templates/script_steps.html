@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Script Steps</title>
+
+    <link rel="stylesheet" href="/static/css/pm.css">
+</head>
+
+<body>
+
+<div class="header">
+
+    Script Steps Builder
+
+</div>
+
+	<a href="/script-studio/library" class="back-btn">
+		← Script Library
+	</a>
+
+		<h2>{{ script_name }}</h2>
+
+		<a href="/script-studio/run/{{ script_id }}" class="back-btn">
+			▶ Run Script
+		</a>
+
+        <br><br>
+
+        <form action="/script-studio/add-step/{{ script_id }}" method="POST">
+
+			<label for="action_type">Action Type</label>
+
+            <br>
+
+            <select name="action_type"
+                    id="action_type">
+
+                <option value="LOGIN">
+                    LOGIN
+                </option>
+
+                <option value="START_TRANSACTION">
+                    START_TRANSACTION
+                </option>
+
+                <option value="SET_TEXT">
+                    SET_TEXT
+                </option>
+
+                <option value="CLICK">
+                    CLICK
+                </option>
+
+                <option value="SCREENSHOT">
+                    SCREENSHOT
+                </option>
+
+                <option value="VERIFY_TEXT">
+                    VERIFY_TEXT
+                </option>
+
+                <option value="LOGOUT">
+					LOGOUT
+				</option>
+
+				<option value="EXECUTE_FLOW">
+					EXECUTE_FLOW
+				</option>
+
+            </select>
+
+            <br><br>
+
+            <label>
+                Parameter Name
+            </label>
+
+            <br>
+
+            <input type="text"
+                   name="parameter_name">
+
+            <br><br>
+
+            <label>
+                Parameter Value
+            </label>
+
+            <br>
+
+            <input type="text"
+                   name="parameter_value">
+
+            <br><br>
+
+            <button type="submit"
+                    class="back-btn">
+
+                Add Step
+
+            </button>
+
+        </form>
+
+    </div>
+
+    <div class="table-container">
+
+        <h2>Existing Steps</h2>
+
+        <table class="test-table">
+
+            <thead>
+
+                <tr>
+                    <th>Seq</th>
+                    <th>Action</th>
+                    <th>Parameter</th>
+                    <th>Value</th>
+                    <th>Actions</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+            {% for row in steps %}
+
+                <tr>
+
+                    <td>{{ row[0] }}</td>
+
+                    <td>{{ row[1] }}</td>
+
+                    <td>{{ row[2] }}</td>
+
+                    <td>{{ row[3] }}</td>
+
+                    <td>
+						<a href="/script-studio/edit-step/{{ script_id }}/{{ row[0] }}"
+						   class="action-icon"
+						   title="Edit">
+							✏️ Edit
+						</a>
+
+						|
+
+						<a href="/script-studio/delete-step/{{ script_id }}/{{ row[0] }}"
+						   class="action-icon"
+						   title="Delete"
+						   onclick="return confirm('Are you sure you want to delete this step?');">
+							🗑️ Delete
+						</a>
+				</td>
+
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</body>
+
+</html>

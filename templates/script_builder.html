@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Script Builder</title>
+
+    <link rel="stylesheet" href="/static/css/pm.css">
+</head>
+
+<body>
+
+    <div class="header">
+
+        Script Builder
+
+    </div>
+
+    <a href="/script-studio" class="back-btn">
+			← Script Studio
+	</a>
+
+    <div class="table-container">
+
+	 <h2>Create Automation Script</h2>
+
+		<form action="/script-studio/save" method="post">
+
+			<label for="script_name">
+				Script Name
+			</label>
+
+			<br>
+
+			<input
+				type="text"
+				id="script_name"
+				name="script_name"
+				required>
+
+			<br><br>
+
+            <label>
+
+                Module
+
+            </label>
+
+            <br>
+
+            <select
+                name="module"
+                required>
+
+                <option value="PM">PM</option>
+                <option value="MM">MM</option>
+                <option value="FI">FI</option>
+                <option value="CO">CO</option>
+                <option value="SD">SD</option>
+                <option value="WM">WM</option>
+                <option value="QM">QM</option>
+                <option value="PP">PP</option>
+				<option value="LO">LO</option>
+				<option value="TR">TR</option>
+				<option value="PLM">PLM</option>
+				<option value="SCM">SCM</option>
+
+            </select>
+
+            <br><br>
+
+            <label>
+
+                Transaction Code
+
+            </label>
+
+            <br>
+
+            <input
+                type="text"
+                name="transaction_code"
+                placeholder="IW31"
+                required>
+
+            <br><br>
+
+            <label>
+
+                Description
+
+            </label>
+
+            <br>
+
+            <textarea
+                name="description"
+                rows="4"
+                cols="60"></textarea>
+
+            <br><br>
+
+            <h3>Included Actions</h3>
+
+            <ul>
+
+                <li>✅ LOGIN</li>
+
+                <li>✅ START_TRANSACTION</li>
+
+                <li>✅ LOGOUT</li>
+
+            </ul>
+
+            <button type="submit" class="back-btn">
+
+                Save Script
+
+            </button>
+
+        </form>
+
+    </div>
+
+</body>
+
+</html>

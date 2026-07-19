@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Edit Step</title>
+
+    <link rel="stylesheet" href="/static/css/pm.css">
+</head>
+
+<body>
+
+    <div class="header">
+        Edit Step
+    </div>
+
+    <a href="/script-studio/script/{{ script_id }}" class="back-btn">
+        ← Back to Script
+    </a>
+
+    <div class="table-container">
+
+        <h2>Edit Action</h2>
+
+        <form action="/script-studio/edit-step/{{ script_id }}/{{ step_sequence }}" method="POST">
+
+            <label>Action Type</label>
+            <br>
+
+            <select name="action_type">
+                <option value="LOGIN">LOGIN</option>
+                <option value="START_TRANSACTION">START_TRANSACTION</option>
+                <option value="SET_TEXT">SET_TEXT</option>
+                <option value="CLICK">CLICK</option>
+                <option value="SCREENSHOT">SCREENSHOT</option>
+                <option value="VERIFY_TEXT">VERIFY_TEXT</option>
+                <option value="LOGOUT">LOGOUT</option>
+            </select>
+
+            <br><br>
+
+            <label>Parameter Name</label>
+            <br>
+
+            <input type="text"
+                   name="parameter_name"
+                   value="{{ parameter_name }}">
+
+            <br><br>
+
+            <label>Parameter Value</label>
+            <br>
+
+            <input type="text"
+                   name="parameter_value"
+                   value="{{ parameter_value }}">
+
+            <br><br>
+
+            <button type="submit" class="back-btn">
+                Save Changes
+            </button>
+
+        </form>
+
+    </div>
+
+</body>
+
+</html>

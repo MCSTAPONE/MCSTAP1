@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SAP Recorder</title>
+
+    <link rel="stylesheet" href="/static/css/pm.css">
+</head>
+
+<body>
+
+    <div class="header">
+
+        SAP Recorder
+
+    </div>
+
+    <a href="/script-studio" class="back-btn">
+			← Script Studio
+	</a>
+
+    <div class="table-container">
+
+        <h2>Recorder</h2>
+
+        <p>
+
+            Future capability to capture SAP GUI actions
+            and automatically generate automation steps.
+
+        </p>
+
+        <button id="checkSessionBtn" class="back-btn">
+
+            Start Recording
+
+        </button>
+		<br><br>
+		<div id="sessionResult"></div>
+
+        <br><br>
+
+        <h3>Status</h3>
+
+        <p>
+
+            🚧 Coming Soon
+
+        </p>
+
+    </div>
+
+</body>
+
+<script>
+
+document
+.getElementById(
+    "checkSessionBtn"
+)
+.addEventListener(
+    "click",
+    async () => {
+
+    const resultDiv =
+        document.getElementById(
+            "sessionResult"
+        );
+
+    resultDiv.innerHTML =
+        "Checking SAP Session...";
+
+    const response =
+        await fetch(
+            "/script-studio/start-recorder"
+        );
+
+    const data =
+        await response.json();
+
+    if (
+        data.status === "SUCCESS"
+    ) {
+
+        resultDiv.innerHTML = `
+
+            <div class="result-card">
+
+                <h3>
+                    ✅ SAP Session Connected
+                </h3>
+
+                <p>
+                    System:
+                    ${data.system}
+                </p>
+
+            </div>
+
+        `;
+
+    } else {
+
+        resultDiv.innerHTML = `
+
+            <div class="result-card">
+
+                <h3>
+                    ❌ Connection Failed
+                </h3>
+
+                <p>
+                    ${data.message}
+                </p>
+
+            </div>
+
+        `;
+
+    }
+
+});
+
+</script>
+
+</html>
+`

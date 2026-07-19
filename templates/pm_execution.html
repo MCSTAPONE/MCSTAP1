@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>PM Execution Center</title>
+
+<!--    /static/css/pm.css-->
+
+</head>
+
+<body>
+
+    <div class="header">
+
+        PM Execution Center
+
+    </div>
+
+    <a href="/pm" class="back-btn">
+        ← Back to PM
+    </a>
+
+    <div class="section">
+
+        <h2>Business Process Execution</h2>
+
+        <div class="tile">
+
+            <div class="tile-title">
+                PM Lifecycle
+            </div>
+
+            <div class="tile-desc">
+
+                IW31 → IW32 → IW33 →
+                IW39 → IW40 → IW41 →
+                IW23 → ME51N
+
+            </div>
+
+            <br>
+
+            <button
+                id="runButton"
+                class="back-btn">
+
+                Run PM Flow
+
+            </button>
+
+        </div>
+
+        <br>
+
+        <div id="result"></div>
+
+    </div>
+
+    <script>
+
+    document
+    .getElementById("runButton")
+    .addEventListener("click", async () => {
+
+        const resultDiv =
+            document.getElementById("result");
+
+        resultDiv.innerHTML =
+            "<h3>Running PM Flow...</h3>";
+
+        const response =
+            await fetch("/pm/run", {
+                method: "POST"
+            });
+
+        const data =
+            await response.json();
+
+        let statusClass = "failed";
+
+if (data.status === "SUCCESS") {
+    statusClass = "success";
+}
+
+resultDiv.innerHTML = `
+
+<div class="result-card">
+
+    <h2>Execution Results</h2>
+
+    <p>
+        Status:
+        <span class="${statusClass}">
+            ${data.status}
+        </span>
+    </p>
+
+    <div class="result-list">
+
+        <div>✅ IW31 Create Order</div>
+
+        <div>✅ IW32 Change Order</div>
+
+        <div>✅ IW33 Display Order</div>
+
+        <div>✅ IW39 Display Orders</div>
+
+        <div>✅ IW40 Processing</div>
+
+        <div>✅ IW41 Confirmation</div>
+
+        <div>✅ IW23 Notification</div>
+
+        <div>✅ ME51N Purchase Requisition</div>
+
+    </div>
+
+</div>
+
+`;
+
+    });
+
+    </script>
+
+</body>
+
+</html>

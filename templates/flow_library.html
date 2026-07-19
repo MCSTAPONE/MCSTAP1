@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flow Library</title>
+
+    <link rel="stylesheet" href="/static/css/pm.css">
+</head>
+
+<body>
+
+    <div class="header">
+        <h1>Flow Library</h1>
+    </div>
+
+    <div class="container">
+		<a href="/dashboard" class="back-btn">
+			← Dashboard
+		</a>
+
+        <a href="/flow-library/new" class="back-btn">
+            + New Flow
+        </a>
+		
+		<form method="get"
+          style="display:flex;
+                 align-items:center;
+                 gap:10px;
+                 margin:0;">
+
+        <input
+            type="text"
+            name="search"
+            value="{{ search }}"
+            placeholder="Search flow name">
+		
+		<form method="get" class="filter-form">
+
+        <label for="module">
+            Module
+        </label>
+
+        <select name="module" id="module">
+
+            <option value=""
+                {% if selected_module == "" %}
+                    selected
+                {% endif %}>
+                All Modules
+            </option>
+
+            <option value="PM"
+                {% if selected_module == "PM" %}
+                    selected
+                {% endif %}>
+                Plant Maintenance (PM)
+            </option>
+
+            <option value="MM"
+                {% if selected_module == "MM" %}
+                    selected
+                {% endif %}>
+                Material Management (MM)
+            </option>
+
+            <option value="CO"
+                {% if selected_module == "CO" %}
+                    selected
+                {% endif %}>
+                Controlling (CO)
+            </option>
+
+            <option value="FI"
+                {% if selected_module == "FI" %}
+                    selected
+                {% endif %}>
+                Finance (FI)
+            </option>
+
+            <option value="SD"
+                {% if selected_module == "SD" %}
+                    selected
+                {% endif %}>
+                Sales & Distribution (SD)
+            </option>
+			
+			<option value="PP"
+                {% if selected_module == "PP" %}
+                    selected
+                {% endif %}>
+                Production Planning (PP)
+            </option>
+			
+			<option value="QM"
+                {% if selected_module == "QM" %}
+                    selected
+                {% endif %}>
+                Quality Management (QM)
+            </option>
+			
+			<option value="WM"
+                {% if selected_module == "WM" %}
+                    selected
+                {% endif %}>
+                Warehouse Management (WM)
+            </option>
+			
+			<option value="TR"
+                {% if selected_module == "TR" %}
+                    selected
+                {% endif %}>
+                Tresury (TR)
+            </option>
+			
+			<option value="LO"
+                {% if selected_module == "LO" %}
+                    selected
+                {% endif %}>
+                Logistic (LO)
+            </option>
+			
+			<option value="PLM"
+                {% if selected_module == "PLM" %}
+                    selected
+                {% endif %}>
+                Product Lifecycle Management (PLM)
+            </option>
+			
+			<option value="SCM"
+                {% if selected_module == "SCM" %}
+                    selected
+                {% endif %}>
+                Supply Chain Management (SCM)
+            </option>
+
+        </select>
+
+        <button type="submit" class="back-btn">
+            Search
+        </button>
+
+    </form>
+
+</div>
+
+<br>
+
+
+        <hr>
+
+        {% for flow in flows %}
+
+        <div class="card">
+
+            <h3>{{ flow[1] }}</h3>
+
+			<p>
+				<strong>Description:</strong>
+			</p>
+
+			<pre>{{ flow[2] }}</pre>
+
+			<p>
+				<strong>Module:</strong>
+				{{ flow[3] }}
+			</p>
+
+			<p>
+				<strong>Status:</strong>
+				{{ flow[4] }}
+			</p>
+
+            <a href="/flow-library/{{ flow[0] }}" class="back-btn">
+                Open Flow
+            </a>
+			<a href="/flow-library/edit/{{ flow[0] }}" class="back-btn">
+                Edit
+            </a>
+			<a href="/flow-library/delete/{{ flow[0] }}" class="back-btn">
+                Delete
+            </a>
+
+        </div>
+
+        <br>
+
+        {% endfor %}
+
+    </div>
+
+</body>
+
+</html>

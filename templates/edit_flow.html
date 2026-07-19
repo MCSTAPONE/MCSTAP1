@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Flow</title>
+
+    <link rel="stylesheet" href="/static/css/pm.css">
+</head>
+
+<body>
+
+<div class="header">
+    <h1>Edit Flow</h1>
+</div>
+
+<div class="container">
+
+    <a href="/flow-library" class="back-btn">
+        ← Flow Library
+    </a>
+
+    <br><br>
+
+    <form method="post">
+
+        <label>
+            Flow Name
+        </label>
+
+        <br>
+
+        <input
+            type="text"
+            name="flow_name"
+            value="{{ flow[1] }}"
+            required>
+
+        <br><br>
+
+        <label>
+            Description
+        </label>
+
+        <br>
+
+        <textarea
+            name="description"
+            rows="12"
+            cols="80">{{ flow[2] }}</textarea>
+
+        <br><br>
+
+        <label>
+            Module
+        </label>
+
+        <br>
+
+        <select
+            name="module"
+            required>
+
+            <option value="PM"
+                {% if flow[3] == "PM" %}
+                selected
+                {% endif %}>
+                Plant Maintenance (PM)
+            </option>
+
+            <option value="MM"
+                {% if flow[3] == "MM" %}
+                selected
+                {% endif %}>
+                Material Management (MM)
+            </option>
+
+            <option value="CO"
+                {% if flow[3] == "CO" %}
+                selected
+                {% endif %}>
+                Controlling (CO)
+            </option>
+
+            <option value="FI"
+                {% if flow[3] == "FI" %}
+                selected
+                {% endif %}>
+                Finance (FI)
+            </option>
+
+            <option value="SD"
+                {% if flow[3] == "SD" %}
+                selected
+                {% endif %}>
+                Sales & Distribution (SD)
+            </option>
+
+            <option value="PP"
+                {% if flow[3] == "PP" %}
+                selected
+                {% endif %}>
+                Production Planning (PP)
+            </option>
+
+            <option value="QM"
+                {% if flow[3] == "QM" %}
+                selected
+                {% endif %}>
+                Quality Management (QM)
+            </option>
+
+            <option value="WM"
+                {% if flow[3] == "WM" %}
+                selected
+                {% endif %}>
+                Warehouse Management (WM)
+            </option>
+
+            <option value="TR"
+                {% if flow[3] == "TR" %}
+                selected
+                {% endif %}>
+                Treasury (TR)
+            </option>
+
+            <option value="LO"
+                {% if flow[3] == "LO" %}
+                selected
+                {% endif %}>
+                Logistics (LO)
+            </option>
+
+            <option value="PLM"
+                {% if flow[3] == "PLM" %}
+                selected
+                {% endif %}>
+                Product Lifecycle Management (PLM)
+            </option>
+
+            <option value="SCM"
+                {% if flow[3] == "SCM" %}
+                selected
+                {% endif %}>
+                Supply Chain Management (SCM)
+            </option>
+
+        </select>
+
+        <br><br>
+
+        <button
+            type="submit"
+            class="back-btn">
+
+            Save Changes
+
+        </button>
+
+    </form>
+
+</div>
+
+</body>
+
+</html>
