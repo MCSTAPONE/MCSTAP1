@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Business Step</title>
+	
+    <link rel="stylesheet" href="/static/css/pm.css">
+
+</head>
+
+<body>
+
+    <div class="header">
+
+        <h1>Add Business Step</h1>
+
+    </div>
+
+    <div class="container">
+
+        <a href="/flow-library/{{ flow_id }}"
+           class="back-btn">
+
+            ← Back
+
+        </a>
+
+        <br><br>
+
+        <div class="card">
+
+            <form method="POST">
+
+                <label for="sequence_no">
+                    Sequence No
+                </label>
+
+                <br>
+
+                <input type="number"
+                       id="sequence_no"
+                       name="sequence_no"
+                       required>
+
+                <br><br>
+
+                <label>
+					Repository Asset
+				</label>
+
+				<br>
+
+				<select
+					name="transaction_code"
+					required>
+
+					<option value="">
+						Select Repository Asset
+					</option>
+
+					{% for asset in assets %}
+
+					<option value="{{ asset[1] }}">
+						{{ asset[1] }}
+					</option>
+
+					{% endfor %}
+
+				</select>
+
+                <br>
+
+                <input type="text"
+                       id="transaction_code"
+                       name="transaction_code"
+                       placeholder="Example: IW31"
+                       required>
+
+                <br><br>
+
+                <label for="description">
+                    Description
+                </label>
+
+                <br>
+
+                <input type="text"
+                       id="description"
+                       name="description"
+                       placeholder="Describe the business step">
+
+                <br><br>
+
+                <button type="submit"
+                        class="back-btn">
+
+                    Save Step
+
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

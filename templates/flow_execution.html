@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Flow Execution</title>
+
+    <link rel="stylesheet"
+          href="/static/css/pm.css">
+
+</head>
+
+<body>
+
+    <div class="header">
+
+        <h1>Flow Execution Result</h1>
+
+    </div>
+
+    <div class="container">
+
+        <a href="/flow-library/{{ flow[0] }}"
+           class="back-btn">
+
+            ← Back to Flow
+
+        </a>
+
+        <br><br>
+
+        <div class="card">
+
+            <h2>{{ flow[1] }}</h2>
+
+            <p>
+
+                <strong>Status:</strong>
+
+                <span class="status-success">
+                    ✅ Execution Completed
+                </span>
+
+            </p>
+
+        </div>
+
+        <br>
+
+        <div class="card">
+
+            <h2>Execution Log</h2>
+
+            {% if logs %}
+
+                {% for log in logs %}
+
+                    <div class="log-entry">
+
+                        {{ log }}
+
+                    </div>
+
+                {% endfor %}
+
+            {% else %}
+
+                <p>
+
+                    No steps found for this flow.
+
+                </p>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

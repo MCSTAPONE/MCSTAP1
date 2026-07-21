@@ -134,6 +134,20 @@
                 {% endif %}>
                 Supply Chain Management (SCM)
             </option>
+			
+			<option value="PROC"
+                {% if selected_module == "PROC" %}
+                    selected
+                {% endif %}>
+                Procurment (PROC)
+            </option>
+			
+			<option value="E2E"
+                {% if selected_module == "E2E" %}
+                    selected
+                {% endif %}>
+                End_To_End (E2E)
+            </option>
 
         </select>
 

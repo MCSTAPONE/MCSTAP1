@@ -145,6 +145,13 @@
                 {% endif %}>
                 Supply Chain Management (SCM)
             </option>
+			
+			<option value="SCM"
+                {% if flow[3] == "PROC" %}
+                selected
+                {% endif %}>
+                Procurment (PROC)
+            </option>
 
         </select>
 

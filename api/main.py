@@ -205,12 +205,8 @@ def test_cases(request: Request):
 def save_test_case(
     title: str = Form(...),
     module: str = Form(...),
-    company_code: str = Form(...),
-    e2e_process: str = Form(...),
-    scenario: str = Form(...),
     transaction_code: str = Form(...),
     process_step: str = Form(...),
-    priority: str = Form(...),
     automation_status: str = Form(...)
 ):
 
@@ -234,12 +230,8 @@ def save_test_case(
             test_case_id,
             title,
             module,
-            company_code,
-            e2e_process,
-            scenario,
             transaction_code,
             process_step,
-            priority,
             automation_status
         )
         VALUES
@@ -249,12 +241,8 @@ def save_test_case(
             test_case_id,
             title,
             module,
-            company_code,
-            e2e_process,
-            scenario,
             transaction_code,
             process_step,
-            priority,
             automation_status
         )
     )
@@ -1255,4 +1243,275 @@ def delete_flow(
     return RedirectResponse(
         url="/flow-library",
         status_code=303
+    )
+    
+@app.get("/flow-library/{flow_id}/add-step")
+def add_step_page(
+    request: Request,
+    flow_id: int
+):
+
+    conn = get_connection()
+
+    cur = conn.cursor()
+
+    cur.execute(
+        """
+        SELECT
+            asset_id,
+            asset_name
+        FROM repository_assets
+        WHERE status = 'Active'
+        ORDER BY asset_name
+        """
+    )
+
+    assets = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+    return templates.TemplateResponse(
+        request=request,
+        name="add_step.html",
+        context={
+            "flow_id": flow_id,
+            "assets": assets
+        }
+    )
+    
+@app.post("/flow-library/{flow_id}/add-step")
+def save_step(
+    flow_id: int,
+    sequence_no: int = Form(...),
+    transaction_code: str = Form(...),
+    description: str = Form("")
+):
+
+    conn = get_connection()
+
+    cur = conn.cursor()
+
+    cur.execute(
+        """
+        INSERT INTO flow_steps
+        (
+            flow_id,
+            sequence_no,
+            transaction_code,
+            description
+        )
+        VALUES
+        (
+            %s,
+            %s,
+            %s,
+            %s
+        )
+        """,
+        (
+            flow_id,
+            sequence_no,
+            transaction_code,
+            description
+        )
+    )
+
+    conn.commit()
+
+    cur.close()
+    conn.close()
+
+    return RedirectResponse(
+        url=f"/flow-library/{flow_id}",
+        status_code=303
+    )
+
+@app.get("/flow-step/edit/{step_id}")
+def edit_step_page(
+    request: Request,
+    step_id: int
+):
+
+    conn = get_connection()
+
+    cur = conn.cursor()
+
+    cur.execute(
+        """
+        SELECT
+            step_id,
+            flow_id,
+            sequence_no,
+            transaction_code,
+            description
+        FROM flow_steps
+        WHERE step_id = %s
+        """,
+        (step_id,)
+    )
+
+    step = cur.fetchone()
+
+    cur.close()
+    conn.close()
+
+    return templates.TemplateResponse(
+        request=request,
+        name="edit_flow_step.html",
+        context={
+            "step": step
+        }
+    )
+    
+@app.post("/flow-step/edit/{step_id}")
+def edit_step(
+    step_id: int,
+    sequence_no: int = Form(...),
+    transaction_code: str = Form(...),
+    description: str = Form("")
+):
+
+    conn = get_connection()
+
+    cur = conn.cursor()
+
+    cur.execute(
+        """
+        UPDATE flow_steps
+        SET
+            sequence_no = %s,
+            transaction_code = %s,
+            description = %s
+        WHERE step_id = %s
+        """,
+        (
+            sequence_no,
+            transaction_code,
+            description,
+            step_id
+        )
+    )
+
+    conn.commit()
+
+    cur.execute(
+        """
+        SELECT flow_id
+        FROM flow_steps
+        WHERE step_id = %s
+        """,
+        (step_id,)
+    )
+
+    flow = cur.fetchone()
+    flow_id = flow[0]
+
+    cur.close()
+    conn.close()
+
+    return RedirectResponse(
+        url=f"/flow-library/{flow[0]}",
+        status_code=303
+    )
+    
+@app.get("/flow-step/delete/{step_id}")
+def delete_step(
+    step_id: int
+):
+
+    conn = get_connection()
+
+    cur = conn.cursor()
+
+    cur.execute(
+        """
+        SELECT flow_id
+        FROM flow_steps
+        WHERE step_id = %s
+        """,
+        (step_id,)
+    )
+
+    flow = cur.fetchone()
+
+    flow_id = flow[0]
+
+    cur.execute(
+        """
+        DELETE
+        FROM flow_steps
+        WHERE step_id = %s
+        """,
+        (step_id,)
+    )
+
+    conn.commit()
+
+    cur.close()
+    conn.close()
+
+    return RedirectResponse(
+        url=f"/flow-library/{flow_id}",
+        status_code=303
+    )
+    
+@app.get("/flow-library/{flow_id}/execute")
+def execute_flow(
+    request: Request,
+    flow_id: int
+):
+
+    conn = get_connection()
+
+    cur = conn.cursor()
+
+    cur.execute(
+        """
+        SELECT
+            flow_id,
+            flow_name
+        FROM flow_master
+        WHERE flow_id = %s
+        """,
+        (flow_id,)
+    )
+
+    flow = cur.fetchone()
+
+    cur.execute(
+        """
+        SELECT
+            fs.sequence_no,
+            fs.transaction_code,
+            ra.script_name
+        FROM flow_steps fs
+        LEFT JOIN repository_assets ra
+            ON fs.transaction_code = ra.transaction_code
+        WHERE fs.flow_id = %s
+        ORDER BY fs.sequence_no
+        """,
+        (flow_id,)
+    )
+
+    steps = cur.fetchall()
+
+    logs = []
+
+    for step in steps:
+
+        logs.append(
+            f"Step {step[0]}: {step[1]} -> {step[2]}"
+        )
+
+    cur.close()
+    conn.close()
+
+    return templates.TemplateResponse(
+        request=request,
+        name="flow_execution.html",
+        context={
+            "flow": flow,
+            "logs": logs
+        }
     )

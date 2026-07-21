@@ -328,3 +328,19 @@ select{
     margin-bottom:30px;
     box-shadow:0 2px 8px rgba(0,0,0,.08);
 }
+
+.status-success {
+    color: #198754;
+    font-weight: 600;
+}
+
+.log-entry {
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    background: #f8f9fa;
+    border-left: 4px solid #0d6efd;
+    border-radius: 4px;
+    font-family: Consolas, Monaco, monospace;
+    font-size: 14px;
+    white-space: pre-wrap;
+}

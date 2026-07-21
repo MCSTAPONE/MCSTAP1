@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Edit Business Step</title>
+
+    <link rel="stylesheet"
+          href="/static/css/pm.css">
+
+</head>
+
+<body>
+
+    <div class="header">
+        <h1>Edit Business Step</h1>
+    </div>
+
+    <div class="container">
+
+        <a href="/flow-library/{{ step[1] }}"
+           class="back-btn">
+            ← Back
+        </a>
+
+        <br><br>
+
+        <div class="card">
+
+            <form method="POST">
+
+                <label for="sequence_no">
+                    Sequence Number
+                </label>
+
+                <br>
+
+                <input
+                    type="number"
+                    id="sequence_no"
+                    name="sequence_no"
+                    value="{{ step[2] }}"
+                    required>
+
+                <br><br>
+
+                <label for="transaction_code">
+                    Transaction Code
+                </label>
+
+                <br>
+
+                <input
+                    type="text"
+                    id="transaction_code"
+                    name="transaction_code"
+                    value="{{ step[3] }}"
+                    required>
+
+                <br><br>
+
+                <label for="description">
+                    Description
+                </label>
+
+                <br>
+
+                <input
+                    type="text"
+                    id="description"
+                    name="description"
+                    value="{{ step[4] }}">
+
+                <br><br>
+
+                <button
+                    type="submit"
+                    class="back-btn">
+
+                    Save Changes
+
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

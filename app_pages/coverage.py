@@ -45,6 +45,7 @@ def show_coverage_page():
         "Quality Management (QM)": "Quality Management/QM",
         "Warehouse Management (WM)": "Warehouse Management/WM",
         "Supply Chain Management (SCM)": "SCM"
+        "Procurment (PROC)": "PROC"
     }
 
     selected_module = st.selectbox("Select Module", list(module_options.keys()))

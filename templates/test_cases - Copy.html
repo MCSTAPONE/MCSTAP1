@@ -37,6 +37,7 @@
             <select name="module">
 
                 <option value="">Select Module</option>
+
                 <option value="PM">PM</option>
                 <option value="MM">MM</option>
                 <option value="FI">FI</option>
@@ -57,6 +58,48 @@
 
             <input
                 type="text"
+                name="company_code"
+                placeholder="Company Code">
+
+            <br><br>
+
+            <select name="e2e_process">
+
+                <option value="">Select Process Type</option>
+
+                <option value="Functional">
+                    Functional
+                </option>
+
+                <option value="End-to-End">
+                    End-to-End
+                </option>
+
+                <option value="Standalone">
+                    Standalone
+                </option>
+				
+				<option value="Non-Functional">
+                    Non-Functional
+                </option>
+				
+				<option value="Regression">
+                    Regression
+                </option>
+
+            </select>
+
+            <br><br>
+
+            <input
+                type="text"
+                name="scenario"
+                placeholder="Scenario">
+
+            <br><br>
+
+            <input
+                type="text"
                 name="transaction_code"
                 placeholder="Transaction Code">
 
@@ -68,10 +111,22 @@
 
             <br><br>
 
+            <select name="priority">
+
+                <option value="High">High</option>
+                <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
+
+            </select>
+
+            <br><br>
+
             <select name="automation_status">
 
                 <option value="Manual">Manual</option>
                 <option value="Automated">Automated</option>
+                <option value="In Progress">Not Executed</option>
+				<option value="In Progress">In Progress</option>
 
             </select>
 
@@ -128,7 +183,6 @@
                 <option value="LO">LO</option>
                 <option value="TR">TR</option>
 				<option value="PLM">PLM</option>
-				<option value="PROC">PROC</option>
 
             </select>
 
@@ -142,9 +196,12 @@
 
                     <th>ID</th>
                     <th>Module</th>
+                    <th>Process</th>
+                    <th>Scenario</th>
                     <th>Transaction</th>
                     <th>Process Step</th>
-                     <th>Status</th>
+                    <th>Priority</th>
+                    <th>Status</th>
                     <th style="width:140px;">
                         Actions
                     </th>

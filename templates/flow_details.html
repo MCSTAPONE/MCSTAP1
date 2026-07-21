@@ -1,12 +1,18 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
     <title>Flow Details</title>
 
-    <link rel="stylesheet" href="/static/css/pm.css">
+    <link rel="stylesheet"
+          href="/static/css/pm.css">
+
 </head>
 
 <body>
@@ -20,86 +26,101 @@
 <div class="container">
 
     <a href="/flow-library" class="back-btn">
-            ← Back
-        </a>
+        ← Back
+    </a>
+
+    <br><br>
+	
+	<a href="/flow-library/{{ flow[0] }}/add-step"
+        class="back-btn">
+        + Add Step
+    </a>
+		
+	<a href="/flow-library/{{ flow[0] }}/execute"
+        class="back-btn">
+        Execute
+    </a>
+
+    <!-- Flow Details -->
 
     <div class="card">
 
         <h2>{{ flow[1] }}</h2>
 
         <p>
-				<strong>Description:</strong>
-			</p>
+            <strong>Description:</strong>
+        </p>
 
-			<pre>{{ flow[2] }}</pre>
+        <pre>{{ flow[2] }}</pre>
 
         <p>
-
             <strong>Module:</strong>
-
             {{ flow[3] }}
-
         </p>
 
         <p>
-
             <strong>Status:</strong>
-
             {{ flow[4] }}
-
         </p>
-	</div>
 
-        <br>
-		
-		<!-- Business Steps -->
+    </div>
 
-        <div class="card">
+    <br>
 
-            <h2>Business Steps</h2>
+    <!-- Business Steps -->
 
-            {% if not steps %}
+    <div class="card">
+
+        <h2>Business Steps</h2>
+
+        {% if not steps %}
+
+            <p>No Steps Defined</p>
+
+        {% else %}
+
+            {% for step in steps %}
+
+            <div class="step-card">
+
+                <h3>Step {{ step[1] }}</h3>
 
                 <p>
-                    No Steps Defined
+                    <strong>Transaction:</strong>
+                    {{ step[2] }}
                 </p>
 
-            {% else %}
+                <p>
+                    <strong>Description:</strong>
+                    {{ step[3] }}
+                </p>
 
-                {% for step in steps %}
+                <div class="button-row">
 
-                    <div class="card">
+                    <a href="/flow-step/edit/{{ step[0] }}"
+                       class="back-btn">
+                        ✏️ Edit
+                    </a>
 
-                        <strong>
-                            Step {{ step[1] }}
-                        </strong>
+                    <a href="/flow-step/delete/{{ step[0] }}"
+                       class="back-btn"
+                       onclick="return confirm('Delete this step?');">
+                        🗑 Delete
+                    </a>
 
-                        <br><br>
+                </div>
 
-                        <strong>Transaction:</strong>
-                        {{ step[2] }}
-
-                        <br>
-
-                        <strong>Description:</strong>
-                        {{ step[3] }}
-
-                    </div>
-
-                    <br>
-
-                {% endfor %}
-
-            {% endif %}
+            </div>
 
             <br>
 
-            <a href="/flow-library/{{ flow_id }}/new-step" class="back-btn">
-				+ Add Step
-				
-			</a>
+            {% endfor %}
 
-        </div>
+        {% endif %}
+
+        <br>
+
+    </div>
 
 </div>
 
