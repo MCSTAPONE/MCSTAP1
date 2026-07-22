@@ -17,59 +17,101 @@
 
 </div>
 
-<a href="/test-cases" class="back-btn">
-    ← Back to Test Cases
-</a>
+	<a href="/test-cases" class="back-btn">
+		← Back to Test Cases
+	</a>
 
-<div class="table-container">
+    <div class="table-container">
 
-    <form method="post">
+        <form method="post">
 
-        <input
-            type="text"
-            name="title"
-            value="{{ row[1] }}"
-            required>
+            <label>Title</label>
 
-        <br><br>
+            <input
+                type="text"
+                name="title"
+                value="{{ row[1] }}"
+                required>
 
-        <input
-            type="text"
-            name="module"
-            value="{{ row[2] }}">
+            <br><br>
 
-        <br><br>
+            <label>Module</label>
 
-        <input
-            type="text"
-            name="scenario"
-            value="{{ row[5] }}">
+            <select name="module">
 
-        <br><br>
+                <option value="PM" {% if row[2] == "PM" %}selected{% endif %}>PM</option>
+                <option value="MM" {% if row[2] == "MM" %}selected{% endif %}>MM</option>
+                <option value="FI" {% if row[2] == "FI" %}selected{% endif %}>FI</option>
+                <option value="CO" {% if row[2] == "CO" %}selected{% endif %}>CO</option>
+                <option value="SD" {% if row[2] == "SD" %}selected{% endif %}>SD</option>
+                <option value="WM" {% if row[2] == "WM" %}selected{% endif %}>WM</option>
+                <option value="QM" {% if row[2] == "QM" %}selected{% endif %}>QM</option>
+                <option value="PP" {% if row[2] == "PP" %}selected{% endif %}>PP</option>
+                <option value="SCM" {% if row[2] == "SCM" %}selected{% endif %}>SCM</option>
+                <option value="LO" {% if row[2] == "LO" %}selected{% endif %}>LO</option>
+                <option value="TR" {% if row[2] == "TR" %}selected{% endif %}>TR</option>
+                <option value="PLM" {% if row[2] == "PLM" %}selected{% endif %}>PLM</option>
+                <option value="PROC" {% if row[2] == "PROC" %}selected{% endif %}>PROC</option>
 
-        <input
-            type="text"
-            name="transaction_code"
-            value="{{ row[6] }}">
+            </select>
 
-        <br><br>
+            <br><br>
 
-        <textarea
-            name="process_step">{{ row[7] }}</textarea>
+            <label>Transaction Code</label>
 
-        <br><br>
+            <input
+                type="text"
+                name="transaction_code"
+                value="{{ row[3] }}">
 
-        <button
-            class="back-btn"
-            type="submit">
+            <br><br>
 
-            Save Changes
+            <label>Process Step</label>
 
-        </button>
+            <textarea
+                name="process_step"
+                rows="5">{{ row[4] }}</textarea>
 
-    </form>
+            <br><br>
 
-</div>
+            <label>Automation Status</label>
+
+            <select name="automation_status">
+
+                <option value="Manual"
+                    {% if row[5] == "Manual" %}selected{% endif %}>
+                    Manual
+                </option>
+
+                <option value="Automated"
+                    {% if row[5] == "Automated" %}selected{% endif %}>
+                    Automated
+                </option>
+
+            </select>
+
+            <br><br>
+
+            <label>Automation Script</label>
+
+            <input
+                type="text"
+                name="script_path"
+                value="{{ row[6] }}">
+
+            <br><br>
+
+            <button
+                type="submit"
+                class="back-btn">
+
+                Save Changes
+
+            </button>
+
+        </form>
+
+    </div>
 
 </body>
 

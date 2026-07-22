@@ -1,4 +1,5 @@
 
+import os
 import win32com.client
 from sap.sap_client import SAPClient
 from sap.sap_login import SAPLogin
@@ -177,12 +178,10 @@ def test_cases(request: Request):
         SELECT
             test_case_id,
             module,
-            e2e_process,
-            scenario,
             transaction_code,
             process_step,
-            priority,
-            automation_status
+            automation_status,
+            script_path
         FROM test_cases
         ORDER BY id ASC
     """)
@@ -207,21 +206,28 @@ def save_test_case(
     module: str = Form(...),
     transaction_code: str = Form(...),
     process_step: str = Form(...),
-    automation_status: str = Form(...)
+    automation_status: str = Form(...),
+    script_path: str = Form(...)
 ):
 
     conn = get_connection()
 
     cur = conn.cursor()
 
-    cur.execute("""
+    # Generate Test Case ID
+
+    cur.execute(
+        """
         SELECT COUNT(*)
         FROM test_cases
-    """)
+        """
+    )
 
     next_id = cur.fetchone()[0] + 1
 
     test_case_id = f"TC{next_id:04d}"
+
+    # Save Test Case
 
     cur.execute(
         """
@@ -232,10 +238,11 @@ def save_test_case(
             module,
             transaction_code,
             process_step,
-            automation_status
+            automation_status,
+            script_path
         )
         VALUES
-        (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+        (%s,%s,%s,%s,%s,%s,%s)
         """,
         (
             test_case_id,
@@ -243,14 +250,59 @@ def save_test_case(
             module,
             transaction_code,
             process_step,
-            automation_status
+            automation_status,
+            script_path
         )
     )
+
+    # Check if Repository Asset already exists
+
+    cur.execute(
+        """
+        SELECT COUNT(*)
+        FROM repository_assets
+        WHERE transaction_code = %s
+        """,
+        (transaction_code,)
+    )
+
+    exists = cur.fetchone()[0]
+
+    # Auto-register Repository Asset
+
+    if exists == 0:
+
+        cur.execute(
+            """
+            INSERT INTO repository_assets
+            (
+                asset_name,
+                module,
+                transaction_code,
+                script_name,
+                description
+            )
+            VALUES
+            (%s,%s,%s,%s,%s)
+            """,
+            (
+                title,
+                module,
+                transaction_code,
+                script_path,
+                process_step
+            )
+        )
 
     conn.commit()
 
     cur.close()
     conn.close()
+
+    return RedirectResponse(
+        url="/test-cases",
+        status_code=303
+    )
 
     return RedirectResponse(
         url="/test-cases",
@@ -272,13 +324,10 @@ def edit_test_case(
             test_case_id,
             title,
             module,
-            company_code,
-            e2e_process,
-            scenario,
             transaction_code,
             process_step,
-            priority,
-            automation_status
+            automation_status,
+            script_path
         FROM test_cases
         WHERE test_case_id = %s
         """,
@@ -303,14 +352,17 @@ def update_test_case(
     test_case_id: str,
     title: str = Form(...),
     module: str = Form(...),
-    scenario: str = Form(...),
     transaction_code: str = Form(...),
-    process_step: str = Form(...)
+    process_step: str = Form(...),
+    automation_status: str = Form(...),
+    script_path: str = Form(...)
 ):
 
     conn = get_connection()
 
     cur = conn.cursor()
+
+    # Update Test Case
 
     cur.execute(
         """
@@ -318,18 +370,41 @@ def update_test_case(
         SET
             title = %s,
             module = %s,
-            scenario = %s,
             transaction_code = %s,
-            process_step = %s
+            process_step = %s,
+            automation_status = %s,
+            script_path = %s
         WHERE test_case_id = %s
         """,
         (
             title,
             module,
-            scenario,
             transaction_code,
             process_step,
+            automation_status,
+            script_path,
             test_case_id
+        )
+    )
+
+    # Update Repository Asset
+
+    cur.execute(
+        """
+        UPDATE repository_assets
+        SET
+            asset_name = %s,
+            module = %s,
+            script_name = %s,
+            description = %s
+        WHERE transaction_code = %s
+        """,
+        (
+            title,
+            module,
+            script_path,
+            process_step,
+            transaction_code
         )
     )
 
@@ -359,13 +434,10 @@ def view_test_case(
             test_case_id,
             title,
             module,
-            company_code,
-            e2e_process,
-            scenario,
             transaction_code,
             process_step,
-            priority,
-            automation_status
+            automation_status,
+            script_path
         FROM test_cases
         WHERE test_case_id = %s
         """,
@@ -427,7 +499,8 @@ def repository(request: Request):
         "LO",
         "TR",
         "SCM",
-        "PLM"
+        "PLM",
+        "PROC"
     ]
 
     return templates.TemplateResponse(
@@ -454,7 +527,8 @@ def repository_module(
             test_case_id,
             title,
             transaction_code,
-            automation_status
+            automation_status,
+            script_path
         FROM test_cases
         WHERE module = %s
         ORDER BY id ASC
@@ -1498,10 +1572,47 @@ def execute_flow(
 
     logs = []
 
+    base_path = r"C:\Users\bndas\SAP_Test\Test_Business\tests\CO"
+
     for step in steps:
 
+        script_name = step[2]
+
+        if not script_name:
+
+            logs.append(
+                f"Step {step[0]} | {step[1]} | NO SCRIPT FOUND"
+            )
+
+            continue
+
+        script_file = os.path.join(
+            base_path,
+            script_name
+        )
+
+        if os.path.exists(script_file):
+
+            import subprocess
+
+            result = subprocess.run(
+                ["python", script_file],
+                capture_output=True,
+                text=True
+            )
+
+            status = (
+                result.stdout.strip()
+                if result.stdout.strip()
+                else "EXECUTED"
+            )
+
+        else:
+
+            status = "NOT FOUND"
+
         logs.append(
-            f"Step {step[0]}: {step[1]} -> {step[2]}"
+            f"Step {step[0]} | {step[1]} | {script_name} | {status}"
         )
 
     cur.close()
