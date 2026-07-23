@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
 
@@ -10,6 +10,8 @@
 
     <title>{{ module }} Repository</title>
 
+    <link rel="stylesheet"
+          href="/static/css/pm.css">
 
 </head>
 
@@ -17,15 +19,52 @@
 
 <div class="header">
 
-    {{ module }} Repository
+    <h1>{{ module }} Repository</h1>
 
 </div>
 
-	<a href="/repository" class="back-btn">
-			← Repository
-	</a>
+<div class="container">
 
-    <div class="table-container">
+    <!-- Repository Card -->
+
+    <div class="card">
+
+        <h2>Repository Overview</h2>
+
+        <p>
+            <strong>Module:</strong>
+            {{ module }}
+        </p>
+
+        <p>
+            <strong>Total Assets:</strong>
+            {{ rows|length }}
+        </p>
+
+        <p>
+            <strong>Status:</strong>
+            Active
+        </p>
+
+        <br>
+
+        <a href="/repository"
+           class="back-btn">
+            ← Repository
+        </a>
+
+        <!--a href="/repository/{{ module }}/new"
+           class="back-btn">
+            + New Asset
+        </a--!>
+
+    </div>
+
+    <br>
+
+    <!-- Repository Table -->
+
+    <div class="card">
 
         <h2>Repository Assets</h2>
 
@@ -36,13 +75,9 @@
                 <tr>
 
                     <th>Test Case ID</th>
-
                     <th>Title</th>
-
                     <th>Transaction</th>
-
                     <th>Status</th>
-
                     <th>Automation Script</th>
 
                 </tr>
@@ -51,29 +86,27 @@
 
             <tbody>
 
-                {% for row in rows %}
+            {% for row in rows %}
 
                 <tr>
 
                     <td>{{ row[0] }}</td>
-
                     <td>{{ row[1] }}</td>
-
                     <td>{{ row[2] }}</td>
-
                     <td>{{ row[3] }}</td>
-
                     <td>{{ row[4] }}</td>
 
                 </tr>
 
-                {% endfor %}
+            {% endfor %}
 
             </tbody>
 
         </table>
 
     </div>
+
+</div>
 
 </body>
 

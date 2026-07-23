@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Assistant</title>
+
+    <link rel="stylesheet" href="/static/css/pm.css">
+</head>
+<body>
+
+    <div class="header">
+
+        AI Assistant
+
+    </div>
+
+    <a href="/dashboard" class="back-btn">
+
+        ← Dashboard
+
+    </a>
+
+
+	<div class="table-container">
+
+		<h2>MC STAP AI Assistant</h2>
+
+		<p>
+			Ask questions about:
+		</p>
+
+		<ul>
+			<li>Repository Assets</li>
+			<li>Business Flows</li>
+			<li>Test Cases</li>
+			<li>Coverage Analysis</li>
+			<li>Risk Analysis</li>
+			<li>Build Test Plan</li>
+			<li>Build Test Strategy</li>
+			<li>Build Test Document</li>
+		</ul>
+
+		<form method="post">
+
+			<textarea
+				name="question"
+				rows="6"
+				style="width:100%;"
+				placeholder="Example: Show all CO repository assets"></textarea>
+
+			<br><br>
+
+			<button
+				type="submit"
+				class="back-btn">
+
+				Ask AI
+
+			</button>
+
+		</form>
+	
+		{% if answer %}
+
+			<br><br>
+
+			<div class="card">
+
+				<h3>AI Response</h3>
+
+				<pre>{{ answer }}</pre>
+
+			</div>
+
+		{% endif %}
+
+	</div>
+
+</body>
+
+</html>
