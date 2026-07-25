@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coverage Intelligence</title>
+
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            margin: 40px;
+            background: #f5f7fa;
+        }
+
+        h1 {
+            color: #0d6efd;
+        }
+
+        h2 {
+            margin-top: 30px;
+            color: #333;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,.1);
+        }
+
+        .module {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .module:last-child {
+            border-bottom: none;
+        }
+
+        #loading {
+            color: gray;
+        }
+
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>MC STAP Coverage Intelligence</h1>
+
+<div id="content">
+    <p id="loading">Loading dashboard...</p>
+</div>
+
+<script>
+async function loadDashboard() {
+
+    const content = document.getElementById("content");
+
+    try {
+
+        const response = await fetch("/api/coverage/dashboard");
+
+        if (!response.ok) {
+            throw new Error("Unable to load dashboard.");
+        }
+
+        const data = await response.json();
+
+        let html = "";
+
+        html += `
+            <div class="card">
+                <h2>Summary</h2>
+
+                <p><strong>Total Processes:</strong> ${data.total_processes ?? 0}</p>
+
+                <p><strong>Total Steps:</strong> ${data.total_steps ?? 0}</p>
+
+                <p><strong>Automation Maturity:</strong> ${data.automation_maturity ?? 0}%</p>
+            </div>
+        `;
+
+        html += `
+            <div class="card">
+                <h2>Modules</h2>
+        `;
+
+        if (data.modules && data.modules.length > 0) {
+
+            data.modules.forEach(module => {
+
+                html += `
+                    <div class="module">
+                        <strong>${module.module}</strong><br>
+                        Processes: ${module.processes}
+                    </div>
+                `;
+            });
+
+        } else {
+
+            html += `<p>No modules found.</p>`;
+        }
+
+        html += `</div>`;
+
+        content.innerHTML = html;
+
+    } catch (error) {
+
+        content.innerHTML = `
+            <p class="error">
+                Failed to load dashboard.<br>
+                ${error.message}
+            </p>
+        `;
+    }
+}
+
+loadDashboard();
+</script>
+
+</body>
+</html>

@@ -23,6 +23,7 @@ from api.flow_library import router as flow_router
 from api.script_studio import router as script_router
 
 from services.script_executor import ScriptExecutor
+from services.coverage_intelligence import get_coverage_dashboard
 
 
 app = FastAPI(
@@ -148,26 +149,7 @@ def coverage_page(request: Request):
 @app.get("/coverage/summary")
 def coverage_summary():
 
-    conn = get_connection()
-
-    cur = conn.cursor()
-
-    cur.execute("""
-        SELECT COUNT(*)
-        FROM test_steps
-    """)
-
-    total_steps = cur.fetchone()[0]
-
-    cur.close()
-    conn.close()
-
-    return {
-        "total_steps": total_steps,
-        "automated": total_steps,
-        "coverage_percent": 100,
-        "modules": 12
-    }
+    return get_coverage_dashboard()
     
 @app.get("/risk")
 def risk_dashboard(request: Request):

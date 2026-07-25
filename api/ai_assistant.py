@@ -8,6 +8,10 @@ from fastapi import Form
 
 from api.database import get_connection
 from api.shared import templates
+from services.ai_skills.coverage_analyzer import analyze_module
+from services.ai_skills.process_viewer import get_process_steps
+from services.ai_skills.process_coverage import analyze_process_coverage
+from services.ai_skills.missing_assets import get_missing_assets
 
 router = APIRouter()
 
@@ -475,119 +479,64 @@ def ai_assistant_ask(
     # COVERAGE ANALYSIS
     # ====================================================
 
-    if "COVERAGE" in question_upper:
+    if (
+        "COVERAGE" in question_upper
+        and not question_upper.startswith("SHOW ")
+    ):
+        detected_module = None
 
-        process_name = (
-            question_upper
-            .replace("ANALYZE", "")
-            .replace("COVERAGE", "")
-            .strip()
-            .title()
-        )
+        modules = [
+            "CO",
+            "FI",
+            "MM",
+            "PM",
+            "PP",
+            "QM",
+            "SD",
+            "SCM",
+            "TR",
+            "WM"
+        ]
 
-        conn = get_connection()
+        words = question_upper.split()
 
-        cur = conn.cursor()
+        for mod in modules:
 
-        cur.execute(
-            """
-            SELECT
-                process_id,
-                process_name
-            FROM sap_process_library
-            WHERE UPPER(process_name) = %s
-            """,
-            (process_name.upper(),)
-        )
+            if mod in words:
+                detected_module = mod
+                break
 
-        process = cur.fetchone()
+        if detected_module is not None:
 
-        if process:
-
-            process_id = process[0]
-
-            cur.execute(
-                """
-                SELECT
-                    transaction_code
-                FROM sap_process_steps
-                WHERE process_id = %s
-                ORDER BY sequence_no
-                """,
-                (process_id,)
+            result = analyze_module(
+                detected_module
             )
-
-            standard_steps = cur.fetchall()
-
-            total_steps = len(standard_steps)
-
-            available = []
-
-            missing = []
-
-            for step in standard_steps:
-
-                transaction_code = step[0]
-
-                cur.execute(
-                    """
-                    SELECT COUNT(*)
-                    FROM repository_assets
-                    WHERE transaction_code = %s
-                    """,
-                    (transaction_code,)
-                )
-
-                count = cur.fetchone()[0]
-
-                if count:
-
-                    available.append(transaction_code)
-
-                else:
-
-                    missing.append(transaction_code)
-
-            coverage = 0
-
-            if total_steps:
-
-                coverage = round(
-                    (len(available) / total_steps) * 100
-                )
 
             answer = (
                 f"Coverage Analysis\n\n"
-                f"Process:\n"
-                f"{process_name}\n\n"
+                f"Module: {result['module']}\n\n"
+                f"Processes: {result['processes']}\n"
+                f"Process Steps: {result['steps']}\n\n"
+                f"Processes:\n\n"
             )
 
-            answer += "Available:\n"
+            for process_name in result["process_list"]:
 
-            for tx in available:
-
-                answer += f"✅ {tx}\n"
-
-            answer += "\nMissing:\n"
-
-            for tx in missing:
-
-                answer += f"❌ {tx}\n"
-
-            answer += (
-                f"\nCoverage:\n"
-                f"{coverage}%"
-            )
+                answer += (
+                    f"- {process_name}\n"
+                )
 
         else:
 
             answer = (
-                f"No process library entry found for:\n\n"
-                f"{process_name}"
+                "Coverage Analysis\n\n"
+                "Please specify a module.\n\n"
+                "Examples:\n"
+                "- Analyze CO Coverage\n"
+                "- Analyze MM Coverage\n"
+                "- Analyze SD Coverage\n"
+                "- Analyze FI Coverage"
             )
-
-        cur.close()
-        conn.close()
 
         return templates.TemplateResponse(
             request=request,
@@ -597,6 +546,210 @@ def ai_assistant_ask(
             }
         )
 
+    # ====================================================
+    # MISSING ASSETS
+    # ====================================================
+
+    if (
+        question_upper.startswith(
+            "SHOW MISSING ASSETS FOR "
+        )
+    ):
+
+        process_name = question.strip()
+
+        process_name = re.sub(
+            r"(?i)^show\s+missing\s+assets\s+for\s+",
+            "",
+            process_name
+        )
+
+        process_name = process_name.strip()
+
+        result = get_missing_assets(
+            process_name
+        )
+
+        if result:
+
+            answer = (
+                f"Missing Assets Analysis\n\n"
+                f"Process: {result['process_name']}\n"
+                f"Module: {result['module']}\n\n"
+                f"Missing Assets:\n\n"
+            )
+
+            if result["missing"]:
+
+                for tx in result["missing"]:
+
+                    answer += (
+                        f"❌ {tx}\n"
+                    )
+
+                answer += (
+                    "\nRecommendation:\n\n"
+                    "Create automation assets "
+                    "for the missing transactions."
+                )
+
+            else:
+
+                answer += (
+                    "No missing assets found.\n\n"
+                    "Coverage appears complete."
+                )
+
+        else:
+
+            answer = (
+                f"Process not found:\n\n"
+                f"{process_name}"
+            )
+
+        return templates.TemplateResponse(
+            request=request,
+            name="ai_assistant.html",
+            context={
+                "answer": answer
+            }
+        )
+
+    # ====================================================
+    # PROCESS VIEWER
+    # ====================================================
+
+    if (
+        question_upper.startswith("SHOW ")
+        and "COVERAGE" not in question_upper
+        and not question_upper.startswith(
+            "SHOW MISSING ASSETS FOR "
+        )
+    ):
+
+        process_name = (
+            question
+            .replace("Show", "")
+            .replace("show", "")
+            .replace("Process", "")
+            .replace("process", "")
+            .strip()
+        )
+
+        process = get_process_steps(
+            process_name
+        )
+
+        if process:
+
+            answer = (
+                f"Process: "
+                f"{process['process_name']}\n\n"
+                f"Module: "
+                f"{process['module']}\n\n"
+                f"Steps:\n\n"
+            )
+
+            for step in process["steps"]:
+
+                answer += (
+                    f"{step[0]}. "
+                    f"{step[1]} - "
+                    f"{step[2]}\n"
+                )
+
+        else:
+
+            answer = (
+                f"Process not found:\n\n"
+                f"{process_name}"
+            )
+
+        return templates.TemplateResponse(
+            request=request,
+            name="ai_assistant.html",
+            context={
+                "answer": answer
+            }
+        )
+        
+    
+        
+    # ====================================================
+    # PROCESS COVERAGE
+    # ====================================================
+
+    if (
+        question_upper.startswith("SHOW ")
+        and "COVERAGE" not in question_upper
+        and not question_upper.startswith(
+            "SHOW MISSING ASSETS FOR "
+        )
+    ):
+
+        process_name = question.strip()
+
+        process_name = re.sub(
+            r"(?i)^show\s+",
+            "",
+            process_name
+        )
+
+        process_name = re.sub(
+            r"(?i)\s+coverage$",
+            "",
+            process_name
+        )
+
+        process_name = process_name.strip()
+        
+        result = analyze_process_coverage(process_name)
+
+        if result:
+
+            answer = (
+                f"Coverage Analysis\n\n"
+                f"Process: {result['process_name']}\n"
+                f"Module: {result['module']}\n\n"
+                f"Required Transactions: "
+                f"{result['required']}\n\n"
+            )
+
+            answer += "Available:\n\n"
+
+            for tx in result["available"]:
+
+                answer += (
+                    f"✅ {tx}\n"
+                )
+
+            answer += "\nMissing:\n\n"
+
+            for tx in result["missing"]:
+
+                answer += (
+                    f"❌ {tx}\n"
+                )
+
+            answer += (
+                f"\nCoverage: "
+                f"{result['coverage']}%"
+            )
+
+        else:
+
+            answer = (
+                f"Process not found:\n\n"
+                f"{process_name}"
+            )
+
+        return templates.TemplateResponse(
+            request=request,
+            name="ai_assistant.html",
+            context={
+                "answer": answer
+            }
+        )
     
     # ====================================================
     # TRANSACTION SEARCH

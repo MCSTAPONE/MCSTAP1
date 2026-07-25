@@ -35,243 +35,115 @@ fetch("/coverage/summary")
 .then(response => response.json())
 .then(data => {
 
+    let moduleHtml = "";
+
+    data.modules.forEach(module => {
+
+        moduleHtml += `
+        <div style="margin-bottom:15px;">
+
+            <div style="
+                display:flex;
+                justify-content:space-between;
+                margin-bottom:5px;
+            ">
+                <span>${module.module}</span>
+                <span>${module.processes} Processes</span>
+            </div>
+
+            <div style="
+                width:100%;
+                background:#ddd;
+                height:18px;
+                border-radius:5px;
+            ">
+
+                <div style="
+                    width:${module.coverage}%;
+                    background:#1e88e5;
+                    height:18px;
+                    border-radius:5px;
+                ">
+                </div>
+
+            </div>
+
+        </div>
+        `;
+    });
+
+    document.getElementById("coverage-content").innerHTML = `
+
+    <div class="summary-container">
+
+        <div class="summary-card">
+            <div class="summary-title">
+                Total Processes
+            </div>
+
+            <div class="summary-value">
+                ${data.total_processes}
+            </div>
+        </div>
+
+        <div class="summary-card">
+            <div class="summary-title">
+                Total Process Steps
+            </div>
+
+            <div class="summary-value">
+                ${data.total_steps}
+            </div>
+        </div>
+
+        <div class="summary-card">
+            <div class="summary-title">
+                Automation Maturity
+            </div>
+
+            <div class="summary-value">
+                ${data.automation_maturity}%
+            </div>
+        </div>
+
+        <div class="summary-card">
+            <div class="summary-title">
+                SAP Modules
+            </div>
+
+            <div class="summary-value">
+                ${data.modules.length}
+            </div>
+        </div>
+
+    </div>
+
+    <div class="module-container">
+
+        <h2>Coverage Intelligence</h2>
+
+        ${moduleHtml}
+
+    </div>
+
+    `;
+
+})
+.catch(error => {
+
+    console.error(error);
+
     document.getElementById(
-    "coverage-content"
-	).innerHTML = `
-
-	<div class="summary-container">
-
-		<div class="summary-card">
-
-			<div class="summary-title">
-				Total Test Steps
-			</div>
-
-			<div class="summary-value">
-				${data.total_steps}
-			</div>
-
-		</div>
-
-		<div class="summary-card">
-
-			<div class="summary-title">
-				Automated Steps
-			</div>
-
-			<div class="summary-value">
-				${data.automated}
-			</div>
-
-		</div>
-
-		<div class="summary-card">
-
-			<div class="summary-title">
-				Coverage %
-			</div>
-
-			<div class="summary-value">
-				${data.coverage_percent}%
-			</div>
-
-		</div>
-
-		<div class="summary-card">
-
-			<div class="summary-title">
-				SAP Modules
-			</div>
-
-			<div class="summary-value">
-				${data.modules}
-			</div>
-
-		</div>
-
-	</div>
-
-	<div class="module-container">
-
-		<h2>Coverage by Module</h2>
-
-		<div class="module-row">
-
-			<div class="module-header">
-				<span>Plant Maintenance (PM)</span>
-				<span>92%</span>
-			</div>
-
-			<div class="progress-bar">
-				<div class="progress-fill" style="width:92%;"></div>
-			</div>
-
-		</div>
-
-		<div class="module-row">
-
-			<div class="module-header">
-				<span>Material Management (MM)</span>
-				<span>78%</span>
-			</div>
-
-			<div class="progress-bar">
-				<div class="progress-fill" style="width:78%;"></div>
-			</div>
-
-		</div>
-
-		<div class="module-row">
-
-			<div class="module-header">
-				<span>Finance & Accounting(FI)</span>
-				<span>65%</span>
-			</div>
-
-			<div class="progress-bar">
-				<div class="progress-fill" style="width:65%;"></div>
-			</div>
-
-		</div>
-
-		<div class="module-row">
-
-			<div class="module-header">
-				<span>Controlling (CO)</span>
-				<span>87%</span>
-			</div>
-
-			<div class="progress-bar">
-				<div class="progress-fill" style="width:87%;"></div>
-			</div>
-
-		</div>
-
-		<div class="module-row">
-
-			<div class="module-header">
-				<span>Sales & Distribution (SD)</span>
-				<span>48%</span>
-			</div>
-
-			<div class="progress-bar">
-				<div class="progress-fill" style="width:48%;"></div>
-			</div>
-
-		</div>
-
-		<div class="module-row">
-
-			<div class="module-header">
-				<span>Warehouse Management (WM)</span>
-				<span>60%</span>
-			</div>
-
-			<div class="progress-bar">
-				<div class="progress-fill" style="width:60%;"></div>
-			</div>
-
-		</div>
-		
-		<div class="module-row">
-
-			<div class="module-header">
-				<span>Treasury (TR)</span>
-				<span>60%</span>
-			</div>
-
-			<div class="progress-bar">
-				<div class="progress-fill" style="width:60%;"></div>
-			</div>
-
-		</div>
-		
-		<div class="module-row">
-
-			<div class="module-header">
-				<span>Logistics (LO)</span>
-				<span>60%</span>
-			</div>
-
-			<div class="progress-bar">
-				<div class="progress-fill" style="width:60%;"></div>
-			</div>
-
-		</div>
-		
-		<div class="module-row">
-
-			<div class="module-header">
-				<span>Production Planning (PP)</span>
-				<span>60%</span>
-			</div>
-
-			<div class="progress-bar">
-				<div class="progress-fill" style="width:60%;"></div>
-			</div>
-
-		</div>
-		
-		<div class="module-row">
-
-			<div class="module-header">
-				<span>Product Lifecycle Management (PLM)</span>
-				<span>60%</span>
-			</div>
-
-			<div class="progress-bar">
-				<div class="progress-fill" style="width:60%;"></div>
-			</div>
-
-		</div>
-		
-		<div class="module-row">
-
-			<div class="module-header">
-				<span>Quality Management (QM)</span>
-				<span>60%</span>
-			</div>
-
-			<div class="progress-bar">
-				<div class="progress-fill" style="width:60%;"></div>
-			</div>
-
-		</div>
-		
-		<div class="module-row">
-
-			<div class="module-header">
-				<span>Supply Chain Management (SCM)</span>
-				<span>60%</span>
-			</div>
-
-			<div class="progress-bar">
-				<div class="progress-fill" style="width:60%;"></div>
-			</div>
-
-		</div>
-		
-		<div class="module-row">
-
-			<div class="module-header">
-				<span>Procurment (PROC)</span>
-				<span>60%</span>
-			</div>
-
-			<div class="progress-bar">
-				<div class="progress-fill" style="width:60%;"></div>
-			</div>
-
-		</div>
-
-	</div>
-
-	`;
-
+        "coverage-content"
+    ).innerHTML = `
+        <div style="color:red;">
+            Failed to load dashboard.<br>
+            ${error}
+        </div>
+    `;
 });
 
 </script>
-
 </body>
 
 </html>
