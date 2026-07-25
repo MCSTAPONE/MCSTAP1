@@ -12,6 +12,8 @@ from services.ai_skills.coverage_analyzer import analyze_module
 from services.ai_skills.process_viewer import get_process_steps
 from services.ai_skills.process_coverage import analyze_process_coverage
 from services.ai_skills.missing_assets import get_missing_assets
+from services.ai_skills.automation_recommendation import get_automation_recommendation
+from services.ai_skills.test_strategy import build_test_strategy
 
 router = APIRouter()
 
@@ -751,6 +753,126 @@ def ai_assistant_ask(
             }
         )
     
+    
+    # ====================================================
+    # AUTOMATION RECOMMENDATION
+    # ====================================================
+
+    if question_upper == "WHAT SHOULD WE AUTOMATE NEXT?":
+
+        recommendations = (
+            get_automation_recommendation()
+        )
+
+        answer = (
+            "Automation Recommendations\n\n"
+        )
+
+        rank = 1
+
+        for item in recommendations:
+
+            answer += (
+                f"{rank}. "
+                f"{item['process']}\n"
+                f"Module: {item['module']}\n"
+                f"Coverage: {item['coverage']}%\n"
+                f"Gap: {item['gap']}%\n\n"
+            )
+
+            rank += 1
+
+        return templates.TemplateResponse(
+            request=request,
+            name="ai_assistant.html",
+            context={
+                "answer": answer
+            }
+        )
+    
+    
+    # ====================================================
+    # TOP AUTOMATION OPPORTUNITIES
+    # ====================================================
+
+    if question_upper == "TOP AUTOMATION OPPORTUNITIES":
+
+        recommendations = (
+            get_automation_recommendation()
+        )
+
+        answer = (
+            "Top Automation Opportunities\n\n"
+        )
+
+        for item in recommendations:
+
+            answer += (
+                f"Process: "
+                f"{item['process']}\n"
+                f"Module: "
+                f"{item['module']}\n"
+                f"Coverage: "
+                f"{item['coverage']}%\n\n"
+            )
+
+        return templates.TemplateResponse(
+            request=request,
+            name="ai_assistant.html",
+            context={
+                "answer": answer
+            }
+        )
+    
+    # ====================================================
+    # TEST STRATEGY
+    # ====================================================
+
+    if question_upper.startswith(
+        "BUILD TEST STRATEGY FOR "
+    ):
+
+        process_name = re.sub(
+            r"(?i)^build test strategy for\s+",
+            "",
+            question
+        ).strip()
+
+        result = build_test_strategy(
+            process_name
+        )
+
+        if result:
+
+            answer = (
+                f"Test Strategy\n\n"
+                f"Process: {result['process']}\n"
+                f"Module: {result['module']}\n\n"
+                f"Scope:\n\n"
+            )
+
+            for step in result["steps"]:
+
+                answer += (
+                    f"- {step[0]} "
+                    f"{step[1]}\n"
+                )
+
+        else:
+
+            answer = (
+                f"Process not found:\n\n"
+                f"{process_name}"
+            )
+
+        return templates.TemplateResponse(
+            request=request,
+            name="ai_assistant.html",
+            context={
+                "answer": answer
+            }
+        )
+        
     # ====================================================
     # TRANSACTION SEARCH
     # ====================================================
