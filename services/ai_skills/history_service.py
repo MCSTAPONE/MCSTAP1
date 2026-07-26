@@ -10,11 +10,11 @@ def get_recent_commands(limit=15):
 
     cur.execute(
         """
-        SELECT DISTINCT command_text
+        SELECT command_text
         FROM ai_command_history
-        ORDER BY command_text
+        ORDER BY id DESC
         LIMIT %s
-        """,
+                """,
         (limit,)
     )
 

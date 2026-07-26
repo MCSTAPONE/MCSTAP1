@@ -210,3 +210,19 @@ body {
 .dropdown:hover .dropdown-content {
     display: block;
 }
+
+.left-panel {
+    width: 280px;
+    background: #fff;
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 8px;
+
+    height: calc(100vh - 140px);
+    overflow-y: auto;
+
+    position: sticky;
+    top: 20px;
+
+    flex-shrink: 0;
+}

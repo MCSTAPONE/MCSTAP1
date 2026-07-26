@@ -17,6 +17,9 @@ from services.ai_skills.test_strategy import build_test_strategy
 from services.ai_skills.test_plan import build_test_plan
 from services.ai_skills.process_dependencies import get_process_dependencies
 from services.ai_skills.history_service import get_recent_commands
+from services.ai_skills.e2e_processes import get_e2e_process
+from services.ai_skills.test_cases_builder import build_test_cases
+
 
 
 router = APIRouter()
@@ -809,6 +812,9 @@ def ai_assistant_ask(
         and not question_upper.startswith(
             "SHOW PROCESS DEPENDENCIES FOR "
         )
+        and not question_upper.endswith(
+            " PROCESS"
+        )
     ):
 
         process_name = (
@@ -1174,6 +1180,241 @@ def ai_assistant_ask(
                 "history": get_recent_commands()
             }
         )
+    
+    
+    # ====================================================
+    # END TO END PROCESS INTELLIGENCE
+    # ====================================================
+
+    if question_upper.startswith(
+        "SHOW "
+    ) and question_upper.endswith(
+        " PROCESS"
+    ):
+
+        process_name = re.sub(
+            r"(?i)^show\s+",
+            "",
+            question
+        )
+
+        process_name = re.sub(
+            r"(?i)\s+process$",
+            "",
+            process_name
+        ).strip()
+
+        e2e_process = get_e2e_process(
+            process_name
+        )
+
+        if e2e_process:
+
+            answer = (
+                f"{process_name}\n\n"
+            )
+
+            for idx, step in enumerate(
+                e2e_process
+            ):
+
+                answer += step
+
+                if idx < len(e2e_process) - 1:
+
+                    answer += "\n↓\n"
+
+        else:
+
+            answer = (
+                f"End-to-End Process "
+                f"not found:\n\n"
+                f"{process_name}"
+            )
+
+        return templates.TemplateResponse(
+            request=request,
+            name="ai_assistant.html",
+            context={
+                "answer": answer,
+                "history": get_recent_commands()
+            }
+        )
+
+    
+    # ====================================================
+    # SAVE TEST CASES
+    # ====================================================
+
+    if (
+        AI_CONTEXT.get("mode")
+        == "SAVE_TEST_CASES"
+        and question_upper == "YES"
+    ):
+
+        conn = get_connection()
+        cur = conn.cursor()
+
+        process_name = (
+            AI_CONTEXT["process_name"]
+        )
+
+        module = (
+            AI_CONTEXT["module"]
+        )
+
+        steps = (
+            AI_CONTEXT["steps"]
+        )
+
+        saved = 0
+
+        for step in steps:
+
+            transaction_code = step[1]
+            step_name = step[2]
+
+            asset_name = (
+                transaction_code
+                + "_"
+                + step_name.upper()
+                .replace(" ", "_")
+            )
+
+            script_name = (
+                asset_name
+                + ".py"
+            )
+
+            cur.execute(
+                """
+                INSERT INTO repository_assets
+                (
+                    asset_name,
+                    module,
+                    transaction_code,
+                    script_name,
+                    description,
+                    status
+                )
+                VALUES
+                (%s,%s,%s,%s,%s,%s)
+                """,
+                (
+                    asset_name,
+                    module,
+                    transaction_code,
+                    script_name,
+                    "Generated from AI Test Case Builder",
+                    "Draft"
+                )
+            )
+
+            saved += 1
+
+        conn.commit()
+
+        cur.close()
+        conn.close()
+
+        AI_CONTEXT.clear()
+
+        answer = (
+            f"Test Cases Saved Successfully\n\n"
+            f"Process: {process_name}\n"
+            f"Module: {module}\n\n"
+            f"Saved: {saved}"
+        )
+
+        return templates.TemplateResponse(
+            request=request,
+            name="ai_assistant.html",
+            context={
+                "answer": answer,
+                "history": get_recent_commands()
+            }
+        )
+            
+    # ====================================================
+    # BUILD TEST CASES
+    # ====================================================
+
+    if question_upper.startswith(
+        "BUILD TEST CASES FOR "
+    ):
+
+        process_name = re.sub(
+            r"(?i)^build test cases for\s+",
+            "",
+            question
+        ).strip()
+
+        result = build_test_cases(
+            process_name
+        )
+
+        if result:
+
+            answer = (
+                f"Test Cases\n\n"
+                f"Process: {result['process']}\n"
+                f"Module: {result['module']}\n\n"
+            )
+
+            tc_no = 1
+
+            for step in result["steps"]:
+
+                answer += (
+                    f"TC{str(tc_no).zfill(3)}\n\n"
+                    f"Transaction: {step[1]}\n"
+                    f"Description: {step[2]}\n\n"
+                    f"Expected Result:\n"
+                    f"{step[2]} executed successfully.\n\n"
+                    f"{'-' * 40}\n\n"
+                )
+
+                tc_no += 1
+
+            AI_CONTEXT["mode"] = (
+                "SAVE_TEST_CASES"
+            )
+
+            AI_CONTEXT["process_name"] = (
+                result["process"]
+            )
+
+            AI_CONTEXT["module"] = (
+                result["module"]
+            )
+
+            AI_CONTEXT["steps"] = (
+                result["steps"]
+            )
+
+            answer += (
+                "\n\n"
+                "Would you like me to save "
+                "these test cases as Repository Assets?\n\n"
+                "Type YES to continue."
+            )
+
+        else:
+
+            answer = (
+                f"Process not found:\n\n"
+                f"{process_name}"
+            )
+
+        return templates.TemplateResponse(
+            request=request,
+            name="ai_assistant.html",
+            context={
+                "answer": answer,
+                "history": get_recent_commands()
+            }
+        )
+    
         
     # ====================================================
     # TRANSACTION SEARCH

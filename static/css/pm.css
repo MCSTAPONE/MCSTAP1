@@ -344,3 +344,34 @@ select{
     font-size: 14px;
     white-space: pre-wrap;
 }
+.left-panel {
+    width: 280px;
+    background: white;
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 8px;
+
+    /* Enable scrolling */
+    height: calc(100vh - 140px);
+    overflow-y: auto;
+
+    /* Keep panel visible while page scrolls */
+    position: sticky;
+    top: 20px;
+
+    flex-shrink: 0;
+}
+
+/* Nice scrollbar */
+.left-panel::-webkit-scrollbar {
+    width: 8px;
+}
+
+.left-panel::-webkit-scrollbar-thumb {
+    background: #bdbdbd;
+    border-radius: 4px;
+}
+
+.left-panel::-webkit-scrollbar-thumb:hover {
+    background: #8d8d8d;
+}

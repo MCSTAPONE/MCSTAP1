@@ -48,20 +48,19 @@ def repository_module(
     cur = conn.cursor()
 
     cur.execute(
-        """
-        SELECT
-            test_case_id,
-            title,
-            transaction_code,
-            automation_status,
-            script_path
-        FROM test_cases
-        WHERE module = %s
-        ORDER BY id ASC
-        """,
-        (module,)
-    )
-
+          """
+          SELECT
+              asset_id,
+              asset_name,
+              transaction_code,
+              status,
+              script_name
+          FROM repository_assets
+          WHERE module = %s
+          ORDER BY asset_id ASC
+          """,
+          (module,)
+)
     rows = cur.fetchall()
 
     cur.close()
