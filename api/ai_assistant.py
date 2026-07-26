@@ -14,6 +14,10 @@ from services.ai_skills.process_coverage import analyze_process_coverage
 from services.ai_skills.missing_assets import get_missing_assets
 from services.ai_skills.automation_recommendation import get_automation_recommendation
 from services.ai_skills.test_strategy import build_test_strategy
+from services.ai_skills.test_plan import build_test_plan
+from services.ai_skills.process_dependencies import get_process_dependencies
+from services.ai_skills.history_service import get_recent_commands
+
 
 router = APIRouter()
 
@@ -23,10 +27,16 @@ AI_CONTEXT = {}
 @router.get("/ai-assistant")
 def ai_assistant(request: Request):
 
+    recent_commands = (
+        get_recent_commands()
+    )
+
     return templates.TemplateResponse(
         request=request,
         name="ai_assistant.html",
-        context={}
+        context={
+            "history": recent_commands
+        }
     )
 
 
@@ -40,7 +50,163 @@ def ai_assistant_ask(
 
     answer = "I could not understand the question."
 
+    global AI_CONTEXT
+
+    answer = "I could not understand the question."
+
     question_upper = question.upper()
+    
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute(
+        """
+        INSERT INTO ai_command_history
+        (
+            command_text
+        )
+        VALUES
+        (%s)
+        """,
+        (question,)
+    )
+
+    conn.commit()
+
+    cur.close()
+    conn.close()
+    
+    commands = [
+        q.strip()
+        for q in question.splitlines()
+        if q.strip()
+    ]
+
+    if len(commands) > 1:
+
+        final_answer = ""
+
+        for command in commands:
+
+            final_answer += (
+                f"\n"
+                f"{'=' * 60}\n"
+                f"QUESTION: {command}\n"
+                f"{'=' * 60}\n\n"
+            )
+
+            cmd_upper = command.upper()
+
+            # -----------------------------
+            # MODULE COVERAGE
+            # -----------------------------
+            if (
+                "COVERAGE" in cmd_upper
+                and not cmd_upper.startswith("SHOW ")
+            ):
+
+                detected_module = None
+
+                modules = [
+                    "CO","FI","MM","PM",
+                    "PP","QM","SD",
+                    "SCM","TR","WM"
+                ]
+
+                words = cmd_upper.split()
+
+                for mod in modules:
+
+                    if mod in words:
+                        detected_module = mod
+                        break
+
+                if detected_module:
+
+                    result = analyze_module(
+                        detected_module
+                    )
+
+                    final_answer += (
+                        f"Module: {result['module']}\n"
+                        f"Processes: {result['processes']}\n"
+                        f"Steps: {result['steps']}\n\n"
+                    )
+
+                continue
+
+            # -----------------------------
+            # PROCESS VIEWER
+            # -----------------------------
+            if cmd_upper.startswith("SHOW "):
+
+                process_name = (
+                    command
+                    .replace("Show", "")
+                    .replace("show", "")
+                    .replace("Process", "")
+                    .replace("process", "")
+                    .strip()
+                )
+
+                process = get_process_steps(
+                    process_name
+                )
+
+                if process:
+
+                    final_answer += (
+                        f"Process: "
+                        f"{process['process_name']}\n"
+                        f"Module: "
+                        f"{process['module']}\n\n"
+                    )
+
+                continue
+
+        return templates.TemplateResponse(
+            request=request,
+            name="ai_assistant.html",
+            context={
+                "answer": answer,
+                "history": get_recent_commands()
+            }
+        )
+
+    # ====================================================
+    # MULTI COMMAND SUPPORT
+    # ====================================================
+
+    if "\n" in question:
+
+        commands = [
+            q.strip()
+            for q in question.splitlines()
+            if q.strip()
+        ]
+
+        answer = (
+            "Multi-command mode is not yet enabled.\n\n"
+            "Commands received:\n\n"
+        )
+
+        for idx, cmd in enumerate(
+            commands,
+            start=1
+        ):
+
+            answer += (
+                f"{idx}. {cmd}\n"
+            )
+
+        return templates.TemplateResponse(
+            request=request,
+            name="ai_assistant.html",
+            context={
+                "answer": answer,
+                "history": get_recent_commands()
+            }
+        )
 
     # ====================================================
     # FLOW BUILDER START
@@ -64,7 +230,10 @@ def ai_assistant_ask(
         return templates.TemplateResponse(
             request=request,
             name="ai_assistant.html",
-            context={"answer": answer}
+            context={
+                "answer": answer,
+                "history": get_recent_commands()
+            }
         )
 
     # ====================================================
@@ -152,7 +321,10 @@ def ai_assistant_ask(
         return templates.TemplateResponse(
             request=request,
             name="ai_assistant.html",
-            context={"answer": answer}
+            context={
+                "answer": answer,
+                "history": get_recent_commands()
+            }
         )
 
     # ====================================================
@@ -277,7 +449,10 @@ def ai_assistant_ask(
         return templates.TemplateResponse(
             request=request,
             name="ai_assistant.html",
-            context={"answer": answer}
+            context={
+                "answer": answer,
+                "history": get_recent_commands()
+            }
         )
 
     # ====================================================
@@ -364,7 +539,8 @@ def ai_assistant_ask(
             request=request,
             name="ai_assistant.html",
             context={
-                "answer": answer
+                "answer": answer,
+                "history": get_recent_commands()
             }
         )
 
@@ -473,9 +649,10 @@ def ai_assistant_ask(
             request=request,
             name="ai_assistant.html",
             context={
-                "answer": answer
+                "answer": answer,
+                "history": get_recent_commands()
             }
-        )
+                    )
 
     # ====================================================
     # COVERAGE ANALYSIS
@@ -544,7 +721,8 @@ def ai_assistant_ask(
             request=request,
             name="ai_assistant.html",
             context={
-                "answer": answer
+                "answer": answer,
+                "history": get_recent_commands()
             }
         )
 
@@ -613,7 +791,8 @@ def ai_assistant_ask(
             request=request,
             name="ai_assistant.html",
             context={
-                "answer": answer
+                "answer": answer,
+                "history": get_recent_commands()
             }
         )
 
@@ -626,6 +805,9 @@ def ai_assistant_ask(
         and "COVERAGE" not in question_upper
         and not question_upper.startswith(
             "SHOW MISSING ASSETS FOR "
+        )
+        and not question_upper.startswith(
+            "SHOW PROCESS DEPENDENCIES FOR "
         )
     ):
 
@@ -671,11 +853,11 @@ def ai_assistant_ask(
             request=request,
             name="ai_assistant.html",
             context={
-                "answer": answer
+                "answer": answer,
+                "history": get_recent_commands()
             }
         )
         
-    
         
     # ====================================================
     # PROCESS COVERAGE
@@ -683,11 +865,9 @@ def ai_assistant_ask(
 
     if (
         question_upper.startswith("SHOW ")
-        and "COVERAGE" not in question_upper
-        and not question_upper.startswith(
-            "SHOW MISSING ASSETS FOR "
-        )
+        and "COVERAGE" in question_upper
     ):
+    
 
         process_name = question.strip()
 
@@ -749,7 +929,8 @@ def ai_assistant_ask(
             request=request,
             name="ai_assistant.html",
             context={
-                "answer": answer
+                "answer": answer,
+                "history": get_recent_commands()
             }
         )
     
@@ -786,7 +967,8 @@ def ai_assistant_ask(
             request=request,
             name="ai_assistant.html",
             context={
-                "answer": answer
+                "answer": answer,
+                "history": get_recent_commands()
             }
         )
     
@@ -820,8 +1002,9 @@ def ai_assistant_ask(
             request=request,
             name="ai_assistant.html",
             context={
-                "answer": answer
-            }
+                "answer": answer,
+                "history": get_recent_commands()
+            }   
         )
     
     # ====================================================
@@ -869,7 +1052,126 @@ def ai_assistant_ask(
             request=request,
             name="ai_assistant.html",
             context={
-                "answer": answer
+                "answer": answer,
+                "history": get_recent_commands()
+            }
+        )
+    
+    # ====================================================
+    # BUILD TEST PLAN
+    # ====================================================
+
+    if question_upper.startswith(
+        "BUILD TEST PLAN FOR "
+    ):
+
+        process_name = re.sub(
+            r"(?i)^build test plan for\s+",
+            "",
+            question
+        ).strip()
+
+        result = build_test_plan(
+            process_name
+        )
+
+        if result:
+
+            answer = (
+                f"Test Plan\n\n"
+                f"Process: {result['process']}\n"
+                f"Module: {result['module']}\n\n"
+            )
+
+            test_case_no = 1
+
+            for step in result["steps"]:
+
+                answer += (
+                    f"TC{str(test_case_no).zfill(3)}\n"
+                    f"Transaction: {step[1]}\n"
+                    f"Action: {step[2]}\n\n"
+                )
+
+                test_case_no += 1
+
+        else:
+
+            answer = (
+                f"Process not found:\n\n"
+                f"{process_name}"
+            )
+
+        return templates.TemplateResponse(
+            request=request,
+            name="ai_assistant.html",
+            context={
+                "answer": answer,
+                "history": get_recent_commands()
+            }
+        )
+        
+    # ====================================================
+    # PROCESS DEPENDENCIES
+    # ====================================================
+
+    if question_upper.startswith(
+        "SHOW PROCESS DEPENDENCIES FOR "
+    ):
+
+        process_name = re.sub(
+            r"(?i)^show process dependencies for\s+",
+            "",
+            question
+        ).strip()
+        
+        result = get_process_dependencies(
+            process_name
+        )
+
+        if result:
+
+            answer = (
+                f"Process Dependencies\n\n"
+                f"Process: {result['process_name']}\n"
+                f"Module: {result['module']}\n\n"
+            )
+
+            step_count = len(
+                result["steps"]
+            )
+
+            current_step = 1
+
+            for step in result["steps"]:
+
+                answer += (
+                    f"{step[1]}"
+                    f" - "
+                    f"{step[2]}"
+                )
+
+                if current_step < step_count:
+
+                    answer += (
+                        "\n↓\n"
+                    )
+
+                current_step += 1
+
+        else:
+
+            answer = (
+                f"Process not found:\n\n"
+                f"{process_name}"
+            )
+
+        return templates.TemplateResponse(
+            request=request,
+            name="ai_assistant.html",
+            context={
+                "answer": answer,
+                "history": get_recent_commands()
             }
         )
         
@@ -986,5 +1288,8 @@ def ai_assistant_ask(
     return templates.TemplateResponse(
         request=request,
         name="ai_assistant.html",
-        context={"answer": answer}
+        context={
+            "answer": answer,
+            "history": get_recent_commands()
+        }
     )
