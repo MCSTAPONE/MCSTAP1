@@ -1285,6 +1285,25 @@ def ai_assistant_ask(
                 asset_name
                 + ".py"
             )
+            
+            cur.execute(
+                """
+                SELECT COUNT(*)
+                FROM repository_assets
+                WHERE
+                    module = %s
+                    AND transaction_code = %s
+                """,
+                (
+                    module,
+                    transaction_code
+                )
+            )
+
+            exists = cur.fetchone()[0]
+
+            if exists > 0:
+                continue
 
             cur.execute(
                 """
@@ -1319,12 +1338,23 @@ def ai_assistant_ask(
 
         AI_CONTEXT.clear()
 
-        answer = (
-            f"Test Cases Saved Successfully\n\n"
-            f"Process: {process_name}\n"
-            f"Module: {module}\n\n"
-            f"Saved: {saved}"
-        )
+        if saved > 0:
+
+            answer = (
+                f"Repository Assets Created Successfully\n\n"
+                f"Process: {process_name}\n"
+                f"Module: {module}\n\n"
+                f"Assets Created: {saved}"
+            )
+
+        else:
+
+            answer = (
+                f"No New Assets Created\n\n"
+                f"Process: {process_name}\n"
+                f"Module: {module}\n\n"
+                f"All repository assets already exist."
+            )
 
         return templates.TemplateResponse(
             request=request,

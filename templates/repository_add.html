@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Add Repository Asset</title>
+
+    <link rel="stylesheet"
+          href="/static/css/pm.css">
+
+</head>
+
+<body>
+
+    <div class="header">
+
+        <h1>Add Repository Asset</h1>
+
+    </div>
+
+    <div class="container">
+
+        <div class="card">
+
+            <form method="post">
+
+                <p>
+                    <label for="asset_name">
+                        Asset Name
+                    </label>
+                </p>
+
+                <input
+                    id="asset_name"
+                    type="text"
+                    name="asset_name"
+                    required
+                    style="width:100%;padding:10px;">
+
+                <br><br>
+
+                <p>
+                    <label for="transaction_code">
+                        Transaction Code
+                    </label>
+                </p>
+
+                <input
+                    id="transaction_code"
+                    type="text"
+                    name="transaction_code"
+                    required
+                    style="width:100%;padding:10px;">
+
+                <br><br>
+
+                <p>
+                    <label for="script_name">
+                        Script Name
+                    </label>
+                </p>
+
+                <input
+                    id="script_name"
+                    type="text"
+                    name="script_name"
+                    required
+                    style="width:100%;padding:10px;">
+
+                <br><br>
+
+                <p>
+                    <label for="description">
+                        Description
+                    </label>
+                </p>
+
+                <textarea
+                    id="description"
+                    name="description"
+                    rows="5"
+                    style="width:100%;padding:10px;"></textarea>
+
+                <br><br>
+
+                <button
+                    type="submit"
+                    class="back-btn">
+
+                    Save
+
+                </button>
+
+                <a
+                    href="/repository/{{ module }}"
+                    class="back-btn">
+
+                    Cancel
+
+                </a>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

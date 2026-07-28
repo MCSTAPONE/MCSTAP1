@@ -17,120 +17,119 @@
 
 <body>
 
-<div class="header">
+    <div class="header">
 
-    <h1>{{ module }} Repository</h1>
+        <h1>{{ module }} Repository</h1>
 
-</div>
+    </div>
 
-<div class="container">
+    <div class="container">
 
-    <!-- Repository Card -->
+        <!-- Repository Overview -->
 
-    <div class="card">
+        <div class="card">
 
-        <h2>Repository Overview</h2>
+            <h2>Repository Overview</h2>
 
-        <p>
-            <strong>Module:</strong>
-            {{ module }}
-        </p>
+            <p>
+                <strong>Module:</strong>
+                {{ module }}
+            </p>
 
-        <p>
-            <strong>Total Assets:</strong>
-            {{ rows|length }}
-        </p>
+            <p>
+                <strong>Total Assets:</strong>
+                {{ rows|length }}
+            </p>
 
-        <p>
-            <strong>Status:</strong>
-            Active
-        </p>
+            <p>
+                <strong>Status:</strong>
+                Active
+            </p>
+
+            <br>
+
+            <a href="/repository"
+               class="back-btn">
+                ← Repository
+            </a>
+
+        </div>
 
         <br>
 
-        <a href="/repository"
-           class="back-btn">
-            ← Repository
-        </a>
+        <!-- Action Buttons -->
 
-        <!--a href="/repository/{{ module }}/new"
-           class="back-btn">
-            + New Asset
-        </a--!>
+        <div style="margin-bottom:15px;">
 
-    </div>
+            <button
+                type="button"
+                class="back-btn"
+                onclick="window.location.href='/repository/add/{{ module }}';">
+                + Add
+            </button>
 
-    <br>
+            <button
+                type="button"
+                class="back-btn"
+                onclick="deleteSelectedAssets();">
+                🗑 Delete
+            </button>
 
-      <div style="margin-bottom:15px;">
+        </div>
 
-          <button
-              class="back-btn"
-              onclick="window.location.href='/repository/{{ module }}';">
-              + Add
-          </button>
+        <!-- Repository Assets -->
 
-          <button
-              class="back-btn"
-              onclick="deleteSelectedAssets();">
-              🗑 Delete
-          </button>
+        <div class="card">
 
-      </div>
+            <h2>Repository Assets</h2>
 
-    <!-- Repository Table -->
+            <table class="test-table">
 
-    <div class="card">
+                <thead>
 
-        <h2>Repository Assets</h2>
+                    <tr>
 
-        <table class="test-table">
+                        <th>Select</th>
+                        <th>Asset ID</th>
+                        <th>Title</th>
+                        <th>Transaction</th>
+                        <th>Status</th>
+                        <th>Automation Script</th>
 
-            <thead>
+                    </tr>
 
-                <tr>
-                    <th>Select</th>
-                    <th>Test Case ID</th>
-                    <th>Title</th>
-                    <th>Transaction</th>
-                    <th>Status</th>
-                    <th>Automation Script</th>
+                </thead>
 
-                </tr>
+                <tbody>
 
-            </thead>
+                    {% for row in rows %}
 
-            <tbody>
+                    <tr>
 
-            {% for row in rows %}
+                        <td>
+                            <input
+                                type="checkbox"
+                                name="asset_ids"
+                                value="{{ row[0] }}">
+                        </td>
 
-                <tr>
+                        <td>{{ row[0] }}</td>
+                        <td>{{ row[1] }}</td>
+                        <td>{{ row[2] }}</td>
+                        <td>{{ row[3] }}</td>
+                        <td>{{ row[4] }}</td>
 
-                      <td>
-                          <input
-                              type="checkbox"
-                              name="asset_ids"
-                              value="{{ row[0] }}">
-                      </td>
+                    </tr>
 
-                      <td>{{ row[0] }}</td>
-                      <td>{{ row[1] }}</td>
-                      <td>{{ row[2] }}</td>
-                      <td>{{ row[3] }}</td>
-                      <td>{{ row[4] }}</td>
+                    {% endfor %}
 
-                  </tr>
+                </tbody>
 
+            </table>
 
-            {% endfor %}
-
-            </tbody>
-
-        </table>
+        </div>
 
     </div>
-
-</div>
 
 <script>
 
@@ -155,10 +154,33 @@ function deleteSelectedAssets() {
         return;
     }
 
-    alert(
-        "Delete functionality will be linked tomorrow.\n\n"
-        + selected.length +
-        " asset(s) selected."
+    if (
+        !confirm(
+            "Delete selected assets?"
+        )
+    ) {
+        return;
+    }
+
+    fetch(
+        "/repository/delete",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type":
+                "application/x-www-form-urlencoded"
+            },
+            body:
+                selected
+                .map(
+                    id =>
+                    "asset_ids=" + id
+                )
+                .join("&")
+        }
+    )
+    .then(
+        () => location.reload()
     );
 }
 
@@ -167,4 +189,3 @@ function deleteSelectedAssets() {
 </body>
 
 </html>
-
