@@ -1,311 +1,271 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MC STAP 1</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-    <link rel="stylesheet"
-          href="/static/css/dashboard.css">
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            background-color: #ebf0f5;
+            color: #1a2533;
+        }
 
+        /* Top Bar */
+        .header {
+            background-color: #0f6cbd;
+            color: #ffffff;
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+
+        .product-title {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .product-subtitle {
+            font-size: 13px;
+            opacity: 0.85;
+            margin-top: 2px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .ai-badge {
+            background: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* Dropdown Menu */
+        .dropdown {
+            position: relative;
+        }
+
+        .menu-btn {
+            background: #ffffff;
+            color: #0f6cbd;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            min-width: 160px;
+            background: #ffffff;
+            border-radius: 6px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            overflow: hidden;
+            z-index: 1000;
+            margin-top: 4px;
+        }
+
+        .dropdown-content a {
+            display: block;
+            padding: 10px 16px;
+            color: #333333;
+            text-decoration: none;
+            font-size: 14px;
+            border-bottom: 1px solid #eeeeee;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f4f6f8;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        /* Dashboard Container */
+        .container {
+            max-width: 1300px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .section {
+            margin-bottom: 35px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a2533;
+            margin-bottom: 15px;
+            padding-left: 10px;
+            border-left: 4px solid #0f6cbd;
+        }
+
+        /* Responsive Grid for Tiles */
+        .tiles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 16px;
+        }
+
+        /* Card Tiles */
+        .tile {
+            background: #ffffff;
+            border-radius: 6px;
+            padding: 18px;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            border: 1px solid #dcdfe4;
+            border-left: 5px solid #0f6cbd;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .tile:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 14px rgba(0,0,0,0.1);
+            background-color: #fafbfc;
+        }
+
+        .tile-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #0f6cbd;
+            margin-bottom: 6px;
+        }
+
+        .tile-desc {
+            font-size: 13px;
+            color: #555555;
+            line-height: 1.3;
+        }
+    </style>
 </head>
-
 <body>
 
-<div class="header">
-
-    <div class="header-left">
-
-        <div class="product-title">
-            MC STAP 1
+    <div class="header">
+        <div class="header-left">
+            <div class="product-title">MC STAP 1</div>
+            <div class="product-subtitle">AI-Powered SAP Test Automation Platform</div>
         </div>
 
-        <div class="product-subtitle">
-            AI-Powered SAP Test Automation Platform
+        <div class="header-right">
+            <div class="ai-badge">🧠 AI-Powered</div>
+            <div class="dropdown">
+                <button class="menu-btn" type="button">☰ Menu</button>
+                <div class="dropdown-content">
+                    <a href="/login">Login</a>
+                    <a href="/license">License</a>
+                    <a href="/upgrade">Upgrade</a>
+                    <a href="/about">About</a>
+                    <a href="/logout">Log off</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+
+        <!-- Test Management -->
+        <div class="section">
+            <div class="section-title">Test Management</div>
+            <div class="tiles-grid">
+                <a href="/requirements" class="tile">
+                    <div class="tile-title">Business Requirements</div>
+                    <div class="tile-desc">Requirements Management</div>
+                </a>
+                <a href="/Test Coverage" class="tile">
+                    <div class="tile-title">Test Coverage</div>
+                    <div class="tile-desc">Coverage Management</div>
+                </a>
+                <a href="/partner-management" class="tile">
+                    <div class="tile-title">Partner Test Management</div>
+                    <div class="tile-desc">Management</div>
+                </a>
+                <a href="/test-plan" class="tile">
+                    <div class="tile-title">Test Plan Management</div>
+                    <div class="tile-desc">Planning</div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Test Suite -->
+        <div class="section">
+            <div class="section-title">Test Suite</div>
+            <div class="tiles-grid">
+                <a href="/administration" class="tile">
+                    <div class="tile-title">Administration</div>
+                    <div class="tile-desc">Test Suite</div>
+                </a>
+                <a href="/test-cases" class="tile">
+                    <div class="tile-title">Test Cases</div>
+                    <div class="tile-desc">Manage Test Cases</div>
+                </a>
+                <a href="/repository" class="tile">
+                    <div class="tile-title">Test Repository</div>
+                    <div class="tile-desc">Repository</div>
+                </a>
+                <a href="/flow-library" class="tile">
+                    <div class="tile-title">Test Suite Preparation</div>
+                    <div class="tile-desc">Business Flow Designer</div>
+                </a>
+                <a href="/script-studio" class="tile">
+                    <div class="tile-title">Scripts Studio</div>
+                    <div class="tile-desc">Automation Builder</div>
+                </a>
+                <a href="/ai-assistant" class="tile">
+                    <div class="tile-title">AI Assistant</div>
+                    <div class="tile-desc">Help</div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Reporting -->
+        <div class="section">
+            <div class="section-title">Reporting</div>
+            <div class="tiles-grid">
+                <a href="/analytics" class="tile">
+                    <div class="tile-title">Analytics</div>
+                    <div class="tile-desc">Statistics</div>
+                </a>
+                <a href="/Coverage" class="tile">
+                    <div class="tile-title">Coverage</div>
+                    <div class="tile-desc">Coverage Analysis</div>
+                </a>
+                <a href="/reports" class="tile">
+                    <div class="tile-title">Reports</div>
+                    <div class="tile-desc">Allure Reports</div>
+                </a>
+                <a href="/risk" class="tile">
+                    <div class="tile-title">Risk Assessment</div>
+                    <div class="tile-desc">Risk Analysis</div>
+                </a>
+            </div>
         </div>
 
     </div>
-
-    <div class="header-right">
-
-        <div class="ai-badge">
-            🧠 AI-Powered
-        </div>
-
-        <div class="dropdown">
-
-            <button class="menu-btn">
-                ☰ Menu
-            </button>
-
-            <div class="dropdown-content">
-
-                <a href="/login">Login</a>
-
-                <a href="/license">License</a>
-
-                <a href="/upgrade">Upgrade</a>
-
-                <a href="/about">About</a>
-				
-				<a href="/log off">Log off</a>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
-<div class="section">
-
-    <h2>Test Management</h2>
-
-    <div class="tiles">
-
-        <div class="tile">
-            <div class="tile-title">Business Requirements</div>
-            <div class="tile-desc">
-                Requirements Management
-            </div>
-        </div>
-
-		<a href="/Test Coverage" class="tile-link">
-			<div class="tile">
-				<div class="tile-title">Test Coverage</div>
-				<div class="tile-desc">
-					Coverage Management
-				</div>
-			</div>
-		</a>
-
-        <div class="tile">
-            <div class="tile-title">Partner Test Management</div>
-            <div class="tile-desc">
-                Management
-            </div>
-        </div>
-
-        <div class="tile">
-            <div class="tile-title">Test Plan Management</div>
-            <div class="tile-desc">
-                Planning
-            </div>
-        </div>
-
-    </div>
-
-</div>
-
-<div class="section">
-
-    <h2>Test Suite</h2>
-
-    <div class="tiles">
-
-        <div class="tile">
-            <div class="tile-title">Administration</div>
-            <div class="tile-desc">Test Suite</div>
-        </div>    
-
-		<a href="/test-cases" class="tile-link">
-			<div class="tile">
-				<div class="tile-title">Test Cases</div>
-				<div class="tile-desc">Manage Test Cases</div>
-			</div>
-		</a>
-
-		<a href="/repository" class="tile-link">
-			<div class="tile">
-				<div class="tile-title">Test Repository</div>
-				<div class="tile-desc">Repository</div>
-			</div>
-		</a>
-		
-		<a href="/flow-library" class="tile-link">
-			<div class="tile">
-				<div class="tile-title">Test Suite Preparation</div>
-				<div class="tile-desc">Business Flow Designer</div>
-			</div>
-		</a>
-		<!--a href="/test-scripts" class="tile-link">
-			<div class="tile">
-				<div class="tile-title">Test Scripts</div>
-				<div class="tile-desc">Automation Scripts</div>
-			</div>
-		</a--!>
-
-		<a href="/script-studio" class="tile-link">
-			<div class="tile">
-				<div class="tile-title">Scripts Studio</div>
-				<div class="tile-desc">Automation Builder</div>
-			</div>
-		</a>
-		
-		<!--a href="/functional" class="tile-link">
-			<div class="tile">
-				<div class="tile-title">Functional Tests</div>
-				<div class="tile-desc">Functional Test Group</div>
-			</div>
-		</a>
-
-		<a href="/standalone" class="tile-link">
-			<div class="tile">
-				<div class="tile-title">Standalone Test</div>
-				<div class="tile-desc">Standalone Test Groups</div>
-			</div>
-		</a>
-
-		<a href="/end_to_end" class="tile-link">
-			<div class="tile">
-				<div class="tile-title">End to End Test</div>
-				<div class="tile-desc">End to End Test Group</div>
-			</div>
-		</a>
-
-		<a href="/regression" class="tile-link">
-			<div class="tile">
-				<div class="tile-title">Regression Test</div>
-				<div class="tile-desc">Regression Test Group</div>
-			</div>
-		</a--!>
-
-
-
-		<a href="/ai-assistant" class="tile-link">
-			<div class="tile">
-				<div class="tile-title">AI Assistant</div>
-				<div class="tile-desc">Help</div>
-			</div>		
-		</a>
-
-    </div>
-
-</div>
-
-<div class="section">
-
-    <h2>Reporting</h2>
-
-    <div class="tiles">        
-
-        <div class="tile">
-            <div class="tile-title">Analytics</div>
-            <div class="tile-desc">Statistics</div>
-        </div>
-
-		<a href="/Coverage" class="tile-link">
-			<div class="tile">
-				<div class="tile-title">Coverage</div>
-				<div class="tile-desc">Coverage Analysis</div>
-			</div>
-		</a>		
-
-        <a href="/reports" class="tile-link">
-			<div class="tile">
-				<div class="tile-title">Reports</div>
-				<div class="tile-desc">Allure Reports</div>
-			</div>
-		</a>
-		<a href="/risk" class="tile-link">
-			<div class="tile">
-				<div class="tile-title">Risk Assessment</div>
-				<div class="tile-desc">Risk Analysis</div>
-			</div>
-		</a>
-		
-
-    </div>
-
-</div>
-
-<!--div class="section">
-
-    <h2>SAP Modules</h2>
-
-    <div class="tiles">
-
-        <a href="/pm" class="tile-link">
-            <div class="tile">
-                <div class="tile-title">Plant Maintenance/PM</div>
-            </div>
-        </a>
-
-        <a href="/mm" class="tile-link">
-            <div class="tile">
-                <div class="tile-title">Material Management/MM</div>
-            </div>
-        </a>
-
-        <a href="/co" class="tile-link">
-            <div class="tile">
-                <div class="tile-title">Controlling/CO</div>
-            </div>
-        </a>
-
-        <a href="/fi" class="tile-link">
-            <div class="tile">
-                <div class="tile-title">Finance &amp; Accounting/FI</div>
-            </div>
-        </a>
-
-        <a href="/sd" class="tile-link">
-            <div class="tile">
-                <div class="tile-title">Sales &amp; Distribution/SD</div>
-            </div>
-        </a>
-
-        <a href="/lo" class="tile-link">
-            <div class="tile">
-                <div class="tile-title">Logistics/LO</div>
-            </div>
-        </a>
-
-        <a href="/tr" class="tile-link">
-            <div class="tile">
-                <div class="tile-title">Treasury/TR</div>
-            </div>
-        </a>
-
-        <a href="/pp" class="tile-link">
-            <div class="tile">
-                <div class="tile-title">Production Planning/PP</div>
-            </div>
-        </a>
-
-        <a href="/plm" class="tile-link">
-            <div class="tile">
-                <div class="tile-title">Product Lifecycle Management/PLM</div>
-            </div>
-        </a>
-
-        <a href="/qm" class="tile-link">
-            <div class="tile">
-                <div class="tile-title">Quality Management/QM</div>
-            </div>
-        </a>
-
-        <a href="/wm" class="tile-link">
-            <div class="tile">
-                <div class="tile-title">Warehouse Management/WM</div>
-            </div>
-        </a>
-
-        <a href="/scm" class="tile-link">
-            <div class="tile">
-                <div class="tile-title">Supply Chain Management/SCM</div>
-            </div>
-        </a>
-		<a href="/proc" class="tile-link">
-            <div class="tile">
-                <div class="tile-title">Procurment/PROC</div>
-            </div>
-        </a>
-
-    </div>
-
-</div--!>
 
 </body>
-
 </html>

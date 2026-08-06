@@ -4,6 +4,11 @@ from fastapi import APIRouter
 from fastapi import Request
 from fastapi import Form
 
+from fastapi import UploadFile
+from fastapi import File
+from fastapi.responses import JSONResponse
+import re
+
 from api.database import get_connection
 from api.shared import templates
 
@@ -48,15 +53,165 @@ def script_logout_template(request: Request):
         name="template_logout.html",
         context={}
     )
-  
+
 @router.get("/script-studio/builder")
 def script_builder(request: Request):
+
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute(
+        """
+        SELECT
+            flow_id,
+            flow_name
+        FROM flow_master
+        ORDER BY flow_name
+        """
+    )
+
+    flows = cur.fetchall()
+
+    cur.close()
+    conn.close()
 
     return templates.TemplateResponse(
         request=request,
         name="script_builder.html",
-        context={}
+        context={
+            "flows": flows
+        }
     )
+    
+@router.get("/script-studio/flow-steps/{flow_id}")
+def get_flow_steps(flow_id: int):
+
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute(
+        """
+        SELECT
+            sequence_no,
+            transaction_code,
+            COALESCE(description,'')
+        FROM flow_steps
+        WHERE flow_id = %s
+        ORDER BY sequence_no
+        """,
+        (flow_id,)
+    )
+
+    rows = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+    steps = []
+
+    for row in rows:
+
+        steps.append(
+            {
+                "sequence_no": row[0],
+                "transaction_code": row[1],
+                "description": row[2]
+            }
+        )
+
+    return steps
+
+@router.post("/script-studio/analyze")
+async def analyze_recording(
+    recording_file: UploadFile = File(...)
+):
+
+    try:
+
+        content = await recording_file.read()
+
+        text = content.decode(
+            "utf-8",
+            errors="ignore"
+        )
+
+        actions = []
+        errors = []
+        transaction = ""
+
+        seq = 1
+
+        for line in text.splitlines():
+
+            try:
+
+                if ".text =" in line:
+
+                    value_match = re.search(
+                        r'=\s*"([^"]*)"',
+                        line
+                    )
+
+                    value = ""
+
+                    if value_match:
+                        value = value_match.group(1)
+
+                    if (
+                        not transaction
+                        and len(value) <= 10
+                    ):
+                        transaction = value.upper()
+
+                    actions.append({
+                        "seq": seq,
+                        "action": "SET_TEXT",
+                        "parameter": "",
+                        "value": value
+                    })
+
+                    seq += 1
+
+                elif ".sendVKey" in line:
+
+                    actions.append({
+                        "seq": seq,
+                        "action": "SEND_VKEY",
+                        "parameter": "ENTER",
+                        "value": "0"
+                    })
+
+                    seq += 1
+
+                elif ".press" in line:
+
+                    actions.append({
+                        "seq": seq,
+                        "action": "PRESS",
+                        "parameter": "",
+                        "value": ""
+                    })
+
+                    seq += 1
+
+            except Exception as ex:
+
+                errors.append(str(ex))
+
+        return JSONResponse({
+            "success": True,
+            "transaction": transaction,
+            "action_count": len(actions),
+            "errors": errors,
+            "actions": actions
+        })
+
+    except Exception as e:
+
+        return JSONResponse({
+            "success": False,
+            "message": str(e)
+        })
 
   
 @router.get("/script-studio/start-recorder")

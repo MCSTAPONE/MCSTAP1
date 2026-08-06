@@ -8,123 +8,1200 @@
     <title>Script Builder</title>
 
     <link rel="stylesheet" href="/static/css/pm.css">
+
+    <style>
+
+        .section {
+            margin-top: 25px;
+            padding: 15px;
+            border: 1px solid #dcdcdc;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+
+        .action-btn {
+            margin-right: 10px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table th,
+        table td {
+            border: 1px solid #cccccc;
+            padding: 8px;
+        }
+
+        textarea {
+            width: 100%;
+        }
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SAP Automation Studio - Script Builder</title>
+
+    <link rel="stylesheet" href="/static/css/pm.css">
+
+
+    <style>
+
+        /* ===============================
+           GLOBAL
+        ================================ */
+
+        body {
+
+            background: #f4f6f9;
+            font-family: "Segoe UI", Arial, sans-serif;
+            margin: 0;
+
+        }
+
+
+        /* ===============================
+           HEADER
+        ================================ */
+
+        .header {
+
+            background: #0a6ed1;
+            color: white;
+
+            padding: 18px 30px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+        }
+
+
+        .header h1 {
+
+            margin: 0;
+            font-size: 22px;
+
+        }
+
+
+        .header span {
+
+            font-size: 14px;
+
+        }
+
+
+        /* ===============================
+           WORKSPACE
+        ================================ */
+
+        .workspace {
+
+            display: grid;
+
+            grid-template-columns:
+                320px
+                1fr
+                330px;
+
+            gap: 20px;
+
+            padding: 20px;
+
+        }
+
+
+
+        /* ===============================
+           CARDS
+        ================================ */
+
+        .card {
+
+            background: white;
+
+            border-radius: 12px;
+
+            padding: 20px;
+
+            box-shadow:
+                0 2px 8px rgba(0,0,0,0.08);
+
+            margin-bottom: 20px;
+
+        }
+
+
+        .card-title {
+
+            font-size: 16px;
+
+            font-weight: 600;
+
+            color: #333;
+
+            border-bottom: 1px solid #eee;
+
+            padding-bottom: 10px;
+
+            margin-bottom: 15px;
+
+        }
+
+
+
+        /* ===============================
+           FORM
+        ================================ */
+
+
+        .form-group {
+
+            margin-bottom: 15px;
+
+        }
+
+
+        label {
+
+            display: block;
+
+            font-size: 13px;
+
+            color: #555;
+
+            margin-bottom: 5px;
+
+        }
+
+
+        input,
+        select,
+        textarea {
+
+            width: 100%;
+
+            padding: 10px;
+
+            border: 1px solid #ccc;
+
+            border-radius: 6px;
+
+            box-sizing: border-box;
+
+        }
+
+
+        textarea {
+
+            resize: vertical;
+
+        }
+
+
+
+        /* ===============================
+           FLOW STEPS
+        ================================ */
+
+
+        .step-card {
+
+            border-left: 5px solid #0a6ed1;
+
+            padding: 12px;
+
+            background: #f8fbff;
+
+            border-radius: 8px;
+
+            margin-bottom: 10px;
+
+        }
+
+
+        .step-title {
+
+            font-weight: bold;
+
+        }
+
+
+
+        /* ===============================
+           METRICS
+        ================================ */
+
+
+        .metric {
+
+            padding: 15px;
+
+            background: #f8f9fa;
+
+            border-radius: 8px;
+
+            margin-bottom: 12px;
+
+        }
+
+
+        .metric-value {
+
+            font-size: 22px;
+
+            font-weight: bold;
+
+            color: #0a6ed1;
+
+        }
+
+
+
+        /* ===============================
+           TABLE
+        ================================ */
+
+
+        .table-container {
+
+            overflow: auto;
+
+        }
+
+
+        table {
+
+            width: 100%;
+
+            border-collapse: collapse;
+
+        }
+
+
+        th {
+
+            background: #eef3f8;
+
+        }
+
+
+        td,
+        th {
+
+            padding: 10px;
+
+            border-bottom: 1px solid #ddd;
+
+            font-size: 13px;
+
+        }
+
+
+
+        /* ===============================
+           SCRIPT EDITOR
+        ================================ */
+
+
+        .script-editor {
+
+            background: #1e1e1e;
+
+            color: #dcdcdc;
+
+            font-family: Consolas, monospace;
+
+            min-height: 300px;
+
+            padding: 20px;
+
+            border-radius: 10px;
+
+        }
+
+
+        /* ===============================
+           FOOTER ACTION BAR
+        ================================ */
+
+
+        .action-bar {
+
+            position: fixed;
+
+            bottom: 0;
+
+            left: 0;
+
+            right: 0;
+
+
+            background: white;
+
+            padding: 15px 30px;
+
+
+            box-shadow:
+                0 -2px 10px rgba(0,0,0,.1);
+
+
+            text-align: right;
+
+        }
+
+
+        .btn {
+
+            padding: 10px 22px;
+
+            border: none;
+
+            border-radius: 6px;
+
+            cursor: pointer;
+
+            margin-left: 10px;
+
+        }
+
+
+        .btn-primary {
+
+            background: #0a6ed1;
+
+            color: white;
+
+        }
+
+
+        .btn-success {
+
+            background: #188918;
+
+            color: white;
+
+        }
+
+
+
+        /* ===============================
+           RESPONSIVE
+        ================================ */
+
+
+        @media(max-width:1200px) {
+
+            .workspace {
+
+                grid-template-columns: 1fr;
+
+            }
+
+        }
+
+
+    </style>
+
+
 </head>
 
 <body>
 
+
+
+    <!-- ================= HEADER ================= -->
+
     <div class="header">
 
-        Script Builder
+        <h1>
+            ⚙ SAP Automation Studio
+        </h1>
+
+        <span>
+            Script Builder
+        </span>
 
     </div>
 
-    <a href="/script-studio" class="back-btn">
-			← Script Studio
+
+
+    <!-- ================= WORKSPACE ================= -->
+
+    <div class="workspace">
+
+
+
+        <!-- ================= LEFT PANEL ================= -->
+
+        <div>
+
+
+            <!-- Script Information -->
+
+            <div class="card">
+
+
+                <div class="card-title">
+
+                    Script Information
+
+                </div>
+
+
+
+                <form method="post"
+                      action="/script-studio/save"
+                      enctype="multipart/form-data">
+
+
+
+                    <div class="form-group">
+
+                        <label>
+                            Script Name *
+                        </label>
+
+
+                        <input
+                            type="text"
+                            id="script_name"
+                            name="script_name"
+                            required>
+
+                    </div>
+
+
+
+
+                    <div class="form-group">
+
+                        <label>
+                            Module *
+                        </label>
+
+
+                        <select name="module">
+
+
+                            <option>
+                                Select Module
+                            </option>
+
+
+                            <option>
+                                PM
+                            </option>
+
+                            <option>
+                                MM
+                            </option>
+
+                            <option>
+                                FI
+                            </option>
+
+                            <option>
+                                CO
+                            </option>
+
+                            <option>
+                                SD
+                            </option>
+
+                            <option>
+                                WM
+                            </option>
+
+                            <option>
+                                PP
+                            </option>
+
+
+                        </select>
+
+                    </div>
+
+
+
+
+
+                    <div class="form-group">
+
+
+                        <label>
+                            Business Flow *
+                        </label>
+
+
+
+                        <select
+                            name="flow_id"
+                            id="flow_id">
+
+
+                            <option>
+                                Select Flow
+                            </option>
+
+
+
+                            {% for flow in flows %}
+
+                            <option value="{{flow[0]}}">
+
+                                {{flow[1]}}
+
+                            </option>
+
+
+                            {% endfor %}
+
+
+                        </select>
+
+
+                    </div>
+
+
+
+
+
+                    <div class="form-group">
+
+
+                        <label>
+                            Description
+                        </label>
+
+
+
+                        <textarea
+                            name="description"
+                            rows="5"></textarea>
+
+
+                    </div>
+
+
+
+            </div>
+
+
+
+
+
+            <!-- SAP Recording Upload -->
+
+
+            <div class="card">
+
+
+                <div class="card-title">
+
+                    SAP Recording Upload
+
+                </div>
+
+
+
+                <div id="recordingUploads">
+
+                    Select Flow First
+
+                </div>
+
+
+
+            </div>
+
+
+
+        </div>
+
+
+
+
+
+
+
+        <!-- ================= CENTER PANEL ================= -->
+
+
+        <div>
+
+
+
+            <!-- Business Flow Steps -->
+
+
+            <div class="card">
+
+
+                <div class="card-title">
+
+                    Business Flow Steps
+
+                </div>
+
+
+
+                <div id="flowSteps">
+
+
+                    Select a flow to display steps
+
+
+                </div>
+
+
+
+            </div>
+
+
+
+
+
+
+
+            <!-- Parsed Actions Preview -->
+
+
+            <div class="card">
+
+
+                <div class="card-title">
+
+                    Parsed Actions Preview
+
+                </div>
+
+
+
+
+                <div class="table-container">
+
+
+                    <table>
+
+
+                        <thead>
+
+
+                            <tr>
+
+
+                                <th>
+                                    Seq
+                                </th>
+
+
+                                <th>
+                                    Action
+                                </th>
+
+
+                                <th>
+                                    Parameter
+                                </th>
+
+
+                                <th>
+                                    Value
+                                </th>
+
+
+                            </tr>
+
+
+                        </thead>
+
+
+
+
+
+                        <tbody id="parsedActions">
+
+
+                            <tr>
+
+
+                                <td colspan="4">
+
+                                    Analyze Recording First
+
+                                </td>
+
+
+                            </tr>
+
+
+                        </tbody>
+
+
+
+                    </table>
+
+
+                </div>
+
+
+
+            </div>
+
+
+
+        </div>
+
+
+
+
+
+
+
+        <!-- ================= RIGHT PANEL ================= -->
+
+
+        <div>
+
+
+
+
+            <!-- Recording Analysis -->
+
+
+            <div class="card">
+
+
+                <div class="card-title">
+
+                    Recording Analysis
+
+                </div>
+
+
+
+
+
+                <div class="metric">
+
+
+                    Status
+
+
+                    <div class="metric-value"
+                         id="analysisStatus">
+
+                        Waiting
+
+                    </div>
+
+
+                </div>
+
+
+
+
+
+
+                <div class="metric">
+
+
+                    Transaction
+
+
+                    <div class="metric-value"
+                         id="detectedTransaction">
+
+
+                        None
+
+
+                    </div>
+
+
+                </div>
+
+
+
+
+
+
+                <div class="metric">
+
+
+                    Actions
+
+
+                    <div class="metric-value"
+                         id="actionCount">
+
+
+                        0
+
+
+                    </div>
+
+
+                </div>
+
+
+
+
+
+
+                <div id="analysisErrors">
+
+                    No Errors
+
+                </div>
+
+
+
+            </div>
+
+
+
+
+
+
+
+            <!-- Framework Flow -->
+
+
+            <div class="card">
+
+
+                <div class="card-title">
+
+                    Framework Flow
+
+                </div>
+
+
+
+                <ul>
+
+
+                    <li>
+                        LOGIN
+                    </li>
+
+
+                    <li>
+                        START_TRANSACTION
+                    </li>
+
+
+                    <li>
+                        RECORDED ACTIONS
+                    </li>
+
+
+                    <li>
+                        LOGOUT
+                    </li>
+
+
+                </ul>
+
+
+
+            </div>
+
+
+
+        </div>
+
+
+
+
+    </div>
+
+
+
+
+
+
+
+
+
+    <!-- ================= GENERATED SCRIPT ================= -->
+
+
+    <div class="card"
+         style="margin:20px;">
+
+
+        <div class="card-title">
+
+            Generated Automation Script
+
+        </div>
+
+
+
+
+
+        <div id="generatedScript"
+             class="script-editor">
+
+
+            Python script will appear here...
+
+
+        </div>
+
+
+
+    </div>
+
+
+
+
+
+
+
+    <!-- ================= ACTION BAR ================= -->
+
+
+    <div class="action-bar">
+
+	<a href="/script-studio" class="back-btn">
+	    ← Script Studio
 	</a>
 
-    <div class="table-container">
+        <button
+            type="button"
+            id="analyzeBtn"
+            class="btn btn-primary">
 
-	 <h2>Create Automation Script</h2>
 
-		<form action="/script-studio/save" method="post">
+            🔍 Analyze
 
-			<label for="script_name">
-				Script Name
-			</label>
 
-			<br>
+        </button>
 
-			<input
-				type="text"
-				id="script_name"
-				name="script_name"
-				required>
 
-			<br><br>
 
-            <label>
 
-                Module
 
-            </label>
+        <button
+            type="button"
+            id="createBtn"
+            class="btn btn-success"
+            disabled>
 
-            <br>
 
-            <select
-                name="module"
-                required>
+            ⚙ Generate Script
 
-                <option value="PM">PM</option>
-                <option value="MM">MM</option>
-                <option value="FI">FI</option>
-                <option value="CO">CO</option>
-                <option value="SD">SD</option>
-                <option value="WM">WM</option>
-                <option value="QM">QM</option>
-                <option value="PP">PP</option>
-				<option value="LO">LO</option>
-				<option value="TR">TR</option>
-				<option value="PLM">PLM</option>
-				<option value="SCM">SCM</option>
-				option value="PROC">PROC</option>
 
-            </select>
+        </button>
 
-            <br><br>
 
-            <label>
 
-                Transaction Code
 
-            </label>
 
-            <br>
+        <button
+            type="submit"
+            id="saveBtn"
+            class="btn btn-primary"
+            disabled>
 
-            <input
-                type="text"
-                name="transaction_code"
-                placeholder="IW31"
-                required>
 
-            <br><br>
+            💾 Save
 
-            <label>
 
-                Description
+        </button>
 
-            </label>
 
-            <br>
-
-            <textarea
-                name="description"
-                rows="4"
-                cols="60"></textarea>
-
-            <br><br>
-
-            <h3>Included Actions</h3>
-
-            <ul>
-
-                <li>✅ LOGIN</li>
-
-                <li>✅ START_TRANSACTION</li>
-
-                <li>✅ LOGOUT</li>
-
-            </ul>
-
-            <button type="submit" class="back-btn">
-
-                Save Script
-
-            </button>
-
-        </form>
 
     </div>
 
+
+
+    </form>
+
+
+    <!-- ================= JAVASCRIPT ================= -->
+
+    <script>
+
+
+        document
+            .getElementById("flow_id")
+            .addEventListener(
+                "change",
+                function () {
+
+
+                    let flowId = this.value;
+
+
+
+                    if (!flowId) {
+
+                        return;
+
+                    }
+
+
+
+
+
+                    fetch(
+                        "/script-studio/flow-steps/" + flowId
+                    )
+
+
+                    .then(response => response.json())
+
+
+                    .then(data => {
+
+
+
+                        let stepsHtml = "";
+
+                        let uploadHtml = "";
+
+
+
+
+
+                        data.forEach(step => {
+
+
+
+                            /*
+                             * Business Flow Steps
+                             */
+
+
+                            stepsHtml += `
+
+                                <div class="step-card">
+
+
+                                    <div class="step-title">
+
+                                        Step ${step.sequence_no}
+
+                                    </div>
+
+
+                                    ${step.transaction_code}
+
+                                    <br>
+
+
+                                    ${step.description}
+
+
+                                </div>
+
+                            `;
+
+
+
+
+
+
+
+                            /*
+                             * Recording Upload Section
+                             */
+
+
+                            uploadHtml += `
+
+
+                                <div class="step-card">
+
+
+                                    <b>
+
+                                        ${step.transaction_code}
+
+                                    </b>
+
+
+                                    <br>
+
+
+                                    <input
+
+                                        type="file"
+
+                                        name="recording_${step.sequence_no}"
+
+                                        accept=".txt">
+
+
+                                </div>
+
+
+                            `;
+
+
+
+                        });
+
+
+
+
+
+
+
+                        document
+                            .getElementById("flowSteps")
+                            .innerHTML = stepsHtml;
+
+
+
+
+
+
+                        document
+                            .getElementById("recordingUploads")
+                            .innerHTML = uploadHtml;
+
+
+
+                    });
+
+
+
+                });
+
+
+
+    </script>
+
+
+
+
+
 </body>
+
 
 </html>

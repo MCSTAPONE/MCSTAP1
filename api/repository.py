@@ -28,7 +28,7 @@ def repository(request: Request):
         "SCM",
         "PLM",
         "PROC",
-	  "E2E"
+	    "E2E"
     ]
 
     return templates.TemplateResponse(
