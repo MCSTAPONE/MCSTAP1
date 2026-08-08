@@ -1,268 +1,432 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Case Management | MC STAP</title>
+    <style>
+        :root {
+            --primary-color: #0f6cbd;
+            --primary-hover: #115ea3;
+            --bg-color: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --badge-automated: #dcfce7;
+            --badge-automated-text: #166534;
+            --badge-manual: #fef3c7;
+            --badge-manual-text: #92400e;
+        }
 
-    <title>Test Case Management</title>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
 
-    <link rel="stylesheet" href="/static/css/pm.css">
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding-bottom: 40px;
+        }
+
+        /* Top Navigation Header */
+        .header {
+            background-color: var(--primary-color);
+            color: #ffffff;
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+        }
+
+        .header h1 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .back-btn {
+            background-color: rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+
+        .back-btn:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Container Layout */
+        .main-container {
+            max-width: 1400px;
+            margin: 24px auto;
+            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Card Panels */
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            padding: 24px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 20px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        /* Form Grid Layout */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group.full-width {
+            grid-column: span 3;
+        }
+
+        label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        input[type="text"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+            color: var(--text-main);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(15, 108, 189, 0.15);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-actions {
+            margin-top: 20px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .btn-submit {
+            background-color: var(--primary-color);
+            color: #ffffff;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-submit:hover {
+            background-color: var(--primary-hover);
+        }
+
+        /* Filter Controls */
+        .filter-bar {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            flex: 1;
+            max-width: 350px;
+        }
+
+        .filter-select {
+            width: 200px;
+        }
+
+        /* Table Styling */
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .test-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        .test-table th {
+            background-color: #f8fafc;
+            color: var(--text-muted);
+            font-weight: 600;
+            padding: 12px 16px;
+            border-bottom: 2px solid var(--border-color);
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .test-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+
+        .test-table tbody tr:hover {
+            background-color: #f8fafc;
+        }
+
+        /* Status Badges */
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-automated {
+            background-color: var(--badge-automated);
+            color: var(--badge-automated-text);
+        }
+
+        .badge-manual {
+            background-color: var(--badge-manual);
+            color: var(--badge-manual-text);
+        }
+
+        /* Action Icons */
+        .action-cell {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .action-icon {
+            text-decoration: none;
+            font-size: 16px;
+            opacity: 0.7;
+            transition: opacity 0.2s, transform 0.1s;
+        }
+
+        .action-icon:hover {
+            opacity: 1;
+            transform: scale(1.15);
+        }
+
+        code {
+            background-color: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: Consolas, Monaco, monospace;
+            font-size: 13px;
+            color: #0f172a;
+        }
+    </style>
 </head>
 
 <body>
 
     <div class="header">
-        Test Case Management
+        <h1>Test Case Management</h1>
+        <a href="/dashboard" class="back-btn">← Dashboard</a>
     </div>
 
-    <a href="/dashboard" class="back-btn">
-		← Dashboard
-	</a>
+    <div class="main-container">
 
-    <div class="table-container">
+        <!-- Form Panel -->
+        <div class="card">
+            <h2 class="card-title">Create New Test Case</h2>
 
-        <h2>Create New Test Case</h2>
+            <form action="/test-cases/save" method="POST">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="title">Title *</label>
+                        <input type="text" id="title" name="title" placeholder="e.g. Create Purchase Order" required>
+                    </div>
 
-        <form action="/test-cases/save" method="POST">
+                    <div class="form-group">
+                        <label for="module">Module *</label>
+                        <select id="module" name="module" required>
+                            <option value="">Select Module</option>
+                            <option value="PM">PM</option>
+                            <option value="MM">MM</option>
+                            <option value="FI">FI</option>
+                            <option value="CO">CO</option>
+                            <option value="SD">SD</option>
+                            <option value="WM">WM</option>
+                            <option value="QM">QM</option>
+                            <option value="PP">PP</option>
+                            <option value="SCM">SCM</option>
+                            <option value="LO">LO</option>
+                            <option value="TR">TR</option>
+                            <option value="PLM">PLM</option>
+                            <option value="PROC">PROC</option>
+                            <option value="E2E">E2E</option>
+                        </select>
+                    </div>
 
-            <input
-                type="text"
-                name="title"
-                placeholder="Title"
-                required>
+                    <div class="form-group">
+                        <label for="transaction_code">Transaction Code</label>
+                        <input type="text" id="transaction_code" name="transaction_code" placeholder="e.g. ME21N">
+                    </div>
 
-            <br><br>
+                    <div class="form-group full-width">
+                        <label for="process_step">Process Step Description</label>
+                        <textarea id="process_step" name="process_step" placeholder="Detail the process steps here..."></textarea>
+                    </div>
 
-            <select name="module">
+                    <div class="form-group">
+                        <label for="automation_status">Automation Status</label>
+                        <select id="automation_status" name="automation_status">
+                            <option value="Manual">Manual</option>
+                            <option value="Automated">Automated</option>
+                        </select>
+                    </div>
 
-                <option value="">Select Module</option>
-                <option value="PM">PM</option>
-                <option value="MM">MM</option>
-                <option value="FI">FI</option>
-                <option value="CO">CO</option>
-                <option value="SD">SD</option>
-                <option value="WM">WM</option>
-                <option value="QM">QM</option>
-                <option value="PP">PP</option>
-                <option value="SCM">SCM</option>
-                <option value="LO">LO</option>
-                <option value="TR">TR</option>
-		    <option value="PLM">PLM</option>
-		    <option value="PROC">PROC</option>
-		    <option value="E2E">E2E</option>
+                    <div class="form-group full-width" style="grid-column: span 2;">
+                        <label for="script_path">Automation Script Path</label>
+                        <input type="text" id="script_path" name="script_path" placeholder="e.g. ME21N_CREATE_PO.py">
+                    </div>
+                </div>
 
-            </select>
-
-            <br><br>
-
-            <input
-                type="text"
-                name="transaction_code"
-                placeholder="Transaction Code">
-
-            <br><br>
-			
-            <textarea
-                name="process_step"
-                placeholder="Process Step"></textarea>
-
-            <br><br>
-
-            <select name="automation_status">
-
-                <option value="Manual">Manual</option>
-                <option value="Automated">Automated</option>
-
-            </select>
-
-            <br><br>
-			Automation Script
-
-			<input
-				type="text"
-				name="script_path">
-				
-			<br><br>
-
-            <button
-                type="submit"
-                class="back-btn">
-
-                Save Test Case
-
-            </button>
-
-        </form>
-
-    </div>
-
-    <div class="table-container">
-
-        <h2>Available Test Cases</h2>
-
-        <div style="margin-bottom:20px;">
-
-            <input
-                type="text"
-                id="searchInput"
-                placeholder="Search Test Cases..."
-                style="padding:8px;width:300px;">
-
-            <select
-                id="moduleFilter"
-                style="padding:8px;margin-left:10px;">
-
-                <option value="">
-                    All Modules
-                </option>
-
-                <option value="PM">PM</option>
-                <option value="MM">MM</option>
-                <option value="FI">FI</option>
-                <option value="CO">CO</option>
-                <option value="SD">SD</option>
-                <option value="WM">WM</option>
-                <option value="QM">QM</option>
-                <option value="PP">PP</option>
-                <option value="SCM">SCM</option>
-                <option value="LO">LO</option>
-                <option value="TR">TR</option>
-		    <option value="PLM">PLM</option>
-		    <option value="PROC">PROC</option>
-		    <option value="E2E">E2E</option>
-
-            </select>
-
+                <div class="form-actions">
+                    <button type="submit" class="btn-submit">Save Test Case</button>
+                </div>
+            </form>
         </div>
 
-        <table class="test-table">
+        <!-- Data Table Panel -->
+        <div class="card">
+            <h2 class="card-title">Available Test Cases</h2>
 
-            <thead>
+            <div class="filter-bar">
+                <input type="text" id="searchInput" class="search-input" placeholder="🔍 Search test cases...">
+                <select id="moduleFilter" class="filter-select">
+                    <option value="">All Modules</option>
+                    <option value="PM">PM</option>
+                    <option value="MM">MM</option>
+                    <option value="FI">FI</option>
+                    <option value="CO">CO</option>
+                    <option value="SD">SD</option>
+                    <option value="WM">WM</option>
+                    <option value="QM">QM</option>
+                    <option value="PP">PP</option>
+                    <option value="SCM">SCM</option>
+                    <option value="LO">LO</option>
+                    <option value="TR">TR</option>
+                    <option value="PLM">PLM</option>
+                    <option value="PROC">PROC</option>
+                    <option value="E2E">E2E</option>
+                </select>
+            </div>
 
-                <tr>
-
-                    <th>ID</th>
-                    <th>Module</th>
-                    <th>Transaction</th>
-                    <th>Process Step</th>
-                     <th>Status</th>
-					 <th>Automation Script</th>
-                    <th style="width:140px;">
-                        Actions
-                    </th>
-
-                </tr>
-
-            </thead>
-
-            <tbody id="testCaseTable">
-
-                {% for row in rows %}
-
-                <tr>
-
-                    <td>{{ row[0] }}</td>
-                    <td>{{ row[1] }}</td>
-                    <td>{{ row[2] }}</td>
-                    <td>{{ row[3] }}</td>
-                    <td>{{ row[4] }}</td>
-					<td>{{ row[5] }}</td>
-
-
-
-                   <td class="action-cell">
-
-						<!-- View -->
-						<a href="/test-cases/view/{{ row[0] }}"
-						   class="action-icon"
-						   title="View">
-							👁️
-						</a>
-
-						<!-- Edit -->
-						<a href="/test-cases/edit/{{ row[0] }}"
-						   class="action-icon"
-						   title="Edit">
-							✏️
-						</a>
-
-						<!-- Delete -->
-						<a href="/test-cases/delete/{{ row[0] }}"
-						   class="action-icon"
-						   title="Delete"
-						   onclick="return confirm('Are you sure you want to delete this test case?');">
-							🗑️
-						</a>
-
-					</td>
-
-                </tr>
-
-                {% endfor %}
-
-            </tbody>
-
-        </table>
+            <div class="table-responsive">
+                <table class="test-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 80px;">ID</th>
+                            <th style="width: 90px;">Module</th>
+                            <th style="width: 120px;">Transaction</th>
+                            <th>Process Step</th>
+                            <th style="width: 120px;">Status</th>
+                            <th style="width: 220px;">Automation Script</th>
+                            <th style="width: 110px; text-align: center;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="testCaseTable">
+                        {% for row in rows %}
+                        <tr>
+                            <td><strong>{{ row[0] }}</strong></td>
+                            <td><code>{{ row[1] }}</code></td>
+                            <td><code>{{ row[2] }}</code></td>
+                            <td>{{ row[3] }}</td>
+                            <td>
+                                {% if row[4] == 'Automated' %}
+                                    <span class="badge badge-automated">Automated</span>
+                                {% else %}
+                                    <span class="badge badge-manual">Manual</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if row[5] %}
+                                    <code>{{ row[5] }}</code>
+                                {% else %}
+                                    <span style="color: var(--text-muted);">-</span>
+                                {% endif %}
+                            </td>
+                            <td class="action-cell" style="justify-content: center;">
+                                <a href="/test-cases/view/{{ row[0] }}" class="action-icon" title="View">👁️</a>
+                                <a href="/test-cases/edit/{{ row[0] }}" class="action-icon" title="Edit">✏️</a>
+                                <a href="/test-cases/delete/{{ row[0] }}" class="action-icon" title="Delete" onclick="return confirm('Are you sure you want to delete this test case?');">🗑️</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
     </div>
 
-<script>
+    <script>
+        const searchInput = document.getElementById("searchInput");
+        const moduleFilter = document.getElementById("moduleFilter");
 
-const searchInput =
-    document.getElementById("searchInput");
+        function filterTable() {
+            const searchValue = searchInput.value.toLowerCase();
+            const selectedModule = moduleFilter.value;
+            const rows = document.querySelectorAll("#testCaseTable tr");
 
-const moduleFilter =
-    document.getElementById("moduleFilter");
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                const module = row.children[1]?.innerText.trim();
 
-function filterTable() {
+                const searchMatch = text.includes(searchValue);
+                const moduleMatch = selectedModule === "" || module === selectedModule;
 
-    const searchValue =
-        searchInput.value.toLowerCase();
+                row.style.display = searchMatch && moduleMatch ? "" : "none";
+            });
+        }
 
-    const selectedModule =
-        moduleFilter.value;
-
-    const rows =
-        document.querySelectorAll(
-            "#testCaseTable tr"
-        );
-
-    rows.forEach(row => {
-
-        const text =
-            row.innerText.toLowerCase();
-
-        const module =
-            row.children[1]?.innerText;
-
-        const searchMatch =
-            text.includes(searchValue);
-
-        const moduleMatch =
-            selectedModule === "" ||
-            module === selectedModule;
-
-        row.style.display =
-            searchMatch && moduleMatch
-                ? ""
-                : "none";
-
-    });
-
-}
-
-searchInput.addEventListener(
-    "keyup",
-    filterTable
-);
-
-moduleFilter.addEventListener(
-    "change",
-    filterTable
-);
-
-</script>
+        searchInput.addEventListener("keyup", filterTable);
+        moduleFilter.addEventListener("change", filterTable);
+    </script>
 
 </body>
 

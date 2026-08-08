@@ -158,8 +158,8 @@ async def analyze_recording(
                         value = value_match.group(1)
 
                     if (
-                        not transaction
-                        and len(value) <= 10
+                        "/okcd" in line
+                        and ".text =" in line
                     ):
                         transaction = value.upper()
 
