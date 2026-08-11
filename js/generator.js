@@ -122,30 +122,50 @@ document
                         )
                         {
 
-                            if (
-                                !action.field ||
-                                action.field.trim() === ""
-                            )
-                            {
-                                return;
-                            }
+                            if (!action.locator)
+					{
+					    return;
+					}
 
-                            const variableName =
-                                mapFieldToVariable(
-                                    action.field
-                                );
+					if (
+					    action.locator ===
+					    "wnd[0]/tbar[0]/okcd"
+					)
+					{
+					    return;
+					}
+
+					if (
+					    !action.field ||
+					    action.field.trim() === ""
+					)
+					{
+					    return;
+					}
+
+					const fieldInfo =
+					    getFieldMetadata(
+						  action.field
+					    );
+
+					if (!fieldInfo)
+					{
+					    return;
+					}
+
+					const variableName =
+					    fieldInfo.variable;
 
                             generatedCode +=
-
-                                'SET_TEXT("'
-                                +
-                                action.field
-                                +
-                                '", '
-                                +
-                                variableName
-                                +
-                                ')\n';
+					    'session.findById("'
+					    +
+					    action.locator
+					    +
+					    '").text = '
+					    +
+					    variableName
+					    +
+					    '\n';
 
                         }
 

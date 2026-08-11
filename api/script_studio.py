@@ -191,6 +191,11 @@ async def analyze_recording(
                         r'([A-Z0-9_]+-[A-Z0-9_]+)',
                         line
                     )
+                    
+                    locator_match = re.search(
+                    r'findById\("([^"]+)"\)',
+                    line
+                )
 
                     value_match = re.search(
                         r'=\s*"([^"]*)"',
@@ -201,17 +206,25 @@ async def analyze_recording(
 
                     sample_value = ""
 
+                    locator = ""
+                    
+                    
+
                     if field_match:
                         field_name = field_match.group(1)
 
                     if value_match:
                         sample_value = value_match.group(1)
+                        
+                    if locator_match:
+                        locator = locator_match.group(1)    
 
                     actions.append(
                         {
                             "seq": seq,
                             "action": "SET_TEXT",
                             "field": field_name,
+                            "locator": locator,
                             "sample_value": sample_value
                         }
                     )
@@ -221,6 +234,7 @@ async def analyze_recording(
                         fields.append(
                             {
                                 "field": field_name,
+                                "locator": locator,
                                 "sample_value": sample_value
                             }
                         )
@@ -283,6 +297,14 @@ async def analyze_recording(
         print("ACTION COUNT =", len(actions))
         print("FIELDS =", len(fields))
         print("================================")
+        
+        print("===== ACTIONS =====")
+
+        for a in actions:
+            print(a)
+
+        print("===================")
+
         
         return JSONResponse(
             {
