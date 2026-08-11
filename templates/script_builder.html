@@ -1,55 +1,4 @@
 <!DOCTYPE html>
-<html>
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Script Builder</title>
-
-    <link rel="stylesheet" href="/static/css/pm.css">
-
-    <style>
-
-        .section {
-            margin-top: 25px;
-            padding: 15px;
-            border: 1px solid #dcdcdc;
-            border-radius: 8px;
-            background: #fafafa;
-        }
-
-        .action-btn {
-            margin-right: 10px;
-            padding: 10px 20px;
-            cursor: pointer;
-        }
-
-        .success {
-            color: green;
-            font-weight: bold;
-        }
-
-        .error {
-            color: red;
-            font-weight: bold;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        table th,
-        table td {
-            border: 1px solid #cccccc;
-            padding: 8px;
-        }
-
-        textarea {
-            width: 100%;
-        }
-<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -60,374 +9,11 @@
     <title>SAP Automation Studio - Script Builder</title>
 
     <link rel="stylesheet" href="/static/css/pm.css">
-
-
-    <style>
-
-        /* ===============================
-           GLOBAL
-        ================================ */
-
-        body {
-
-            background: #f4f6f9;
-            font-family: "Segoe UI", Arial, sans-serif;
-            margin: 0;
-
-        }
-
-
-        /* ===============================
-           HEADER
-        ================================ */
-
-        .header {
-
-            background: #0a6ed1;
-            color: white;
-
-            padding: 18px 30px;
-
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-
-        }
-
-
-        .header h1 {
-
-            margin: 0;
-            font-size: 22px;
-
-        }
-
-
-        .header span {
-
-            font-size: 14px;
-
-        }
-
-
-        /* ===============================
-           WORKSPACE
-        ================================ */
-
-        .workspace {
-
-            display: grid;
-
-            grid-template-columns:
-                320px
-                1fr
-                330px;
-
-            gap: 20px;
-
-            padding: 20px;
-
-        }
-
-
-
-        /* ===============================
-           CARDS
-        ================================ */
-
-        .card {
-
-            background: white;
-
-            border-radius: 12px;
-
-            padding: 20px;
-
-            box-shadow:
-                0 2px 8px rgba(0,0,0,0.08);
-
-            margin-bottom: 20px;
-
-        }
-
-
-        .card-title {
-
-            font-size: 16px;
-
-            font-weight: 600;
-
-            color: #333;
-
-            border-bottom: 1px solid #eee;
-
-            padding-bottom: 10px;
-
-            margin-bottom: 15px;
-
-        }
-
-
-
-        /* ===============================
-           FORM
-        ================================ */
-
-
-        .form-group {
-
-            margin-bottom: 15px;
-
-        }
-
-
-        label {
-
-            display: block;
-
-            font-size: 13px;
-
-            color: #555;
-
-            margin-bottom: 5px;
-
-        }
-
-
-        input,
-        select,
-        textarea {
-
-            width: 100%;
-
-            padding: 10px;
-
-            border: 1px solid #ccc;
-
-            border-radius: 6px;
-
-            box-sizing: border-box;
-
-        }
-
-
-        textarea {
-
-            resize: vertical;
-
-        }
-
-
-
-        /* ===============================
-           FLOW STEPS
-        ================================ */
-
-
-        .step-card {
-
-            border-left: 5px solid #0a6ed1;
-
-            padding: 12px;
-
-            background: #f8fbff;
-
-            border-radius: 8px;
-
-            margin-bottom: 10px;
-
-        }
-
-
-        .step-title {
-
-            font-weight: bold;
-
-        }
-
-
-
-        /* ===============================
-           METRICS
-        ================================ */
-
-
-        .metric {
-
-            padding: 15px;
-
-            background: #f8f9fa;
-
-            border-radius: 8px;
-
-            margin-bottom: 12px;
-
-        }
-
-
-        .metric-value {
-
-            font-size: 22px;
-
-            font-weight: bold;
-
-            color: #0a6ed1;
-
-        }
-
-
-
-        /* ===============================
-           TABLE
-        ================================ */
-
-
-        .table-container {
-
-            overflow: auto;
-
-        }
-
-
-        table {
-
-            width: 100%;
-
-            border-collapse: collapse;
-
-        }
-
-
-        th {
-
-            background: #eef3f8;
-
-        }
-
-
-        td,
-        th {
-
-            padding: 10px;
-
-            border-bottom: 1px solid #ddd;
-
-            font-size: 13px;
-
-        }
-
-
-
-        /* ===============================
-           SCRIPT EDITOR
-        ================================ */
-
-
-        .script-editor {
-
-            background: #1e1e1e;
-
-            color: #dcdcdc;
-
-            font-family: Consolas, monospace;
-
-            min-height: 300px;
-
-            padding: 20px;
-
-            border-radius: 10px;
-
-        }
-
-
-        /* ===============================
-           FOOTER ACTION BAR
-        ================================ */
-
-
-        .action-bar {
-
-            position: fixed;
-
-            bottom: 0;
-
-            left: 0;
-
-            right: 0;
-
-
-            background: white;
-
-            padding: 15px 30px;
-
-
-            box-shadow:
-                0 -2px 10px rgba(0,0,0,.1);
-
-
-            text-align: right;
-
-        }
-
-
-        .btn {
-
-            padding: 10px 22px;
-
-            border: none;
-
-            border-radius: 6px;
-
-            cursor: pointer;
-
-            margin-left: 10px;
-
-        }
-
-
-        .btn-primary {
-
-            background: #0a6ed1;
-
-            color: white;
-
-        }
-
-
-        .btn-success {
-
-            background: #188918;
-
-            color: white;
-
-        }
-
-
-
-        /* ===============================
-           RESPONSIVE
-        ================================ */
-
-
-        @media(max-width:1200px) {
-
-            .workspace {
-
-                grid-template-columns: 1fr;
-
-            }
-
-        }
-
-
-    </style>
-
+    <link rel="stylesheet" href="/static/css/script_builder.css">
 
 </head>
 
 <body>
-
-
 
     <!-- ================= HEADER ================= -->
 
@@ -443,23 +29,17 @@
 
     </div>
 
-
-
     <!-- ================= WORKSPACE ================= -->
 
     <div class="workspace">
-
-
 
         <!-- ================= LEFT PANEL ================= -->
 
         <div>
 
-
             <!-- Script Information -->
 
             <div class="card">
-
 
                 <div class="card-title">
 
@@ -467,20 +47,15 @@
 
                 </div>
 
-
-
                 <form method="post"
                       action="/script-studio/save"
                       enctype="multipart/form-data">
-
-
 
                     <div class="form-group">
 
                         <label>
                             Script Name *
                         </label>
-
 
                         <input
                             type="text"
@@ -489,9 +64,6 @@
                             required>
 
                     </div>
-
-
-
 
                     <div class="form-group">
 
@@ -502,11 +74,9 @@
 
                         <select name="module">
 
-
                             <option>
                                 Select Module
                             </option>
-
 
                             <option>
                                 PM
@@ -535,35 +105,30 @@
                             <option>
                                 LO
                             </option>
-				    
-				    <option>
+
+                            <option>
                                 FI
                             </option>
-				    
-				    <option>
+
+                            <option>
                                 TR
                             </option>
-				    
-				    <option>
+
+                            <option>
                                 PLM
                             </option>
-				    
-				    <option>
+
+                            <option>
                                 SCP
                             </option>
-				    
-				    <option>
+
+                            <option>
                                 PROC
                             </option>
-
 
                         </select>
 
                     </div>
-
-
-
-
 
                     <div class="form-group">
 
@@ -572,18 +137,13 @@
                             Business Flow *
                         </label>
 
-
-
                         <select
                             name="flow_id"
                             id="flow_id">
 
-
                             <option>
                                 Select Flow
                             </option>
-
-
 
                             {% for flow in flows %}
 
@@ -593,48 +153,29 @@
 
                             </option>
 
-
                             {% endfor %}
-
 
                         </select>
 
-
                     </div>
 
-
-
-
-
                     <div class="form-group">
-
 
                         <label>
                             Description
                         </label>
 
-
-
                         <textarea
                             name="description"
                             rows="5"></textarea>
 
-
                     </div>
-
-
 
             </div>
 
-
-
-
-
             <!-- SAP Recording Upload -->
 
-
             <div class="card">
-
 
                 <div class="card-title">
 
@@ -642,40 +183,23 @@
 
                 </div>
 
-
-
                 <div id="recordingUploads">
 
                     Select Flow First
 
                 </div>
 
-
-
             </div>
-
-
 
         </div>
 
-
-
-
-
-
-
         <!-- ================= CENTER PANEL ================= -->
-
 
         <div>
 
-
-
             <!-- Business Flow Steps -->
 
-
             <div class="card">
-
 
                 <div class="card-title">
 
@@ -683,31 +207,16 @@
 
                 </div>
 
-
-
                 <div id="flowSteps">
 
-
                     Select a flow to display steps
-
-
                 </div>
-
-
 
             </div>
 
-
-
-
-
-
-
             <!-- Parsed Actions Preview -->
 
-
             <div class="card">
-
 
                 <div class="card-title">
 
@@ -715,55 +224,37 @@
 
                 </div>
 
-
-
-
                 <div class="table-container">
-
 
                     <table>
 
-
                         <thead>
 
-
                             <tr>
-
 
                                 <th>
                                     Seq
                                 </th>
 
-
                                 <th>
                                     Action
                                 </th>
 
-
                                 <th>
-                                    Parameter
+                                    Field
                                 </th>
 
-
                                 <th>
-                                    Value
+                                    Sample Value
                                 </th>
-
 
                             </tr>
 
-
                         </thead>
-
-
-
-
 
                         <tbody id="parsedActions">
 
-
                             <tr>
-
 
                                 <td colspan="4">
 
@@ -771,46 +262,25 @@
 
                                 </td>
 
-
                             </tr>
-
 
                         </tbody>
 
-
-
                     </table>
-
 
                 </div>
 
-
-
             </div>
-
-
 
         </div>
 
-
-
-
-
-
-
         <!-- ================= RIGHT PANEL ================= -->
-
 
         <div>
 
-
-
-
             <!-- Recording Analysis -->
 
-
             <div class="card">
-
 
                 <div class="card-title">
 
@@ -818,15 +288,9 @@
 
                 </div>
 
-
-
-
-
                 <div class="metric">
 
-
                     Status
-
 
                     <div class="metric-value"
                          id="analysisStatus">
@@ -835,59 +299,59 @@
 
                     </div>
 
-
                 </div>
-
-
-
-
-
 
                 <div class="metric">
 
-
                     Transaction
-
 
                     <div class="metric-value"
                          id="detectedTransaction">
 
-
                         None
-
 
                     </div>
 
-
                 </div>
-
-
-
-
-
 
                 <div class="metric">
 
-
                     Actions
-
 
                     <div class="metric-value"
                          id="actionCount">
 
-
                         0
-
 
                     </div>
 
+                </div>
+
+                <div class="metric">
+
+                    Fields
+
+                    <div class="metric-value"
+                         id="fieldCount">
+
+                        0
+
+                    </div>
 
                 </div>
 
+                <div class="metric">
 
+                    Validation
 
+                    <div class="metric-value"
+                         id="validationStatus">
 
+                        Waiting
 
+                    </div>
+
+                </div>
 
                 <div id="analysisErrors">
 
@@ -895,21 +359,35 @@
 
                 </div>
 
+            </div>
 
+            <hr>
+
+            <h4>
+                Discovered Fields
+            </h4>
+
+            <div id="discoveredFields">
+
+                Analyze Recording First
 
             </div>
 
+            <hr>
 
+            <h4>
+                Flow Validation
+            </h4>
 
+            <div id="flowValidation">
 
+                Analyze Flow First
 
-
+            </div>
 
             <!-- Framework Flow -->
 
-
             <div class="card">
-
 
                 <div class="card-title">
 
@@ -917,60 +395,36 @@
 
                 </div>
 
-
-
                 <ul>
-
 
                     <li>
                         LOGIN
                     </li>
 
-
                     <li>
                         START_TRANSACTION
                     </li>
-
 
                     <li>
                         RECORDED ACTIONS
                     </li>
 
-
                     <li>
                         LOGOUT
                     </li>
 
-
                 </ul>
-
-
 
             </div>
 
-
-
         </div>
-
-
-
 
     </div>
 
-
-
-
-
-
-
-
-
     <!-- ================= GENERATED SCRIPT ================= -->
-
 
     <div class="card"
          style="margin:20px;">
-
 
         <div class="card-title">
 
@@ -978,52 +432,31 @@
 
         </div>
 
-
-
-
-
-        <div id="generatedScript"
+        <pre id="generatedScript"
              class="script-editor">
-
 
             Python script will appear here...
 
-
-        </div>
-
-
+        </pre>
 
     </div>
 
-
-
-
-
-
-
     <!-- ================= ACTION BAR ================= -->
-
 
     <div class="action-bar">
 
-	<a href="/script-studio" class="back-btn">
-	    ← Script Studio
-	</a>
+        <a href="/script-studio" class="back-btn">
+            ← Script Studio
+        </a>
 
         <button
             type="button"
             id="analyzeBtn"
             class="btn btn-primary">
 
-
             🔍 Analyze
 
-
         </button>
-
-
-
-
 
         <button
             type="button"
@@ -1031,15 +464,9 @@
             class="btn btn-success"
             disabled>
 
-
             ⚙ Generate Script
 
-
         </button>
-
-
-
-
 
         <button
             type="submit"
@@ -1047,181 +474,21 @@
             class="btn btn-primary"
             disabled>
 
-
             💾 Save
-
 
         </button>
 
-
-
     </div>
-
-
 
     </form>
 
-
     <!-- ================= JAVASCRIPT ================= -->
-
-    <script>
-
-
-        document
-            .getElementById("flow_id")
-            .addEventListener(
-                "change",
-                function () {
-
-
-                    let flowId = this.value;
-
-
-
-                    if (!flowId) {
-
-                        return;
-
-                    }
-
-
-
-
-
-                    fetch(
-                        "/script-studio/flow-steps/" + flowId
-                    )
-
-
-                    .then(response => response.json())
-
-
-                    .then(data => {
-
-
-
-                        let stepsHtml = "";
-
-                        let uploadHtml = "";
-
-
-
-
-
-                        data.forEach(step => {
-
-
-
-                            /*
-                             * Business Flow Steps
-                             */
-
-
-                            stepsHtml += `
-
-                                <div class="step-card">
-
-
-                                    <div class="step-title">
-
-                                        Step ${step.sequence_no}
-
-                                    </div>
-
-
-                                    ${step.transaction_code}
-
-                                    <br>
-
-
-                                    ${step.description}
-
-
-                                </div>
-
-                            `;
-
-
-
-
-
-
-
-                            /*
-                             * Recording Upload Section
-                             */
-
-
-                            uploadHtml += `
-
-
-                                <div class="step-card">
-
-
-                                    <b>
-
-                                        ${step.transaction_code}
-
-                                    </b>
-
-
-                                    <br>
-
-
-                                    <input
-
-                                        type="file"
-
-                                        name="recording_${step.sequence_no}"
-
-                                        accept=".txt">
-
-
-                                </div>
-
-
-                            `;
-
-
-
-                        });
-
-
-
-
-
-
-
-                        document
-                            .getElementById("flowSteps")
-                            .innerHTML = stepsHtml;
-
-
-
-
-
-
-                        document
-                            .getElementById("recordingUploads")
-                            .innerHTML = uploadHtml;
-
-
-
-                    });
-
-
-
-                });
-
-
-
-    </script>
-
-
-
-
+    <script src="/js/script_builder.js"></script>
+    <script src="/js/flow_loader.js"></script>
+    <script src="/js/analyzer.js"></script>
+    <script src="/js/generator.js"></script>
+    <script src="/js/metadata.js"></script>
 
 </body>
-
 
 </html>

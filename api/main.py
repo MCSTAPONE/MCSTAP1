@@ -46,6 +46,12 @@ app.mount(
 )
 
 app.mount(
+    "/js",
+    StaticFiles(directory="js"),
+    name="js"
+)
+
+app.mount(
     "/allure",
     StaticFiles(directory="allure-report"),
     name="allure"

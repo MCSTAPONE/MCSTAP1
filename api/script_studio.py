@@ -130,90 +130,187 @@ async def analyze_recording(
 
         content = await recording_file.read()
 
-        text = content.decode(
-            "utf-8",
-            errors="ignore"
-        )
+        try:
+
+            text = content.decode("utf-16")
+
+        except UnicodeError:
+
+            text = content.decode(
+                "utf-8",
+                errors="ignore"
+            )
 
         actions = []
+
+        fields = []
+
         errors = []
+
         transaction = ""
 
         seq = 1
 
         for line in text.splitlines():
-
+            print(line)
             try:
 
-                if ".text =" in line:
+                line = str(line).strip()
+
+                # --------------------------
+                # TRANSACTION DETECTION
+                # --------------------------
+
+                if (
+                    "/okcd" in line
+                    and ".text =" in line
+                ):
 
                     value_match = re.search(
                         r'=\s*"([^"]*)"',
                         line
                     )
 
-                    value = ""
+                    if value_match:
+
+                        transaction = (
+                            value_match.group(1)
+                            .replace("/n", "")
+                            .upper()
+                        )
+
+                # --------------------------
+                # SET_TEXT
+                # --------------------------
+
+                if ".text" in line:
+
+                    print("TEXT FOUND =", line)
+
+                    field_match = re.search(
+                        r'([A-Z0-9_]+-[A-Z0-9_]+)',
+                        line
+                    )
+
+                    value_match = re.search(
+                        r'=\s*"([^"]*)"',
+                        line
+                    )
+
+                    field_name = ""
+
+                    sample_value = ""
+
+                    if field_match:
+                        field_name = field_match.group(1)
 
                     if value_match:
-                        value = value_match.group(1)
+                        sample_value = value_match.group(1)
 
-                    if (
-                        "/okcd" in line
-                        and ".text =" in line
-                    ):
-                        transaction = value.upper()
+                    actions.append(
+                        {
+                            "seq": seq,
+                            "action": "SET_TEXT",
+                            "field": field_name,
+                            "sample_value": sample_value
+                        }
+                    )
 
-                    actions.append({
-                        "seq": seq,
-                        "action": "SET_TEXT",
-                        "parameter": "",
-                        "value": value
-                    })
+                    if field_name:
+
+                        fields.append(
+                            {
+                                "field": field_name,
+                                "sample_value": sample_value
+                            }
+                        )
+
+                    seq += 1
+
+                # --------------------------
+                # SEND_VKEY
+                # --------------------------
+
+                elif "sendVKey" in line:
+
+                    print("VKEY FOUND =", line)
+
+                    key_match = re.search(
+                        r'sendVKey\s+(\d+)',
+                        line
+                    )
+
+                    vkey = "0"
+
+                    if key_match:
+                        vkey = key_match.group(1)
+
+                    actions.append(
+                        {
+                            "seq": seq,
+                            "action": "SEND_VKEY",
+                            "field": "ENTER_KEY",
+                            "sample_value": vkey
+                        }
+                    )
 
                     seq += 1
 
-                elif ".sendVKey" in line:
-
-                    actions.append({
-                        "seq": seq,
-                        "action": "SEND_VKEY",
-                        "parameter": "ENTER",
-                        "value": "0"
-                    })
-
-                    seq += 1
+                # --------------------------
+                # PRESS
+                # --------------------------
 
                 elif ".press" in line:
 
-                    actions.append({
-                        "seq": seq,
-                        "action": "PRESS",
-                        "parameter": "",
-                        "value": ""
-                    })
+                    print("PRESS FOUND =", line)
+
+                    actions.append(
+                        {
+                            "seq": seq,
+                            "action": "PRESS",
+                            "field": "",
+                            "sample_value": ""
+                        }
+                    )
 
                     seq += 1
 
             except Exception as ex:
 
                 errors.append(str(ex))
-
-        return JSONResponse({
-            "success": True,
-            "transaction": transaction,
-            "action_count": len(actions),
-            "errors": errors,
-            "actions": actions
-        })
+        print("================================")
+        print("TRANSACTION =", transaction)
+        print("ACTION COUNT =", len(actions))
+        print("FIELDS =", len(fields))
+        print("================================")
+        
+        return JSONResponse(
+            {
+                "success": True,
+                "transaction": transaction,
+                "action_count": len(actions),
+                "field_count": len(fields),
+                "errors": errors,
+                "fields": fields,
+                "actions": actions
+            }
+        )
 
     except Exception as e:
 
-        return JSONResponse({
-            "success": False,
-            "message": str(e)
-        })
+        print("================================")
+        print("ANALYZE ERROR")
+        print(str(e))
+        print("================================")
 
-  
+        return JSONResponse(
+            {
+                "success": False,
+                "message": str(e)
+            }
+        )
+
+
 @router.get("/script-studio/start-recorder")
 def start_recorder():
 

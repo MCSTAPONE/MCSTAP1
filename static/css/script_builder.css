@@ -1,0 +1,211 @@
+/* ===============================
+   GLOBAL
+================================ */
+
+body {
+    background: #f4f6f9;
+    font-family: "Segoe UI", Arial, sans-serif;
+    margin: 0;
+    padding-bottom: 120px;
+}
+
+/* ===============================
+   HEADER
+================================ */
+
+.header {
+    background: #0a6ed1;
+    color: white;
+    padding: 18px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 22px;
+}
+
+.header span {
+    font-size: 14px;
+}
+
+/* ===============================
+   WORKSPACE
+================================ */
+
+.workspace {
+    display: grid;
+    grid-template-columns: 320px 1fr 330px;
+    gap: 20px;
+    padding: 20px;
+}
+
+/* ===============================
+   CARDS
+================================ */
+
+.card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    margin-bottom: 20px;
+}
+
+.card-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+/* ===============================
+   FORM
+================================ */
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    font-size: 13px;
+    color: #555;
+    margin-bottom: 5px;
+}
+
+input,
+select,
+textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+}
+
+textarea {
+    resize: vertical;
+}
+
+/* ===============================
+   FLOW STEPS
+================================ */
+
+.step-card {
+    border-left: 5px solid #0a6ed1;
+    padding: 12px;
+    background: #f8fbff;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.step-title {
+    font-weight: bold;
+}
+
+/* ===============================
+   METRICS
+================================ */
+
+.metric {
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin-bottom: 12px;
+}
+
+.metric-value {
+    font-size: 22px;
+    font-weight: bold;
+    color: #0a6ed1;
+}
+
+/* ===============================
+   TABLE
+================================ */
+
+.table-container {
+    overflow: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    background: #eef3f8;
+}
+
+td,
+th {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    font-size: 13px;
+}
+
+/* ===============================
+   SCRIPT EDITOR
+================================ */
+
+.script-editor {
+    background: #1e1e1e;
+    color: #dcdcdc;
+    font-family: Consolas, monospace;
+    min-height: 400px;
+    max-height: 700px;
+    overflow-y: auto;
+    overflow-x: auto;
+    white-space: pre;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid #444;
+}
+
+/* ===============================
+   FOOTER ACTION BAR
+================================ */
+
+.action-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    padding: 15px 30px;
+    box-shadow: 0 -2px 10px rgba(0,0,0,.1);
+    text-align: right;
+}
+
+.btn {
+    padding: 10px 22px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+.btn-primary {
+    background: #0a6ed1;
+    color: white;
+}
+
+.btn-success {
+    background: #188918;
+    color: white;
+}
+
+/* ===============================
+   RESPONSIVE
+================================ */
+
+@media(max-width:1200px) {
+    .workspace {
+        grid-template-columns: 1fr;
+    }
+}
