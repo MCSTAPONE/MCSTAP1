@@ -8,6 +8,7 @@ from fastapi import UploadFile
 from fastapi import File
 from fastapi.responses import JSONResponse
 import re
+import time
 
 from api.database import get_connection
 from api.shared import templates
@@ -264,6 +265,7 @@ async def analyze_recording(
                             "seq": seq,
                             "action": "SEND_VKEY",
                             "field": "ENTER_KEY",
+				    "locator": "wnd[0]",
                             "sample_value": vkey
                         }
                     )
@@ -298,14 +300,7 @@ async def analyze_recording(
         print("FIELDS =", len(fields))
         print("================================")
         
-        print("===== ACTIONS =====")
 
-        for a in actions:
-            print(a)
-
-        print("===================")
-
-        
         return JSONResponse(
             {
                 "success": True,
