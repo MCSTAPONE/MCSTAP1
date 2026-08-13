@@ -3,12 +3,16 @@
 from fastapi import APIRouter
 from fastapi import Request
 from fastapi import Form
+from fastapi import Body
+from pathlib import Path
 
 from fastapi import UploadFile
 from fastapi import File
 from fastapi.responses import JSONResponse
+from fastapi.responses import (HTMLResponse, RedirectResponse)
 import re
 import time
+import json
 
 from api.database import get_connection
 from api.shared import templates
@@ -453,11 +457,25 @@ def save_script(
     script_name: str = Form(...),
     module: str = Form(...),
     transaction_code: str = Form(...),
-    description: str = Form(...)
+    description: str = Form(...),
+    generated_script: str = Form(""),
+    analysis_results: str = Form("")
 ):
+
+    print("========== SAVE ==========")
+    print("script_name =", script_name)
+    print("module =", module)
+    print("transaction_code =", transaction_code)
+    print("description =", description)
+    print("generated_script length =", len(generated_script))
+    print("==========================")
 
     conn = get_connection()
     cur = conn.cursor()
+
+    # ---------------------------------------
+    # SCRIPT MASTER
+    # ---------------------------------------
 
     cur.execute(
         """
@@ -467,11 +485,12 @@ def save_script(
             module,
             transaction_code,
             description,
+            generated_script,
             status,
             created_by
         )
         VALUES
-        (%s,%s,%s,%s,%s,%s)
+        (%s,%s,%s,%s,%s,%s,%s)
         RETURNING script_id
         """,
         (
@@ -479,28 +498,17 @@ def save_script(
             module,
             transaction_code,
             description,
+            generated_script,
             "Draft",
-            "Biranchi"
+            "Biranchi Das"
         )
     )
 
     new_script_id = cur.fetchone()[0]
 
-    cur.execute(
-        """
-        INSERT INTO script_steps
-        (
-            script_id,
-            step_sequence,
-            action_type,
-            parameter_name,
-            parameter_value
-        )
-        VALUES
-        (%s,1,'LOGIN','','')
-        """,
-        (str(new_script_id),)
-    )
+    # ---------------------------------------
+    # LOGIN
+    # ---------------------------------------
 
     cur.execute(
         """
@@ -513,14 +521,139 @@ def save_script(
             parameter_value
         )
         VALUES
-        (%s,2,'START_TRANSACTION','TCODE',%s)
+        (%s,%s,'LOGIN','','')
         """,
         (
             str(new_script_id),
+            1
+        )
+    )
+
+    # ---------------------------------------
+    # TRANSACTION
+    # ---------------------------------------
+
+    cur.execute(
+        """
+        INSERT INTO script_steps
+        (
+            script_id,
+            step_sequence,
+            action_type,
+            parameter_name,
+            parameter_value
+        )
+        VALUES
+        (%s,%s,'START_TRANSACTION','TCODE',%s)
+        """,
+        (
+            str(new_script_id),
+            2,
             transaction_code
         )
     )
 
+    step_sequence = 3
+
+    # ---------------------------------------
+    # ANALYZED ACTIONS
+    # ---------------------------------------
+
+    try:
+
+        results = json.loads(
+            analysis_results
+        )
+
+        for result in results:
+
+            for action in result["actions"]:
+
+                # Ignore tcode launcher
+                if (
+                    action.get("locator") ==
+                    "wnd[0]/tbar[0]/okcd"
+                ):
+                    continue
+
+                if (
+                    action["action"] ==
+                    "SET_TEXT"
+                ):
+
+                    cur.execute(
+                        """
+                        INSERT INTO script_steps
+                        (
+                            script_id,
+                            step_sequence,
+                            action_type,
+                            parameter_name,
+                            parameter_value
+                        )
+                        VALUES
+                        (%s,%s,%s,%s,%s)
+                        """,
+                        (
+                            str(new_script_id),
+                            step_sequence,
+                            "SET_TEXT",
+                            action.get(
+                                "locator",
+                                ""
+                            ),
+                            action.get(
+                                "sample_value",
+                                ""
+                            )
+                        )
+                    )
+
+                    step_sequence += 1
+
+                elif (
+                    action["action"] ==
+                    "SEND_VKEY"
+                ):
+
+                    cur.execute(
+                        """
+                        INSERT INTO script_steps
+                        (
+                            script_id,
+                            step_sequence,
+                            action_type,
+                            parameter_name,
+                            parameter_value
+                        )
+                        VALUES
+                        (%s,%s,%s,%s,%s)
+                        """,
+                        (
+                            str(new_script_id),
+                            step_sequence,
+                            "SEND_VKEY",
+                            "KEY",
+                            action.get(
+                                "sample_value",
+                                ""
+                            )
+                        )
+                    )
+
+                    step_sequence += 1
+
+    except Exception as ex:
+
+        print(
+            "STEP CREATION ERROR:",
+            str(ex)
+        )
+
+    # ---------------------------------------
+    # LOGOUT
+    # ---------------------------------------
+
     cur.execute(
         """
         INSERT INTO script_steps
@@ -532,9 +665,12 @@ def save_script(
             parameter_value
         )
         VALUES
-        (%s,3,'LOGOUT','','')
+        (%s,%s,'LOGOUT','','')
         """,
-        (str(new_script_id),)
+        (
+            str(new_script_id),
+            step_sequence
+        )
     )
 
     conn.commit()

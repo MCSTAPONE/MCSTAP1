@@ -88,6 +88,38 @@ class ScriptExecutor:
                     self.log(
                         f"{parameter} opened"
                     )
+                    
+                    
+                elif action == "SET_TEXT":
+
+                    self.log(
+                        f"SET_TEXT {step[2]}"
+                    )
+
+                    self.sap.set_text(
+                        step[2],
+                        step[3]
+                    )
+
+                elif action == "SEND_VKEY":
+
+                    self.log(
+                        f"SEND_VKEY {step[3]}"
+                    )
+
+                    self.sap.send_vkey(
+                        step[3]
+                    )
+
+                elif action == "PRESS":
+
+                    self.log(
+                        f"PRESS {step[2]}"
+                    )
+
+                    self.sap.press(
+                        step[2]
+                    )
 
                 elif action == "EXECUTE_FLOW":
 
