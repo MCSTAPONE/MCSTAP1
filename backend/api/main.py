@@ -21,7 +21,6 @@ from api.repository import router as repository_router
 from api.test_cases import router as test_cases_router
 from api.flow_library import router as flow_router
 from api.script_studio import router as script_router
-from api.tdc import router as tdc_router
 
 from services.script_executor import ScriptExecutor
 from services.coverage_intelligence import get_coverage_dashboard
@@ -38,7 +37,6 @@ app.include_router(repository_router)
 app.include_router(test_cases_router)
 app.include_router(flow_router)
 app.include_router(script_router)
-app.include_router(tdc_router)
 
 templates = Jinja2Templates(directory="templates")
 app.mount(

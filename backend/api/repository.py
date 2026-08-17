@@ -54,13 +54,18 @@ def edit_asset(
 @router.post("/repository/update/{asset_id}")
 def update_asset(
     asset_id: int,
+
     asset_name: str = Form(...),
+
     module: str = Form(...),
+
     transaction_code: str = Form(...),
+
     business_object: str = Form(""),
+
     operation: str = Form(""),
-    description: str = Form(""),
-    asset_script: str = Form("")
+
+    description: str = Form("")
 ):
 
     service.update_asset(
@@ -70,8 +75,7 @@ def update_asset(
         transaction_code,
         business_object,
         operation,
-        description,
-	  asset_script
+        description
     )
 
     return RedirectResponse(

@@ -1,0 +1,99 @@
+body {
+    font-family: Segoe UI, Arial, sans-serif;
+    background: #f4f6f9;
+    margin: 0;
+}
+
+.container {
+    padding: 20px;
+}
+
+h2 {
+    color: #0a6ed1;
+    margin-bottom: 20px;
+}
+
+/* Table Styles */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+th {
+    background: #0a6ed1;
+    color: white;
+    font-weight: 600;
+}
+
+td, th {
+    border: 1px solid #dcdcdc;
+    padding: 10px 12px;
+    text-align: left;
+}
+
+tr:nth-child(even) {
+    background: #f8f9fa;
+}
+
+tr:hover {
+    background: #eef3f8;
+}
+
+table a {
+    color: #0a6ed1;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+table a:hover {
+    text-decoration: underline;
+}
+
+/* Form Styles */
+form {
+    display: inline-block;
+}
+
+/* Standard inputs, selects, and description textarea stay compact */
+form input[type="text"],
+form select {
+    width: 320px;
+    box-sizing: border-box;
+}
+
+form textarea[name="description"] {
+    width: 640px;
+    box-sizing: border-box;
+}
+
+/* Large code script box stays wide */
+form textarea[name="asset_script"] {
+    width: 960px;
+    box-sizing: border-box;
+}
+
+/* Save button aligned to the right edge of the Asset Script box */
+.form-actions {
+    display: flex !important;
+    justify-content: flex-end !important;
+    width: 960px;
+    margin-top: 20px;
+    box-sizing: border-box;
+}
+
+.btn-save {
+    background: #0a6ed1;
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 4px;
+}
+
+.btn-save:hover {
+    background: #0859a0;
+}

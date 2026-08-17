@@ -1,0 +1,46 @@
+body
+{
+    font-family: Segoe UI, Arial, sans-serif;
+    background: #f4f6f9;
+    margin: 0;
+}
+
+.header
+{
+    background: #0a6ed1;
+    color: white;
+    padding: 15px;
+}
+
+.container
+{
+    padding: 20px;
+}
+
+table
+{
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+th
+{
+    background: #0a6ed1;
+    color: white;
+}
+
+td,
+th
+{
+    border: 1px solid #dcdcdc;
+    padding: 8px;
+}
+
+.btn
+{
+    padding: 8px 12px;
+    background: #0a6ed1;
+    color: white;
+    text-decoration: none;
+}

@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Assistant</title>
+
+    <link rel="stylesheet" href="/static/css/pm.css">
+</head>
+<body>
+
+    <div class="header">
+
+        AI Assistant
+
+    </div>
+
+    <a href="/dashboard" class="back-btn">
+
+        ← Dashboard
+
+    </a>
+
+    <div style="display:flex; gap:20px; padding:20px;">
+
+        <!-- LEFT PANEL -->
+
+        <div
+            style="
+                width:280px;
+                background:white;
+                border:1px solid #ddd;
+                padding:15px;
+                border-radius:8px;
+                height:fit-content;
+            "
+        >
+
+            <h3>🕒 Recent Commands</h3>
+
+            {% if history %}
+
+                {% for item in history %}
+
+                    <div
+                        style="
+                            padding:8px;
+                            border-bottom:1px solid #eee;
+                            cursor:pointer;
+                        "
+                        onclick="
+                            document.querySelector(
+                                'textarea[name=question]'
+                            ).value=`{{ item }}`;
+                        "
+                    >
+                        {{ item }}
+                    </div>
+
+                {% endfor %}
+
+            {% else %}
+
+                <div>No history available</div>
+
+            {% endif %}
+
+            <br>
+
+            <h3>⭐ Suggested Commands</h3>
+
+            <div
+                style="cursor:pointer;padding:6px;"
+                onclick="
+                    document.querySelector(
+                        'textarea[name=question]'
+                    ).value='What Should We Automate Next?';
+                "
+            >
+                What Should We Automate Next?
+            </div>
+
+            <div
+                style="cursor:pointer;padding:6px;"
+                onclick="
+                    document.querySelector(
+                        'textarea[name=question]'
+                    ).value='Top Automation Opportunities';
+                "
+            >
+                Top Automation Opportunities
+            </div>
+
+            <div
+                style="cursor:pointer;padding:6px;"
+                onclick="
+                    document.querySelector(
+                        'textarea[name=question]'
+                    ).value='Build Test Strategy For Purchase Order';
+                "
+            >
+                Build Test Strategy For Purchase Order
+            </div>
+
+            <div
+                style="cursor:pointer;padding:6px;"
+                onclick="
+                    document.querySelector(
+                        'textarea[name=question]'
+                    ).value='Build Test Plan For Purchase Order';
+                "
+            >
+                Build Test Plan For Purchase Order
+            </div>
+
+            <div
+                style="cursor:pointer;padding:6px;"
+                onclick="
+                    document.querySelector(
+                        'textarea[name=question]'
+                    ).value='Show Process Dependencies For Purchase Order';
+                "
+            >
+                Show Process Dependencies For Purchase Order
+            </div>
+
+        </div>
+
+        <!-- MAIN CONTENT -->
+
+        <div class="table-container" style="flex:1;">
+
+            <h2>MC STAP AI Assistant</h2>
+
+            <p>
+                Ask questions about:
+            </p>
+
+            <ul>
+                <li>Repository Assets</li>
+                <li>Business Flows</li>
+                <li>Test Cases</li>
+                <li>Coverage Analysis</li>
+                <li>Risk Analysis</li>
+                <li>Build Test Plan</li>
+                <li>Build Test Strategy</li>
+                <li>Build Test Document</li>
+            </ul>
+
+            <form method="post">
+
+                <textarea
+                    name="question"
+                    rows="6"
+                    style="width:100%;"
+                    placeholder="Example: Show all CO repository assets"></textarea>
+
+                <br><br>
+
+                <!--button
+                    type="submit"
+                    class="back-btn">
+                    Ask AI
+                </button--!>
+
+            </form>
+
+            {% if answer %}
+
+                <br><br>
+
+                <div class="card">
+
+                    <h3>AI Response</h3>
+
+                    <pre>{{ answer }}</pre>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+    <script>
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
+
+            const textarea = document.querySelector(
+                "textarea[name='question']"
+            );
+
+            textarea.addEventListener(
+                "keydown",
+                function (event) {
+
+                    if (
+                        event.key === "Enter"
+                        && !event.shiftKey
+                    ) {
+
+                        event.preventDefault();
+
+                        this.form.submit();
+                    }
+                }
+            );
+        }
+    );
+
+    </script>
+
+</body>
+</html>

@@ -3,9 +3,12 @@
 from fastapi import APIRouter
 from fastapi import Request
 from fastapi import Form
+from urllib3 import request
 
 from api.database import get_connection
 from api.shared import templates
+
+from fastapi.responses import RedirectResponse
 
 router = APIRouter()
 
@@ -16,48 +19,79 @@ def test_cases(request: Request):
 
     cur = conn.cursor()
 
-    
-    cur.execute("""
+    cur.execute(
+        """
         SELECT
-            test_case_id,
-            module,
-            transaction_code,
-            process_step,
-            automation_status,
-            script_path
-        FROM test_cases
-        ORDER BY id ASC
-    """)
 
+            tc.id,
+            tc.test_case_id,
+            tc.title,
+            tc.module,
+            fm.flow_name,
+		tm.tdc_name,
+            tc.priority
+        FROM test_cases tc
+        LEFT JOIN flow_master fm
+            ON tc.flow_id = fm.flow_id
+	  LEFT JOIN tdc_master tm
+		ON tc.tdc_id = tm.tdc_id
+
+        ORDER BY tc.id
+        """
+    )
 
     rows = cur.fetchall()
+
+    cur.execute(
+        """
+        SELECT
+            flow_id,
+            flow_name
+        FROM flow_master
+        ORDER BY flow_name
+        """
+    )
+
+    flows = cur.fetchall()
+    
+    cur.execute(
+	  """
+	  SELECT
+	    tdc_id,
+	    tdc_name
+	  FROM tdc_master
+	  WHERE status = 'Active'
+	  ORDER BY tdc_name
+	  """
+    )
+
+    tdcs = cur.fetchall()
 
     cur.close()
     conn.close()
 
     return templates.TemplateResponse(
-        request=request,
-        name="test_cases.html",
-        context={
-            "rows": rows
-        }
-    )
+            request=request,
+            name="test_cases.html",
+            context={
+                "rows": rows,
+                "flows": flows,
+            "tdcs": tdcs
+            }
+        )
     
 @router.post("/test-cases/save")
 def save_test_case(
     title: str = Form(...),
     module: str = Form(...),
-    transaction_code: str = Form(...),
-    process_step: str = Form(...),
-    automation_status: str = Form(...),
-    script_path: str = Form(...)
+    flow_id: int = Form(...),
+    tdc_id: int = Form(...),
+    priority: str = Form(...),
 ):
 
     conn = get_connection()
 
     cur = conn.cursor()
-
-    # Generate Test Case ID
 
     cur.execute(
         """
@@ -70,82 +104,41 @@ def save_test_case(
 
     test_case_id = f"TC{next_id:04d}"
 
-    # Save Test Case
-
     cur.execute(
         """
         INSERT INTO test_cases
-        (
-            test_case_id,
-            title,
-            module,
-            transaction_code,
-            process_step,
-            automation_status,
-            script_path
-        )
+		(
+		    test_case_id,
+		    title,
+		    module,
+		    flow_id,
+		    tdc_id,
+		    priority
+		)
         VALUES
-        (%s,%s,%s,%s,%s,%s,%s)
+        (
+            %s,
+            %s,
+            %s,
+            %s,
+            %s,
+            %s
+        )
         """,
         (
             test_case_id,
             title,
             module,
-            transaction_code,
-            process_step,
-            automation_status,
-            script_path
+            flow_id,
+		tdc_id,
+            priority
         )
     )
-
-    # Check if Repository Asset already exists
-
-    cur.execute(
-        """
-        SELECT COUNT(*)
-        FROM repository_assets
-        WHERE transaction_code = %s
-        """,
-        (transaction_code,)
-    )
-
-    exists = cur.fetchone()[0]
-
-    # Auto-register Repository Asset
-
-    if exists == 0:
-
-        cur.execute(
-            """
-            INSERT INTO repository_assets
-            (
-                asset_name,
-                module,
-                transaction_code,
-                script_name,
-                description
-            )
-            VALUES
-            (%s,%s,%s,%s,%s)
-            """,
-            (
-                title,
-                module,
-                transaction_code,
-                script_path,
-                process_step
-            )
-        )
 
     conn.commit()
 
     cur.close()
     conn.close()
-
-    return RedirectResponse(
-        url="/test-cases",
-        status_code=303
-    )
 
     return RedirectResponse(
         url="/test-cases",
@@ -169,8 +162,8 @@ def edit_test_case(
             module,
             transaction_code,
             process_step,
-            automation_status,
-            script_path
+            script_path,
+		repository_assets
         FROM test_cases
         WHERE test_case_id = %s
         """,
@@ -279,7 +272,6 @@ def view_test_case(
             module,
             transaction_code,
             process_step,
-            automation_status,
             script_path
         FROM test_cases
         WHERE test_case_id = %s

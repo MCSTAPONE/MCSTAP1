@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+	<title>Test Data Containers</title>
+	<link rel="stylesheet" href="/static/css/tdc.css">
+
+</head>
+
+<body>
+
+<div class="header">
+
+    <h1>
+        Test Data Containers
+    </h1>
+
+</div>
+
+<div class="container">
+    <a href="/tdc/new" class="btn-primary">
+        + New TDC
+    </a>
+</div>
+
+    <br><br>
+
+    <table>
+
+        <tr>
+
+            <th>ID</th>
+
+            <th>TDC Name</th>
+
+            <th>Business Object</th>
+
+            <th>Description</th>
+
+            <th>Status</th>
+
+        </tr>
+
+        {% for tdc in tdcs %}
+
+        <tr>
+
+            <td>{{ tdc[0] }}</td>
+
+            <td>
+		    <a href="/tdc/{{ tdc[0] }}">
+			  {{ tdc[1] }}
+		    </a>
+		</td>
+
+            <td>{{ tdc[2] }}</td>
+
+            <td>{{ tdc[3] }}</td>
+
+            <td>{{ tdc[4] }}</td>
+
+        </tr>
+
+        {% endfor %}
+
+    </table>
+
+</div>
+
+</body>
+
+</html>

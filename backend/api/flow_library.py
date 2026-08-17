@@ -133,8 +133,6 @@ def open_flow(
 
     cur = conn.cursor()
 
-    # FLOW HEADER
-
     cur.execute(
         """
         SELECT
@@ -150,40 +148,17 @@ def open_flow(
     )
 
     flow = cur.fetchone()
-
-    # FLOW STEPS
-
+    
     cur.execute(
         """
         SELECT
-            fs.step_id,
-            fs.sequence_no,
-
-            COALESCE(
-                ra.asset_name,
-                fs.transaction_code
-            ) AS asset_name,
-
-            COALESCE(
-                ra.business_object,
-                ''
-            ) AS business_object,
-
-            COALESCE(
-                ra.operation,
-                ''
-            ) AS operation,
-
-            fs.description
-
-        FROM flow_steps fs
-
-        LEFT JOIN repository_assets ra
-            ON fs.asset_id = ra.asset_id
-
-        WHERE fs.flow_id = %s
-
-        ORDER BY fs.sequence_no
+            step_id,
+            sequence_no,
+            transaction_code,
+            description
+        FROM flow_steps
+        WHERE flow_id = %s
+        ORDER BY sequence_no
         """,
         (flow_id,)
     )
@@ -307,7 +282,7 @@ def delete_flow(
         status_code=303
     )
     
-@router.get("/flow-library/{flow_id}/flow_add-step")
+@router.get("/flow-library/{flow_id}/add-step")
 def add_step_page(
     request: Request,
     flow_id: int
@@ -321,15 +296,7 @@ def add_step_page(
         """
         SELECT
             asset_id,
-            asset_name,
-            COALESCE(
-                business_object,
-                ''
-            ),
-            COALESCE(
-                operation,
-                ''
-            )
+            asset_name
         FROM repository_assets
         WHERE status = 'Active'
         ORDER BY asset_name
@@ -343,27 +310,20 @@ def add_step_page(
 
     return templates.TemplateResponse(
         request=request,
-        name="flow_add_step.html",
+        name="add_step.html",
         context={
             "flow_id": flow_id,
             "assets": assets
         }
     )
     
-@router.post("/flow-library/{flow_id}/flow_add-step")
+@router.post("/flow-library/{flow_id}/add-step")
 def save_step(
     flow_id: int,
     sequence_no: int = Form(...),
-    asset_id: int = Form(...),
+    transaction_code: str = Form(...),
     description: str = Form("")
 ):
-    
-    print("===== SAVE STEP =====")
-    print("flow_id =", flow_id)
-    print("sequence_no =", sequence_no)
-    print("asset_id =", asset_id)
-    print("description =", description)
-    print("=====================")
 
     conn = get_connection()
 
@@ -375,7 +335,7 @@ def save_step(
         (
             flow_id,
             sequence_no,
-            asset_id,
+            transaction_code,
             description
         )
         VALUES
@@ -389,7 +349,7 @@ def save_step(
         (
             flow_id,
             sequence_no,
-            asset_id,
+            transaction_code,
             description
         )
     )

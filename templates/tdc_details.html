@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>TDC Details</title>
+
+	<link rel="stylesheet" href="/static/css/tdc.css">
+
+</head>
+
+<body>
+
+<div class="header">
+
+    <h1>
+        {{ tdc[1] }}
+    </h1>
+
+</div>
+
+<div class="container">
+    <a href="javascript:history.back()" class="btn">
+        ← Back
+    </a>
+    <br><br>
+
+    <div class="card">
+
+        <h2>
+            TDC Details
+        </h2>
+
+        <p>
+
+            <strong>
+                Business Object:
+            </strong>
+
+            {{ tdc[2] }}
+
+        </p>
+
+        <p>
+
+            <strong>
+                Description:
+            </strong>
+
+            {{ tdc[3] }}
+
+        </p>
+
+        <p>
+
+            <strong>
+                Status:
+            </strong>
+
+            {{ tdc[4] }}
+
+        </p>
+
+    </div>
+
+    <br>
+
+<div class="card">
+
+    <h2>
+        Add Parameter
+    </h2>
+
+    <form action="/tdc/{{ tdc[0] }}/add-value" method="POST">
+
+        <p>
+            <label for="parameter_name">Parameter Name</label>
+            <br>
+            <input
+                type="text"
+                id="parameter_name"
+                name="parameter_name"
+                required>
+        </p>
+
+        <p>
+            <label for="parameter_value">Parameter Value</label>
+            <br>
+            <input
+                type="text"
+                id="parameter_value"
+                name="parameter_value"
+                required>
+        </p>
+
+        <button
+            type="submit"
+            class="btn">
+            Add Value
+        </button>
+
+    </form>
+
+</div>
+    <br>
+
+    <div class="card">
+
+        <h2>
+            Parameter Values
+        </h2>
+
+        <table>
+
+            <tr>
+
+                <th>
+                    Parameter
+                </th>
+
+                <th>
+                    Value
+                </th>
+
+            </tr>
+
+            {% for value in values %}
+
+            <tr>
+
+                <td>
+                    {{ value[0] }}
+                </td>
+
+                <td>
+                    {{ value[1] }}
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </table>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

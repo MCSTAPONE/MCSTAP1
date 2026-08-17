@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+    <title>Create TDC</title>
+
+    <link rel="stylesheet" href="/static/css/tdc.css">
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>
+        Create Test Data Container
+    </h2>
+
+    <form method="POST">
+
+        <p>
+
+            TDC Name
+
+            <br>
+
+            <input
+                type="text"
+                name="tdc_name"
+                required>
+
+        </p>
+
+        <p>
+
+            Business Object
+
+            <br>
+
+            <select
+		    name="business_object"
+		    required>
+
+		    <option value="">
+			  Select Business Object
+		    </option>
+
+		    <option value="COSTCENTER">
+			  COSTCENTER
+		    </option>
+
+		    <option value="WORKORDER">
+			  WORKORDER
+		    </option>
+
+		    <option value="SALESORDER">
+			  SALESORDER
+		    </option>
+
+		    <option value="PURCHASEORDER">
+			  PURCHASEORDER
+		    </option>
+
+		    <option value="MATERIAL">
+			  MATERIAL
+		    </option>
+
+		</select>
+
+        </p>
+
+        <p>
+
+            Description
+
+            <br>
+
+            <textarea
+                name="description"
+                rows="5"></textarea>
+
+        </p>
+
+        <button type="submit">
+
+            Save TDC
+
+        </button>
+
+    </form>
+
+</div>
+
+</body>
+
+</html>
