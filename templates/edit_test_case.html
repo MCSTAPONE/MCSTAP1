@@ -1,116 +1,107 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Edit Test Case</title>
-
-    <link rel="stylesheet" href="static/css/pm.css">
+    <link rel="stylesheet" href="/static/css/edit_test_cases.css">
 </head>
+
 <body>
 
-<div class="header">
+    <div class="container">
 
-    Edit Test Case
+        <div class="top-nav">
+            <a href="/test-cases" class="back-btn">
+                <span>&larr;</span> Back to Test Cases
+            </a>
+        </div>
 
-</div>
+        <div class="card">
+            <div class="card-header">
+                <h2>Edit Test Case: {{ row[0] if row and row|length > 0 else '' }}</h2>
+            </div>
 
-	<a href="/test-cases" class="back-btn">
-		← Back to Test Cases
-	</a>
+            <div class="card-body">
+                <form action="/test-cases/edit/{{ row[0] }}" method="post" class="edit-form">
 
-    <div class="table-container">
+                    <!-- Test Case ID (Read-only display) -->
+                    <div class="form-group">
+                        <label>Test Case ID</label>
+                        <input type="text" value="{{ row[0] if row and row|length > 0 and row[0] else '' }}" class="form-input" readonly disabled>
+                    </div>
 
-        <form method="post">
+                    <!-- Title -->
+                    <div class="form-group">
+                        <label>Title</label>
+                        <input type="text" name="title" value="{{ row[1] if row and row|length > 1 and row[1] else '' }}" class="form-input" required>
+                    </div>
 
-            <label>Title</label>
+                    <!-- Module -->
+                    <div class="form-group">
+                        <label>Module</label>
+                        {% set mod = row[2] if row and row|length > 2 else '' %}
+                        <select name="module" class="form-select">
+                            <option value="PM" {% if mod == "PM" %}selected{% endif %}>PM</option>
+                            <option value="MM" {% if mod == "MM" %}selected{% endif %}>MM</option>
+                            <option value="FI" {% if mod == "FI" %}selected{% endif %}>FI</option>
+                            <option value="CO" {% if mod == "CO" %}selected{% endif %}>CO</option>
+                            <option value="SD" {% if mod == "SD" %}selected{% endif %}>SD</option>
+                            <option value="WM" {% if mod == "WM" %}selected{% endif %}>WM</option>
+                            <option value="QM" {% if mod == "QM" %}selected{% endif %}>QM</option>
+                            <option value="PP" {% if mod == "PP" %}selected{% endif %}>PP</option>
+                            <option value="SCM" {% if mod == "SCM" %}selected{% endif %}>SCM</option>
+                            <option value="LO" {% if mod == "LO" %}selected{% endif %}>LO</option>
+                            <option value="TR" {% if mod == "TR" %}selected{% endif %}>TR</option>
+                            <option value="PLM" {% if mod == "PLM" %}selected{% endif %}>PLM</option>
+                            <option value="PROC" {% if mod == "PROC" %}selected{% endif %}>PROC</option>
+                            <option value="E2E" {% if mod == "E2E" %}selected{% endif %}>E2E</option>
+                        </select>
+                    </div>
 
-            <input
-                type="text"
-                name="title"
-                value="{{ row[1] }}"
-                required>
+                    <!-- Transaction Code -->
+                    <div class="form-group">
+                        <label>Transaction Code</label>
+                        <input type="text" name="transaction_code" value="{{ row[3] if row and row|length > 3 and row[3] else '' }}" class="form-input">
+                    </div>
 
-            <br><br>
+                    <!-- Process Step / Description -->
+                    <div class="form-group">
+                        <label>Process Step / Description</label>
+                        <textarea name="process_step" rows="4" class="form-textarea">{{ row[4] if row and row|length > 4 and row[4] else '' }}</textarea>
+                    </div>
 
-            <label>Module</label>
+                    <!-- Script Path -->
+                    <div class="form-group">
+                        <label>Automation Script Path</label>
+                        <input type="text" name="script_path" value="{{ row[5] if row and row|length > 5 and row[5] else '' }}" class="form-input">
+                    </div>
 
-            <select name="module">
+                    <!-- TDC ID / Selection -->
+                    <div class="form-group">
+                        <label>TDC ID</label>
+                        <input type="text" name="tdc_id" value="{{ row[6] if row and row|length > 6 and row[6] else '' }}" class="form-input">
+                    </div>
 
-                <option value="PM" {% if row[2] == "PM" %}selected{% endif %}>PM</option>
-                <option value="MM" {% if row[2] == "MM" %}selected{% endif %}>MM</option>
-                <option value="FI" {% if row[2] == "FI" %}selected{% endif %}>FI</option>
-                <option value="CO" {% if row[2] == "CO" %}selected{% endif %}>CO</option>
-                <option value="SD" {% if row[2] == "SD" %}selected{% endif %}>SD</option>
-                <option value="WM" {% if row[2] == "WM" %}selected{% endif %}>WM</option>
-                <option value="QM" {% if row[2] == "QM" %}selected{% endif %}>QM</option>
-                <option value="PP" {% if row[2] == "PP" %}selected{% endif %}>PP</option>
-                <option value="SCM" {% if row[2] == "SCM" %}selected{% endif %}>SCM</option>
-                <option value="LO" {% if row[2] == "LO" %}selected{% endif %}>LO</option>
-                <option value="TR" {% if row[2] == "TR" %}selected{% endif %}>TR</option>
-                <option value="PLM" {% if row[2] == "PLM" %}selected{% endif %}>PLM</option>
-                <option value="PROC" {% if row[2] == "PROC" %}selected{% endif %}>PROC</option>
-		    <option value="E2E" {% if row[2] == "E2E" %}selected{% endif %}>E2E</option>
+                    <!-- Priority -->
+                    <div class="form-group">
+                        <label>Priority</label>
+                        <select name="priority" class="form-select">
+                            {% set prio = row[7] if row and row|length > 7 else '' %}
+                            <option value="High" {% if prio == "High" %}selected{% endif %}>High</option>
+                            <option value="Medium" {% if prio == "Medium" %}selected{% endif %}>Medium</option>
+                            <option value="Low" {% if prio == "Low" %}selected{% endif %}>Low</option>
+                        </select>
+                    </div>
 
-            </select>
+                    <div class="form-actions">
+                        <button type="submit" class="save-btn">Save Changes</button>
+                    </div>
 
-            <br><br>
-
-            <label>Transaction Code</label>
-
-            <input
-                type="text"
-                name="transaction_code"
-                value="{{ row[3] }}">
-
-            <br><br>
-
-            <label>Process Step</label>
-
-            <textarea
-                name="process_step"
-                rows="5">{{ row[4] }}</textarea>
-
-            <br><br>
-
-            <label>Automation Status</label>
-
-            <select name="automation_status">
-
-                <option value="Manual"
-                    {% if row[5] == "Manual" %}selected{% endif %}>
-                    Manual
-                </option>
-
-                <option value="Automated"
-                    {% if row[5] == "Automated" %}selected{% endif %}>
-                    Automated
-                </option>
-
-            </select>
-
-            <br><br>
-
-            <label>Automation Script</label>
-
-            <input
-                type="text"
-                name="script_path"
-                value="{{ row[6] }}">
-
-            <br><br>
-
-            <button
-                type="submit"
-                class="back-btn">
-
-                Save Changes
-
-            </button>
-
-        </form>
+                </form>
+            </div>
+        </div>
 
     </div>
 
