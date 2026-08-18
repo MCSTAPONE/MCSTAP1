@@ -173,10 +173,15 @@ class ExecutionContextService:
         conn.close()
 
         return {
-	    "test_case": test_case,
-	    "flow": flow,
-	    "flow_steps": flow_steps,
-	    "tdc": tdc,
-	    "test_data": test_data,
-	    "runtime": {}
-	  }
+
+            "test_case": test_case,
+
+            "flow": flow,
+
+            "flow_steps": flow_steps,
+
+            "tdc": tdc,
+
+            "test_data": test_data
+
+        }

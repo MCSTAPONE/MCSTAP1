@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict zLrWw6xeGASwv9J5ueyG1cGV3RZtLDlVvHgxwZQQV7edZyPzFSEzdPFe0BnygAQ
+\restrict 4EsOsKIG2Z5bc82B3e5azj5We5ZjCV6QMTnHflUozL7xh45Te1XvJE95aabe9nA
 
 -- Dumped from database version 18.4
 -- Dumped by pg_dump version 18.4
@@ -59,6 +59,46 @@ ALTER SEQUENCE public.ai_command_history_id_seq OWNED BY public.ai_command_histo
 
 
 --
+-- Name: execution_context; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.execution_context (
+    execution_id integer NOT NULL,
+    test_case_id integer,
+    flow_id integer,
+    tdc_id integer,
+    execution_status character varying(20),
+    started_on timestamp without time zone,
+    completed_on timestamp without time zone,
+    created_on timestamp without time zone DEFAULT CURRENT_TIMESTAMP
+);
+
+
+ALTER TABLE public.execution_context OWNER TO postgres;
+
+--
+-- Name: execution_context_execution_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.execution_context_execution_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.execution_context_execution_id_seq OWNER TO postgres;
+
+--
+-- Name: execution_context_execution_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.execution_context_execution_id_seq OWNED BY public.execution_context.execution_id;
+
+
+--
 -- Name: flow_master; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -104,9 +144,10 @@ CREATE TABLE public.flow_steps (
     step_id integer NOT NULL,
     flow_id integer NOT NULL,
     sequence_no integer NOT NULL,
-    transaction_code character varying(20) NOT NULL,
+    transaction_code character varying(20),
     description character varying(255),
-    created_on timestamp without time zone DEFAULT CURRENT_TIMESTAMP
+    created_on timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    asset_id integer
 );
 
 
@@ -146,7 +187,10 @@ CREATE TABLE public.repository_assets (
     script_name character varying(255) NOT NULL,
     description character varying(500),
     status character varying(20) DEFAULT 'Active'::character varying,
-    created_on timestamp without time zone DEFAULT CURRENT_TIMESTAMP
+    created_on timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    business_object character varying(100),
+    operation character varying(50),
+    asset_script text
 );
 
 
@@ -265,7 +309,8 @@ CREATE TABLE public.script_master (
     created_date timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
     updated_date timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
     transaction_code character varying(20),
-    flow_id integer
+    flow_id integer,
+    generated_script text
 );
 
 
@@ -332,6 +377,80 @@ ALTER SEQUENCE public.script_steps_id_seq OWNED BY public.script_steps.id;
 
 
 --
+-- Name: tdc_master; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.tdc_master (
+    tdc_id integer NOT NULL,
+    tdc_name character varying(100) NOT NULL,
+    business_object character varying(100),
+    description character varying(500),
+    status character varying(20) DEFAULT 'Active'::character varying,
+    created_on timestamp without time zone DEFAULT CURRENT_TIMESTAMP
+);
+
+
+ALTER TABLE public.tdc_master OWNER TO postgres;
+
+--
+-- Name: tdc_master_tdc_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.tdc_master_tdc_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.tdc_master_tdc_id_seq OWNER TO postgres;
+
+--
+-- Name: tdc_master_tdc_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.tdc_master_tdc_id_seq OWNED BY public.tdc_master.tdc_id;
+
+
+--
+-- Name: tdc_values; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.tdc_values (
+    value_id integer NOT NULL,
+    tdc_id integer NOT NULL,
+    parameter_name character varying(100),
+    parameter_value text
+);
+
+
+ALTER TABLE public.tdc_values OWNER TO postgres;
+
+--
+-- Name: tdc_values_value_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.tdc_values_value_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.tdc_values_value_id_seq OWNER TO postgres;
+
+--
+-- Name: tdc_values_value_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.tdc_values_value_id_seq OWNED BY public.tdc_values.value_id;
+
+
+--
 -- Name: test_cases; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -349,7 +468,9 @@ CREATE TABLE public.test_cases (
     automation_status character varying(20),
     created_date timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
     script_path character varying(500),
-    asset_name character varying(100)
+    asset_name character varying(100),
+    flow_id integer,
+    tdc_id integer
 );
 
 
@@ -667,6 +788,13 @@ ALTER TABLE ONLY public.ai_command_history ALTER COLUMN id SET DEFAULT nextval('
 
 
 --
+-- Name: execution_context execution_id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.execution_context ALTER COLUMN execution_id SET DEFAULT nextval('public.execution_context_execution_id_seq'::regclass);
+
+
+--
 -- Name: flow_master flow_id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -713,6 +841,20 @@ ALTER TABLE ONLY public.script_master ALTER COLUMN script_id SET DEFAULT nextval
 --
 
 ALTER TABLE ONLY public.script_steps ALTER COLUMN id SET DEFAULT nextval('public.script_steps_id_seq'::regclass);
+
+
+--
+-- Name: tdc_master tdc_id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.tdc_master ALTER COLUMN tdc_id SET DEFAULT nextval('public.tdc_master_tdc_id_seq'::regclass);
+
+
+--
+-- Name: tdc_values value_id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.tdc_values ALTER COLUMN value_id SET DEFAULT nextval('public.tdc_values_value_id_seq'::regclass);
 
 
 --
@@ -841,6 +983,25 @@ COPY public.ai_command_history (id, command_text, created_at) FROM stdin;
 63	Create Flow	2026-08-08 17:01:52.956803
 64	Purchase Order	2026-08-08 17:02:15.483118
 65	YES	2026-08-08 17:02:21.448577
+66	Create Flow	2026-08-12 12:08:18.599278
+67	Work Order	2026-08-12 12:08:30.158708
+68	YES	2026-08-12 12:08:46.424368
+69	YES	2026-08-12 12:09:04.408798
+70	Create Flow	2026-08-12 12:11:11.510468
+71	Maintenance Plan	2026-08-12 12:11:23.21048
+72	YES	2026-08-12 12:11:30.363554
+73	Create Flow	2026-08-12 12:11:50.996596
+74	Work Order	2026-08-12 12:11:56.446729
+75	YES	2026-08-12 12:11:59.593807
+76	YES	2026-08-12 12:12:07.891343
+\.
+
+
+--
+-- Data for Name: execution_context; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.execution_context (execution_id, test_case_id, flow_id, tdc_id, execution_status, started_on, completed_on, created_on) FROM stdin;
 \.
 
 
@@ -925,16 +1086,16 @@ COPY public.flow_master (flow_id, flow_name, description, module, status, create
 97	P2P_PROCURE_TO_PAY_SUITE	Description: Manage maintenance work from notification creation through execution and financial settlement.        	E2E	Draft	2026-07-20 08:47:22.611413
 98	PLAN_TO_PRODUCE_SUITE	Description: Execute manufacturing activities from planning through production confirmation and goods receipt.        	SCM	Draft	2026-07-20 08:47:39.579821
 100	EXECUTION_ENGINE_TEST	MCSTAP Execution Test        	E2E	Draft	2026-07-21 15:19:17.878986
+118	WORK_ORDER_PLACEHOLDER	AI Generated Placeholder Flow	PM	Draft	2026-08-12 12:12:07.972654
 106	PURCHASE_ORDER_LIFECYCLE	AI Generated Flow for PURCHASE_ORDER	MM	Draft	2026-07-23 11:44:49.453227
 107	COST_CENTER_LIFECYCLE	AI Generated Flow for COST_CENTER	CO	Draft	2026-07-23 11:45:33.90521
 108	SALES_ORDER_PLACEHOLDER	AI Generated Placeholder Flow	SD	Draft	2026-07-23 14:09:03.522824
 109	MAINTENANCE_PLAN_PLACEHOLDER	AI Generated Placeholder Flow	PM	Draft	2026-07-24 12:30:41.986324
 110	PURCHASE_ORDER_LIFECYCLE	AI Generated Flow for PURCHASE_ORDER	MM	Draft	2026-07-25 11:31:10.961788
-111	WORK_ORDER_PLACEHOLDER	AI Generated Placeholder Flow	PM	Draft	2026-07-25 11:45:05.806527
-112	WORK_ORDER_PLACEHOLDER	AI Generated Placeholder Flow	PM	Draft	2026-07-25 15:20:31.519583
 113	SALES_ORDER_PLACEHOLDER	AI Generated Placeholder Flow	SD	Draft	2026-07-25 15:38:54.115329
 114	AVAILABLE_TO_PROMISE_SCM_PLACEHOLDER	AI Generated Placeholder Flow	SCM	Draft	2026-08-06 12:29:32.226315
 115	PURCHASE_ORDER_LIFECYCLE	AI Generated Flow for PURCHASE_ORDER	MM	Draft	2026-08-08 17:02:21.512054
+116	Create Mataerial stock Report	Create Mataerial stock Report By Venkat   	MM	Draft	2026-08-12 12:03:43.340136
 \.
 
 
@@ -942,76 +1103,69 @@ COPY public.flow_master (flow_id, flow_name, description, module, status, create
 -- Data for Name: flow_steps; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.flow_steps (step_id, flow_id, sequence_no, transaction_code, description, created_on) FROM stdin;
-2	24	1	VD01	Create Customer	2026-07-19 19:04:53.158929
-3	24	2	VD02	Change Customer	2026-07-19 19:05:13.589455
-4	24	3	VD03	Display Customer	2026-07-19 19:05:32.195889
-5	59	1	KS01	Create Cost Center	2026-07-20 09:46:04.154628
-6	59	2	KS02	Change Cost Center	2026-07-20 09:46:29.284782
-7	59	3	KS03	Display Cost Center	2026-07-20 09:46:50.183081
-9	59	4	KS04	Delete Order. It can't be delete but you can suspend it.	2026-07-20 09:58:48.475719
-11	62	1	HELLO	HELLO_WORLD_TEST	2026-07-20 12:56:50.517518
-12	100	1	HELLO	MCSTAP Execution Test	2026-07-21 15:20:13.48989
-13	62	2	DATE	date and time execution	2026-07-22 07:49:22.19312
-14	100	2	DATE	Test Date and Time	2026-07-22 13:51:41.614739
-30	106	1	ME21N	\N	2026-07-23 11:44:49.453227
-31	106	2	ME22N	\N	2026-07-23 11:44:49.453227
-32	106	3	ME23N	\N	2026-07-23 11:44:49.453227
-33	107	1	KS01	\N	2026-07-23 11:45:33.90521
-34	107	2	KS02	\N	2026-07-23 11:45:33.90521
-35	107	3	KS03	\N	2026-07-23 11:45:33.90521
-36	107	4	KS04	\N	2026-07-23 11:45:33.90521
-37	108	1	VA01	\N	2026-07-23 14:09:03.522824
-38	108	2	VL01N	\N	2026-07-23 14:09:03.522824
-39	108	3	VL02N	\N	2026-07-23 14:09:03.522824
-40	108	4	VF01	\N	2026-07-23 14:09:03.522824
-41	108	5	VF03	\N	2026-07-23 14:09:03.522824
-42	109	1	IP01	\N	2026-07-24 12:30:41.986324
-43	109	1	IP01	\N	2026-07-24 12:30:41.986324
-44	109	2	IP02	\N	2026-07-24 12:30:41.986324
-45	109	2	IP02	\N	2026-07-24 12:30:41.986324
-46	109	3	IP03	\N	2026-07-24 12:30:41.986324
-47	109	3	IP03	\N	2026-07-24 12:30:41.986324
-48	109	4	IP10	\N	2026-07-24 12:30:41.986324
-49	110	1	ME21N	\N	2026-07-25 11:31:10.961788
-50	110	2	ME22N	\N	2026-07-25 11:31:10.961788
-51	110	3	ME23N	\N	2026-07-25 11:31:10.961788
-52	111	1	IW31	\N	2026-07-25 11:45:05.806527
-53	111	1	IW31	\N	2026-07-25 11:45:05.806527
-54	111	2	IW32	\N	2026-07-25 11:45:05.806527
-55	111	2	IW32	\N	2026-07-25 11:45:05.806527
-56	111	3	IW33	\N	2026-07-25 11:45:05.806527
-57	111	3	IW33	\N	2026-07-25 11:45:05.806527
-58	111	4	IW38	\N	2026-07-25 11:45:05.806527
-59	111	4	IW38	\N	2026-07-25 11:45:05.806527
-60	112	1	IW31	\N	2026-07-25 15:20:31.519583
-61	112	1	IW31	\N	2026-07-25 15:20:31.519583
-62	112	2	IW32	\N	2026-07-25 15:20:31.519583
-63	112	2	IW32	\N	2026-07-25 15:20:31.519583
-64	112	3	IW33	\N	2026-07-25 15:20:31.519583
-65	112	3	IW33	\N	2026-07-25 15:20:31.519583
-66	112	4	IW38	\N	2026-07-25 15:20:31.519583
-67	112	4	IW38	\N	2026-07-25 15:20:31.519583
-68	113	1	VA01	\N	2026-07-25 15:38:54.115329
-69	113	1	VA01	\N	2026-07-25 15:38:54.115329
-70	113	1	VA01	\N	2026-07-25 15:38:54.115329
-71	113	1	VA01	\N	2026-07-25 15:38:54.115329
-72	113	2	VA02	\N	2026-07-25 15:38:54.115329
-73	113	2	VL01N	\N	2026-07-25 15:38:54.115329
-74	113	2	VL01N	\N	2026-07-25 15:38:54.115329
-75	113	3	VL02N	\N	2026-07-25 15:38:54.115329
-76	113	3	VL02N	\N	2026-07-25 15:38:54.115329
-77	113	3	VA03	\N	2026-07-25 15:38:54.115329
-78	113	4	VF01	\N	2026-07-25 15:38:54.115329
-79	113	4	VA05	\N	2026-07-25 15:38:54.115329
-80	113	4	VF01	\N	2026-07-25 15:38:54.115329
-81	113	5	VF03	\N	2026-07-25 15:38:54.115329
-82	114	1	GATP	\N	2026-08-06 12:29:32.226315
-83	114	2	CO09	\N	2026-08-06 12:29:32.226315
-84	114	3	/SAPAPO/AC42	\N	2026-08-06 12:29:32.226315
-85	115	1	ME21N	\N	2026-08-08 17:02:21.512054
-86	115	2	ME22N	\N	2026-08-08 17:02:21.512054
-87	115	3	ME23N	\N	2026-08-08 17:02:21.512054
+COPY public.flow_steps (step_id, flow_id, sequence_no, transaction_code, description, created_on, asset_id) FROM stdin;
+2	24	1	VD01	Create Customer	2026-07-19 19:04:53.158929	\N
+3	24	2	VD02	Change Customer	2026-07-19 19:05:13.589455	\N
+4	24	3	VD03	Display Customer	2026-07-19 19:05:32.195889	\N
+11	62	1	HELLO	HELLO_WORLD_TEST	2026-07-20 12:56:50.517518	\N
+12	100	1	HELLO	MCSTAP Execution Test	2026-07-21 15:20:13.48989	\N
+13	62	2	DATE	date and time execution	2026-07-22 07:49:22.19312	\N
+14	100	2	DATE	Test Date and Time	2026-07-22 13:51:41.614739	\N
+30	106	1	ME21N	\N	2026-07-23 11:44:49.453227	\N
+31	106	2	ME22N	\N	2026-07-23 11:44:49.453227	\N
+32	106	3	ME23N	\N	2026-07-23 11:44:49.453227	\N
+33	107	1	KS01	\N	2026-07-23 11:45:33.90521	\N
+34	107	2	KS02	\N	2026-07-23 11:45:33.90521	\N
+35	107	3	KS03	\N	2026-07-23 11:45:33.90521	\N
+36	107	4	KS04	\N	2026-07-23 11:45:33.90521	\N
+37	108	1	VA01	\N	2026-07-23 14:09:03.522824	\N
+38	108	2	VL01N	\N	2026-07-23 14:09:03.522824	\N
+39	108	3	VL02N	\N	2026-07-23 14:09:03.522824	\N
+40	108	4	VF01	\N	2026-07-23 14:09:03.522824	\N
+41	108	5	VF03	\N	2026-07-23 14:09:03.522824	\N
+42	109	1	IP01	\N	2026-07-24 12:30:41.986324	\N
+43	109	1	IP01	\N	2026-07-24 12:30:41.986324	\N
+44	109	2	IP02	\N	2026-07-24 12:30:41.986324	\N
+45	109	2	IP02	\N	2026-07-24 12:30:41.986324	\N
+46	109	3	IP03	\N	2026-07-24 12:30:41.986324	\N
+47	109	3	IP03	\N	2026-07-24 12:30:41.986324	\N
+48	109	4	IP10	\N	2026-07-24 12:30:41.986324	\N
+49	110	1	ME21N	\N	2026-07-25 11:31:10.961788	\N
+50	110	2	ME22N	\N	2026-07-25 11:31:10.961788	\N
+51	110	3	ME23N	\N	2026-07-25 11:31:10.961788	\N
+68	113	1	VA01	\N	2026-07-25 15:38:54.115329	\N
+69	113	1	VA01	\N	2026-07-25 15:38:54.115329	\N
+70	113	1	VA01	\N	2026-07-25 15:38:54.115329	\N
+71	113	1	VA01	\N	2026-07-25 15:38:54.115329	\N
+72	113	2	VA02	\N	2026-07-25 15:38:54.115329	\N
+73	113	2	VL01N	\N	2026-07-25 15:38:54.115329	\N
+74	113	2	VL01N	\N	2026-07-25 15:38:54.115329	\N
+75	113	3	VL02N	\N	2026-07-25 15:38:54.115329	\N
+76	113	3	VL02N	\N	2026-07-25 15:38:54.115329	\N
+77	113	3	VA03	\N	2026-07-25 15:38:54.115329	\N
+78	113	4	VF01	\N	2026-07-25 15:38:54.115329	\N
+79	113	4	VA05	\N	2026-07-25 15:38:54.115329	\N
+80	113	4	VF01	\N	2026-07-25 15:38:54.115329	\N
+81	113	5	VF03	\N	2026-07-25 15:38:54.115329	\N
+82	114	1	GATP	\N	2026-08-06 12:29:32.226315	\N
+83	114	2	CO09	\N	2026-08-06 12:29:32.226315	\N
+84	114	3	/SAPAPO/AC42	\N	2026-08-06 12:29:32.226315	\N
+85	115	1	ME21N	\N	2026-08-08 17:02:21.512054	\N
+86	115	2	ME22N	\N	2026-08-08 17:02:21.512054	\N
+87	115	3	ME23N	\N	2026-08-08 17:02:21.512054	\N
+88	116	100	MM01	By venkat	2026-08-12 12:04:53.340636	\N
+97	118	1	IW31	\N	2026-08-12 12:12:07.972654	\N
+98	118	1	IW31	\N	2026-08-12 12:12:07.972654	\N
+99	118	2	IW32	\N	2026-08-12 12:12:07.972654	\N
+100	118	2	IW32	\N	2026-08-12 12:12:07.972654	\N
+101	118	3	IW33	\N	2026-08-12 12:12:07.972654	\N
+102	118	3	IW33	\N	2026-08-12 12:12:07.972654	\N
+103	118	4	IW38	\N	2026-08-12 12:12:07.972654	\N
+104	118	4	IW38	\N	2026-08-12 12:12:07.972654	\N
+106	59	1	\N	Create Cost Center	2026-08-13 14:40:02.927379	1
+107	59	2	\N	Modify cost center	2026-08-13 14:42:39.016527	2
+108	59	3	\N	Display Cost Center	2026-08-13 14:42:57.62806	3
+109	59	4	\N	Delete or Block Cost Center	2026-08-13 14:43:16.442966	4
 \.
 
 
@@ -1019,33 +1173,34 @@ COPY public.flow_steps (step_id, flow_id, sequence_no, transaction_code, descrip
 -- Data for Name: repository_assets; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.repository_assets (asset_id, asset_name, module, transaction_code, script_name, description, status, created_on) FROM stdin;
-8	ME21N Create Purchase Order	MM	ME21N	ME21N_CREATE_PURCHAGE_ORDER.py	Description: Create Purchase Order\r\nSteps:\r\n1.\tExecute ME21N\r\n2.\tSelect Vendor\r\n3.\tReference Purchase Requisition\r\n4.\tVerify pricing\r\n5.\tVerify delivery schedule\r\n6.\tSave\r\n7.\tVerify PO Number created\r\n	Active	2026-07-22 09:35:15.836436
-7	ME51N Create Purchase Requisition	MM	ME51N	ME51N_CREATE_PURCHASE_REQISITION.py	Description: Create Purchase Requisition\r\nSteps:\r\n1.\tExecute ME51N\r\n2.\tEnter Material\r\n3.\tEnter Quantity\r\n4.\tEnter Plant\r\n5.\tEnter Delivery Date\r\n6.\tSave\r\n7.\tVerify PR Number generated\r\n	Active	2026-07-22 09:34:07.328954
-9	ME22N Change Purchase Order	MM	ME22N	ME22N_CHANGE_PURCHAGE_ORDER.py	Description: Change Purchase Order\r\nSteps:\r\n1.\tExecute ME22N\r\n2.\tEnter PO Number\r\n3.\tModify quantity\r\n4.\tUpdate delivery date\r\n5.\tSave\r\n6.\tVerify changes\r\n\r\n	Active	2026-07-22 09:37:03.622502
-10	ME23N Display Purchase Order	MM	ME23N	ME51N_DISPLAY_PURCHASE_ORDER.py	Description: Display Purchase Order\r\nSteps:\r\n1.\tExecute ME23N\r\n2.\tEnter PO Number\r\n3.\tValidate Header\r\n4.\tValidate Items\r\n5.\tValidate Conditions\r\n6.\tValidate History\r\n	Active	2026-07-22 09:40:05.11645
-2	KS02_MODIFY_COST_CENTER	CO	KS02	KS02_MODIFY_COST_CENTER.py	Description: Change Cost Center\r\nSteps:\r\n1.\tExecute KS02\r\n2.\tEnter Cost Center\r\n3.\tSelect Change\r\n4.\tModify Description\r\n5.\tModify Responsible Person\r\n6.\tSave\r\n7.\tVerify changes updated\r\n	Active	2026-07-21 14:45:48.275047
-3	KS03_DISPLAY_COST_CENTER3	CO	KS03	KS03_DISPLAY_COST_CENTER.py	Description: Display Cost Center\r\nSteps:\r\n1.\tExecute KS03\r\n2.\tEnter Cost Center\r\n3.\tDisplay Master Data\r\n4.\tVerify Organization Assignment\r\n5.\tVerify Validity Dates\r\n6.\tVerify Cost Center Status\r\n	Active	2026-07-21 14:46:54.714918
-4	KS04_BLOCK_COST_CENTER3	CO	KS04	KS04_BLOCK_COST_CENTER.py	Description: Block Cost Center\r\nSteps:\r\n1.\tExecute KS04\r\n2.\tEnter Cost Center\r\n3.\tDisplay Master Data\r\n4.\tDelete \r\n	Active	2026-07-21 14:47:29.072942
-5	HELLO_WORLD_TEST	E2E	HELLO	HELLO_WORLD_TEST.py	MCSTAP Execution Test	Active	2026-07-21 15:18:08.3486
-6	Test day and time	E2E	DATE	REPOSITORY_ENGINE_TEST.py	Date and time	Active	2026-07-22 07:37:54.03672
-1	KS01_CREATE_COST_CENTER	CO	KS01	KS01_CREATE_COST_CENTER.py	Description: Create Cost Center\r\nSteps:\r\n1.\tExecute KS01\r\n2.\tEnter Controlling Area\r\n3.\tEnter Cost Center ID\r\n4.\tEnter Name and Description\r\n5.\tEnter Valid From Date\r\n6.\tAssign Cost Center Category\r\n7.\tAssign Profit Center\r\n8.\tSave\r\n9.\tVerify Cost Center created successfully\r\n	Active	2026-07-20 12:41:23.672259
-11	ME51N_CREATE_PURCHASE_REQUISITION	MM	ME51N	ME51N_CREATE_PURCHASE_REQUISITION.py	Generated from AI Test Case Builder	Draft	2026-07-26 21:31:00.771379
-12	ME21N_CREATE_PO	MM	ME21N	ME21N_CREATE_PO.py	Generated from AI Test Case Builder	Draft	2026-07-26 21:31:00.771379
-13	MIGO_GOODS_RECEIPT	MM	MIGO	MIGO_GOODS_RECEIPT.py	Generated from AI Test Case Builder	Draft	2026-07-26 21:31:00.771379
-14	MIRO_INVOICE_VERIFICATION	MM	MIRO	MIRO_INVOICE_VERIFICATION.py	Generated from AI Test Case Builder	Draft	2026-07-26 21:31:00.771379
-19	IW31_CREATE_WORK_ORDER	PM	IW31	IW31_CREATE_WORK_ORDER.py	Generated from AI Test Case Builder	Draft	2026-07-26 21:40:57.989637
-20	IW32_CHANGE_WORK_ORDER	PM	IW32	IW32_CHANGE_WORK_ORDER.py	Generated from AI Test Case Builder	Draft	2026-07-26 21:40:57.989637
-21	IW33_DISPLAY_WORK_ORDER	PM	IW33	IW33_DISPLAY_WORK_ORDER.py	Generated from AI Test Case Builder	Draft	2026-07-26 21:40:57.989637
-22	IW38_ORDER_LIST	PM	IW38	IW38_ORDER_LIST.py	Generated from AI Test Case Builder	Draft	2026-07-26 21:40:57.989637
-35	VA01_CREATE_SALES_ORDER	SD	VA01	VA01_CREATE_SALES_ORDER.py	Generated from AI Test Case Builder	Draft	2026-07-28 09:11:05.673135
-36	VA02_CHANGE_SALES_ORDER	SD	VA02	VA02_CHANGE_SALES_ORDER.py	Generated from AI Test Case Builder	Draft	2026-07-28 09:11:05.673135
-37	VL01N_CREATE_DELIVERY	SD	VL01N	VL01N_CREATE_DELIVERY.py	Generated from AI Test Case Builder	Draft	2026-07-28 09:11:05.673135
-38	VA03_DISPLAY_SALES_ORDER	SD	VA03	VA03_DISPLAY_SALES_ORDER.py	Generated from AI Test Case Builder	Draft	2026-07-28 09:11:05.673135
-39	VL02N_POST_GOODS_ISSUE	SD	VL02N	VL02N_POST_GOODS_ISSUE.py	Generated from AI Test Case Builder	Draft	2026-07-28 09:11:05.673135
-40	VA05_SALES_ORDER_LIST	SD	VA05	VA05_SALES_ORDER_LIST.py	Generated from AI Test Case Builder	Draft	2026-07-28 09:11:05.673135
-41	VF01_CREATE_BILLING_DOCUMENT	SD	VF01	VF01_CREATE_BILLING_DOCUMENT.py	Generated from AI Test Case Builder	Draft	2026-07-28 09:11:05.673135
-42	VF03_DISPLAY_BILLING_DOCUMENT	SD	VF03	VF03_DISPLAY_BILLING_DOCUMENT.py	Generated from AI Test Case Builder	Draft	2026-07-28 09:11:05.673135
+COPY public.repository_assets (asset_id, asset_name, module, transaction_code, script_name, description, status, created_on, business_object, operation, asset_script) FROM stdin;
+8	ME21N Create Purchase Order	MM	ME21N	ME21N_CREATE_PURCHAGE_ORDER.py	Description: Create Purchase Order\r\nSteps:\r\n1.\tExecute ME21N\r\n2.\tSelect Vendor\r\n3.\tReference Purchase Requisition\r\n4.\tVerify pricing\r\n5.\tVerify delivery schedule\r\n6.\tSave\r\n7.\tVerify PO Number created\r\n	Active	2026-07-22 09:35:15.836436	\N	\N	\N
+7	ME51N Create Purchase Requisition	MM	ME51N	ME51N_CREATE_PURCHASE_REQISITION.py	Description: Create Purchase Requisition\r\nSteps:\r\n1.\tExecute ME51N\r\n2.\tEnter Material\r\n3.\tEnter Quantity\r\n4.\tEnter Plant\r\n5.\tEnter Delivery Date\r\n6.\tSave\r\n7.\tVerify PR Number generated\r\n	Active	2026-07-22 09:34:07.328954	\N	\N	\N
+9	ME22N Change Purchase Order	MM	ME22N	ME22N_CHANGE_PURCHAGE_ORDER.py	Description: Change Purchase Order\r\nSteps:\r\n1.\tExecute ME22N\r\n2.\tEnter PO Number\r\n3.\tModify quantity\r\n4.\tUpdate delivery date\r\n5.\tSave\r\n6.\tVerify changes\r\n\r\n	Active	2026-07-22 09:37:03.622502	\N	\N	\N
+10	ME23N Display Purchase Order	MM	ME23N	ME51N_DISPLAY_PURCHASE_ORDER.py	Description: Display Purchase Order\r\nSteps:\r\n1.\tExecute ME23N\r\n2.\tEnter PO Number\r\n3.\tValidate Header\r\n4.\tValidate Items\r\n5.\tValidate Conditions\r\n6.\tValidate History\r\n	Active	2026-07-22 09:40:05.11645	\N	\N	\N
+5	HELLO_WORLD_TEST	E2E	HELLO	HELLO_WORLD_TEST.py	MCSTAP Execution Test	Active	2026-07-21 15:18:08.3486	\N	\N	\N
+6	Test day and time	E2E	DATE	REPOSITORY_ENGINE_TEST.py	Date and time	Active	2026-07-22 07:37:54.03672	\N	\N	\N
+11	ME51N_CREATE_PURCHASE_REQUISITION	MM	ME51N	ME51N_CREATE_PURCHASE_REQUISITION.py	Generated from AI Test Case Builder	Draft	2026-07-26 21:31:00.771379	\N	\N	\N
+12	ME21N_CREATE_PO	MM	ME21N	ME21N_CREATE_PO.py	Generated from AI Test Case Builder	Draft	2026-07-26 21:31:00.771379	\N	\N	\N
+13	MIGO_GOODS_RECEIPT	MM	MIGO	MIGO_GOODS_RECEIPT.py	Generated from AI Test Case Builder	Draft	2026-07-26 21:31:00.771379	\N	\N	\N
+14	MIRO_INVOICE_VERIFICATION	MM	MIRO	MIRO_INVOICE_VERIFICATION.py	Generated from AI Test Case Builder	Draft	2026-07-26 21:31:00.771379	\N	\N	\N
+19	IW31_CREATE_WORK_ORDER	PM	IW31	IW31_CREATE_WORK_ORDER.py	Generated from AI Test Case Builder	Draft	2026-07-26 21:40:57.989637	\N	\N	\N
+20	IW32_CHANGE_WORK_ORDER	PM	IW32	IW32_CHANGE_WORK_ORDER.py	Generated from AI Test Case Builder	Draft	2026-07-26 21:40:57.989637	\N	\N	\N
+21	IW33_DISPLAY_WORK_ORDER	PM	IW33	IW33_DISPLAY_WORK_ORDER.py	Generated from AI Test Case Builder	Draft	2026-07-26 21:40:57.989637	\N	\N	\N
+22	IW38_ORDER_LIST	PM	IW38	IW38_ORDER_LIST.py	Generated from AI Test Case Builder	Draft	2026-07-26 21:40:57.989637	\N	\N	\N
+35	VA01_CREATE_SALES_ORDER	SD	VA01	VA01_CREATE_SALES_ORDER.py	Generated from AI Test Case Builder	Draft	2026-07-28 09:11:05.673135	\N	\N	\N
+36	VA02_CHANGE_SALES_ORDER	SD	VA02	VA02_CHANGE_SALES_ORDER.py	Generated from AI Test Case Builder	Draft	2026-07-28 09:11:05.673135	\N	\N	\N
+37	VL01N_CREATE_DELIVERY	SD	VL01N	VL01N_CREATE_DELIVERY.py	Generated from AI Test Case Builder	Draft	2026-07-28 09:11:05.673135	\N	\N	\N
+38	VA03_DISPLAY_SALES_ORDER	SD	VA03	VA03_DISPLAY_SALES_ORDER.py	Generated from AI Test Case Builder	Draft	2026-07-28 09:11:05.673135	\N	\N	\N
+39	VL02N_POST_GOODS_ISSUE	SD	VL02N	VL02N_POST_GOODS_ISSUE.py	Generated from AI Test Case Builder	Draft	2026-07-28 09:11:05.673135	\N	\N	\N
+40	VA05_SALES_ORDER_LIST	SD	VA05	VA05_SALES_ORDER_LIST.py	Generated from AI Test Case Builder	Draft	2026-07-28 09:11:05.673135	\N	\N	\N
+41	VF01_CREATE_BILLING_DOCUMENT	SD	VF01	VF01_CREATE_BILLING_DOCUMENT.py	Generated from AI Test Case Builder	Draft	2026-07-28 09:11:05.673135	\N	\N	\N
+42	VF03_DISPLAY_BILLING_DOCUMENT	SD	VF03	VF03_DISPLAY_BILLING_DOCUMENT.py	Generated from AI Test Case Builder	Draft	2026-07-28 09:11:05.673135	\N	\N	\N
+43	Create Material	MM	MM01	MM01_CREATE_MATERIAL_REPORT.py	Create Material record	Active	2026-08-12 12:01:51.206379	\N	\N	\N
+3	KS03_DISPLAY_COST_CENTER3	CO	KS03	KS03_DISPLAY_COST_CENTER.py	Description: Display Cost Center\r\nSteps:\r\n1.\tExecute KS03\r\n2.\tEnter Cost Center\r\n3.\tDisplay Master Data\r\n4.\tVerify Organization Assignment\r\n5.\tVerify Validity Dates\r\n6.\tVerify Cost Center Status\r\n	Active	2026-07-21 14:46:54.714918	COSTCENTER	DISPLAY	def run(session, test_data):\r\n  import time\r\n\r\n  def wait_for_window(s, wnd_id, timeout=5):\r\n    start = time.time()\r\n    while time.time() - start < timeout:\r\n      try:\r\n        return s.findById(wnd_id)\r\n      except Exception:\r\n        time.sleep(0.3)\r\n    return None\r\n\r\n  def handle_controlling_area_popup(s):\r\n    popup = wait_for_window(s, "wnd[1]", timeout=3)\r\n    if popup:\r\n      try:\r\n        s.findById("wnd[1]").sendVKey(4)\r\n        search = wait_for_window(s, "wnd[2]", timeout=3)\r\n        if search:\r\n          search.findById("wnd[2]/usr/lbl[1,10]").setFocus()\r\n          search.sendVKey(0)\r\n\r\n        popup = wait_for_window(s, "wnd[1]", timeout=3)\r\n        if popup:\r\n          popup.sendVKey(0)\r\n      except Exception as e:\r\n        print(f"Controlling area popup warning: {e}")\r\n\r\n  # 1. Retrieve Cost Center ID safely from test_data\r\n  COSTCENTER = test_data.get("COSTCENTER") or test_data.get("COST_CENTER")\r\n  costcenter = COSTCENTER  # Alias to ensure casing safety across references\r\n\r\n  if not costcenter:\r\n    raise ValueError(\r\n        "Database parameter missing: 'COSTCENTER' is required for KS03 display."\r\n    )\r\n\r\n  print(f"Opening KS03 to display Cost Center: {costcenter}")\r\n\r\n  # 2. Open KS03 directly from SAP main menu\r\n  session.findById("wnd[0]/tbar[0]/okcd").text = "/nKS03"\r\n  session.findById("wnd[0]").sendVKey(0)\r\n  time.sleep(1)\r\n\r\n  # 3. Handle Controlling Area Popup if prompted\r\n  handle_controlling_area_popup(session)\r\n\r\n  # 4. Enter Cost Center ID\r\n  session.findById("wnd[0]/usr/ctxtCSKSZ-KOSTL").text = str(costcenter)\r\n\r\n  # Press Enter to open display screen\r\n  session.findById("wnd[0]").sendVKey(0)\r\n  time.sleep(1)\r\n\r\n  # Handle secondary popups (e.g. validity period selection)\r\n  popup = wait_for_window(session, "wnd[1]", timeout=2)\r\n  if popup:\r\n    popup.sendVKey(0)\r\n    time.sleep(1)\r\n\r\n  # 5. Check SAP status bar for errors\r\n  sbar_type = session.findById("wnd[0]/sbar").messageType\r\n  if sbar_type == "E":\r\n    sbar_msg = session.findById("wnd[0]/sbar").text\r\n    raise Exception(f"SAP KS03 Error: {sbar_msg}")\r\n\r\n    print(f"✅ KS03 SUCCESS: Displayed Cost Center {costcenter}")\r\n\r\n  # 7. Exit back to main menu\r\n  session.findById("wnd[0]/tbar[0]/okcd").text = "/n"\r\n  session.findById("wnd[0]").sendVKey(0)\r\n\r\n  time.sleep(1)\r\n\r\n  print(f"✅ KS03 SUCCESS: DISPLAYED Cost Center {COSTCENTER}")\r\n  time.sleep(2)\r\n  return {\r\n    "status": "SUCCESS",\r\n    "business_object": "COSTCENTER",\r\n    "operation": "DISPLAYED",\r\n    "costcenter": costcenter\r\n  }
+2	KS02_MODIFY_COST_CENTER	CO	KS02	KS02_MODIFY_COST_CENTER.py	Description: Change Cost Center\r\nSteps:\r\n1.\tExecute KS02\r\n2.\tEnter Cost Center\r\n3.\tSelect Change\r\n4.\tModify Description\r\n5.\tModify Responsible Person\r\n6.\tSave\r\n7.\tVerify changes updated\r\n	Active	2026-07-21 14:45:48.275047	COSTCENTER	CHANGE	def run(session, test_data):\r\n\r\n  import time\r\n  # 1. Retrieve Cost Center ID safely from test_data\r\n  COSTCENTER = test_data.get("COSTCENTER") or test_data.get("COST_CENTER")\r\n  costcenter = COSTCENTER  # Casing safety\r\n\r\n  if not costcenter:\r\n    raise ValueError(\r\n        "Database parameter missing: 'COSTCENTER' is required for KS02"\r\n        " modification."\r\n    )\r\n\r\n\r\n  # 2. Open KS02\r\n  session.findById("wnd[0]/tbar[0]/okcd").text = "/nKS02"\r\n  session.findById("wnd[0]").sendVKey(0)\r\n  time.sleep(1)\r\n\r\n  # 3. Enter Cost Center ID and load master data\r\n  session.findById("wnd[0]/usr/ctxtCSKSZ-KOSTL").text = str(costcenter)\r\n  session.findById("wnd[0]").sendVKey(0)\r\n  time.sleep(1)\r\n\r\n  # Select Basic Data Tab if needed\r\n  try:\r\n    session.findById("wnd[0]/usr/tabsTABSTRIP_EINZEL/tabpGRUN").select()\r\n    time.sleep(0.5)\r\n  except Exception:\r\n    pass\r\n\r\n  # 4. Modify Field Value (from test_data or fallback to default update)\r\n  updated_name = test_data.get("COSTCENTER_NAME") or "AUTO KS02"\r\n\r\n  # Direct field update via standard GUI ID or findByName lookup\r\n  try:\r\n    session.findById("wnd[0]/usr/subSUB1:SAPLBAT0:0100/txtCSKSZ-KTEXT").text = (\r\n        str(updated_name)\r\n    )\r\n  except Exception:\r\n    try:\r\n      session.findById("wnd[0]/usr").findByName(\r\n          "CSKSZ-KTEXT", "GuiTextField"\r\n      ).text = str(updated_name)\r\n    except Exception as e:\r\n      print(f"Warning on field update: {e}")\r\n\r\n  # Validate change (Enter)\r\n  session.findById("wnd[0]").sendVKey(0)\r\n  time.sleep(1)\r\n\r\n  # 5. Save (CTRL+S / btn[11])\r\n  session.findById("wnd[0]/tbar[0]/btn[11]").press()\r\n  time.sleep(1)\r\n  print(f"✅ KS02 SUCCESS: Updated Cost Center {costcenter}")\r\n\r\n  # 6. Exit back to SAP Easy Access main menu\r\n  session.findById("wnd[0]/tbar[0]/okcd").text = "/n"\r\n  session.findById("wnd[0]").sendVKey(0)\r\n  time.sleep(2)\r\n  return {\r\n    "status": "SUCCESS",\r\n    "business_object": "COSTCENTER",\r\n    "operation": "MODIFYED",\r\n    "costcenter": costcenter\r\n  }\r\n
+4	KS04_BLOCK_COST_CENTER3	CO	KS04	KS04_BLOCK_COST_CENTER.py	Description: Block Cost Center\r\nSteps:\r\n1.\tExecute KS04\r\n2.\tEnter Cost Center\r\n3.\tDisplay Master Data\r\n4.\tDelete \r\n	Active	2026-07-21 14:47:29.072942	COSTCENTER	DELETE	def run(session, test_data):\r\n  import time\r\n  # 1. Retrieve Cost Center ID safely from test_data\r\n  COSTCENTER = test_data.get("COSTCENTER") or test_data.get("COST_CENTER")\r\n  costcenter = COSTCENTER  # Casing safety\r\n\r\n  if not costcenter:\r\n    raise ValueError(\r\n        "Database parameter missing: 'COSTCENTER' is required for KS04"\r\n        " deletion."\r\n    )\r\n\r\n  print(f"Opening KS04 to delete Cost Center: {costcenter}")\r\n\r\n  # 2. Open KS04\r\n  session.findById("wnd[0]/tbar[0]/okcd").text = "/nKS04"\r\n  session.findById("wnd[0]").sendVKey(0)\r\n  time.sleep(1)\r\n\r\n  # 3. Target the specific KS04 Cost Center selection field\r\n  try:\r\n    session.findById(\r\n        "wnd[0]/usr/subKOSTL_SELECTION:SAPLKMS1:0100/ctxtKMAS_D-KOSTL"\r\n    ).text = str(costcenter)\r\n  except Exception:\r\n    # Fallback to standard field if selection frame is absent\r\n    session.findById("wnd[0]/usr/ctxtKMAS_D-KOSTL").text = str(costcenter)\r\n\r\n  session.findById("wnd[0]").sendVKey(0)\r\n  time.sleep(0.5)\r\n\r\n  # 4. Uncheck 'Test Run' checkbox to perform actual deletion\r\n  try:\r\n    session.findById("wnd[0]/usr/chkCSKSZ-KZ_TEST").selected = False\r\n  except Exception as e:\r\n    print(f"Test run checkbox warning: {e}")\r\n\r\n  # 5. Execute Deletion (F8 / btn[8])\r\n  session.findById("wnd[0]/tbar[1]/btn[8]").press()\r\n  time.sleep(1)\r\n\r\n  # 6. Confirm Deletion Popup ("Yes" / Option 1)\r\n  try:\r\n    popup = session.findById("wnd[1]")\r\n    if popup:\r\n      popup.findById("usr/btnSPOP-OPTION1").press()\r\n      time.sleep(1)\r\n  except Exception:\r\n    pass\r\n\r\n  # 7. Check SAP Status Bar for error messages\r\n  try:\r\n    sbar_type = session.findById("wnd[0]/sbar").messageType\r\n    if sbar_type == "E":\r\n      sbar_msg = session.findById("wnd[0]/sbar").text\r\n      raise Exception(f"SAP KS04 Deletion Error: {sbar_msg}")\r\n  except Exception as e:\r\n    if "SAP KS04 Deletion Error" in str(e):\r\n      raise e  \r\n\r\n  print(f"✅ KS04 SUCCESS: Deleted Cost Center {costcenter}")\r\n\r\n  # 7. Exit back to main menu\r\n  session.findById("wnd[0]/tbar[0]/okcd").text = "/n"\r\n  session.findById("wnd[0]").sendVKey(0)\r\n\r\n  time.sleep(1)\r\n\r\n  print(f"✅ KS04 SUCCESS: DELETEED/OBSOLATED Cost Center {COSTCENTER}")\r\n  time.sleep(2)\r\n  return {\r\n    "status": "SUCCESS",\r\n    "business_object": "COSTCENTER",\r\n    "operation": "DELETED",\r\n    "costcenter": costcenter\r\n  }\r\n\r\n  try:\r\n    session.findById("wnd[0]/tbar[0]/okcd").text = "/nex"\r\n    session.findById("wnd[0]").sendVKey(0)\r\n  except:\r\n    pass\r\n\r\n
+1	KS01_CREATE_COST_CENTER	CO	KS01	KS01_CREATE_COST_CENTER.py	Description: Create Cost Center\r\nSteps:\r\n1.\tExecute KS01\r\n2.\tEnter Controlling Area\r\n3.\tEnter Cost Center ID\r\n4.\tEnter Name and Description\r\n5.\tEnter Valid From Date\r\n6.\tAssign Cost Center Category\r\n7.\tAssign Profit Center\r\n8.\tSave\r\n9.\tVerify Cost Center created successfully\r\n	Active	2026-07-20 12:41:23.672259	COSTCENTER	CREATE	def run(session, test_data):\r\n  import time\r\n\r\n  def wait_for_window(s, wnd_id, timeout=5):\r\n    start = time.time()\r\n    while time.time() - start < timeout:\r\n      try:\r\n        return s.findById(wnd_id)\r\n      except Exception:\r\n        time.sleep(0.3)\r\n    return None\r\n\r\n  def generate_costcenter():\r\n    return "10" + str(int(time.time()))[-5:]\r\n\r\n  def handle_controlling_area_popup(s):\r\n    popup = wait_for_window(s, "wnd[1]", timeout=3)\r\n    if popup:\r\n      try:\r\n        s.findById("wnd[1]").sendVKey(4)\r\n        search = wait_for_window(s, "wnd[2]", timeout=3)\r\n        if search:\r\n          search.findById("wnd[2]/usr/lbl[1,10]").setFocus()\r\n          search.sendVKey(0)\r\n\r\n        popup = wait_for_window(s, "wnd[1]", timeout=3)\r\n        if popup:\r\n          popup.sendVKey(0)\r\n      except Exception as e:\r\n        print(f"Controlling area popup warning: {e}")\r\n\r\n  # Exact match locator to avoid matching 'CSKSZ-VERAK_USER' when searching 'CSKSZ-VERAK'\r\n  def find_input_field(container, target_name):\r\n    try:\r\n      if hasattr(container, "Name"):\r\n        elem_name = container.Name.rsplit("/", 1)[-1]\r\n        if target_name in elem_name:\r\n          if target_name == "CSKSZ-VERAK" and "VERAK_USER" in elem_name:\r\n            pass\r\n          elif container.Type in ["GuiTextField", "GuiCTextField"]:\r\n            return container\r\n      if hasattr(container, "Children"):\r\n        for child in container.Children:\r\n          res = find_input_field(child, target_name)\r\n          if res:\r\n            return res\r\n    except Exception:\r\n      pass\r\n    return None\r\n\r\n  def set_field_value(field_name, value):\r\n    if value is None or str(value).strip() == "":\r\n      return False\r\n\r\n    user_area = session.findById("wnd[0]/usr")\r\n\r\n    # Direct findByName lookup\r\n    try:\r\n      elem = user_area.findByName(field_name, "GuiCTextField")\r\n      elem.text = str(value)\r\n      return True\r\n    except Exception:\r\n      try:\r\n        elem = user_area.findByName(field_name, "GuiTextField")\r\n        elem.text = str(value)\r\n        return True\r\n      except Exception:\r\n        pass\r\n\r\n    # Fallback to precise tree traversal\r\n    element = find_input_field(user_area, field_name)\r\n    if element:\r\n      element.text = str(value)\r\n      return True\r\n    else:\r\n      raise Exception(\r\n          f"Editable input field '{field_name}' not found on screen."\r\n      )\r\n\r\n  # 1. Generate unique Cost Center ID and assign both casing variants\r\n  COSTCENTER = generate_costcenter()\r\n  costcenter = COSTCENTER  # Prevents casing NameError in scope\r\n\r\n  # Populate test_data dictionary so downstream steps (KS02, KS03) receive the generated ID\r\n  test_data["COSTCENTER"] = COSTCENTER\r\n  test_data["COST_CENTER"] = COSTCENTER\r\n\r\n  print(f"Opening KS01 with dynamic Cost Center: {COSTCENTER}")\r\n\r\n  # 2. Open KS01\r\n  session.findById("wnd[0]/tbar[0]/okcd").text = "/nKS01"\r\n  session.findById("wnd[0]").sendVKey(0)\r\n  time.sleep(1)\r\n\r\n  # 3. Handle Controlling Area Popup\r\n  handle_controlling_area_popup(session)\r\n\r\n  # 4. Initial Screen\r\n  session.findById("wnd[0]/usr/ctxtCSKSZ-KOSTL").text = COSTCENTER\r\n  session.findById("wnd[0]/usr/ctxtCSKSZ-DATAB_ANFO").text = "01.01.2026"\r\n  session.findById("wnd[0]/usr/ctxtCSKSZ-DATBI_ANFO").text = "31.12.2035"\r\n\r\n  # Press Master Data screen button (F5)\r\n  session.findById("wnd[0]/tbar[1]/btn[5]").press()\r\n  time.sleep(2)\r\n\r\n  # 5. Fill Basic Data Fields strictly from test_data\r\n  set_field_value(\r\n      "CSKSZ-KTEXT",\r\n      test_data.get("COSTCENTER_NAME") or test_data.get("LONG_TEXT"),\r\n  )\r\n  set_field_value("CSKSZ-LTEXT", test_data.get("LONG_TEXT"))\r\n\r\n  if "USER_RESPONSIBLE" in test_data:\r\n    set_field_value("CSKSZ-VERAK_USER", test_data.get("USER_RESPONSIBLE"))\r\n\r\n  set_field_value("CSKSZ-VERAK", test_data.get("RESPONSIBLE_PERSON"))\r\n  set_field_value("CSKSZ-KOSAR", test_data.get("COSTCENTER_CATEGORY"))\r\n  set_field_value("CSKSZ-KHINR", test_data.get("HIERARCHY_AREA"))\r\n  set_field_value("CSKSZ-BUKRS", test_data.get("COMPANY_CODE"))\r\n  set_field_value("CSKSZ-PRCTR", test_data.get("PROFIT_CENTER"))\r\n\r\n  # Validate inputs (Enter)\r\n  session.findById("wnd[0]").sendVKey(0)\r\n  time.sleep(1)\r\n\r\n  # Check for error in SAP status bar\r\n  sbar_type = session.findById("wnd[0]/sbar").messageType\r\n  if sbar_type == "E":\r\n    sbar_msg = session.findById("wnd[0]/sbar").text\r\n    raise Exception(f"SAP Validation Error: {sbar_msg}")\r\n\r\n  # 6. Save Cost Center (CTRL+S / Save)\r\n  session.findById("wnd[0]/tbar[0]/btn[11]").press()\r\n  time.sleep(1)\r\n\r\n  # Handle post-save popup if present\r\n  popup = wait_for_window(session, "wnd[1]", timeout=2)\r\n  if popup:\r\n    popup.sendVKey(0)\r\n    time.sleep(1)\r\n\r\n  print(f"✅ KS01 SUCCESS: Created Cost Center {COSTCENTER}")\r\n\r\n  # 7. Exit back to SAP Easy Access main menu\r\n  session.findById("wnd[0]/tbar[0]/okcd").text = "/n"\r\n  session.findById("wnd[0]").sendVKey(0)\r\n  time.sleep(1)\r\n\r\n  return f"CREATED_{COSTCENTER}"
 \.
 
 
@@ -2493,8 +2648,13 @@ COPY public.sap_process_steps (process_step_id, process_id, sequence_no, transac
 -- Data for Name: script_master; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.script_master (script_id, script_name, description, module, version, status, created_by, created_date, updated_date, transaction_code, flow_id) FROM stdin;
-4	Creat PM Master record 	This is End to End test	PM	1	Draft	Biranchi	2026-07-14 15:17:07.407971	2026-07-14 15:17:07.407971	IW31	\N
+COPY public.script_master (script_id, script_name, description, module, version, status, created_by, created_date, updated_date, transaction_code, flow_id, generated_script) FROM stdin;
+4	Creat PM Master record 	This is End to End test	PM	1	Draft	Biranchi	2026-07-14 15:17:07.407971	2026-07-14 15:17:07.407971	IW31	\N	\N
+5	KS01	Generated By MC STAP	CO	1	Draft	Biranchi Das	2026-08-12 13:14:52.993435	2026-08-12 13:14:52.993435	KS01	\N	# -*- coding: utf-8 -*-\r\n\r\nimport time\r\nfrom sap.sap_login import SAPLogin\r\n\r\ndef generate_costcenter():\r\n    return '9' + str(int(time.time()))[-5:]\r\n\r\ndef generate_name():\r\n    return 'AUTO COST CENTER'\r\n\r\ndef generate_long_text():\r\n    return 'Generated By MC STAP'\r\n\r\ndef get_valid_responsible_person():\r\n    return 'Biranchi Das'\r\n\r\ndef get_valid_profit_center():\r\n    return '1030'\r\n\r\ndef test_ks01(sap_session):\r\n\r\n    # LOGIN\r\n    login = SAPLogin(sap_session)\r\n    login.login()\r\n\r\n    session = sap_session\r\n\r\n    # TEST DATA\r\n\r\n    # Cost Center [BUSINESS_KEY]\r\n    COSTCENTER = generate_costcenter()\r\n\r\n    # Cost Center Name [DESCRIPTION]\r\n    COSTCENTER_NAME = generate_name()\r\n\r\n    # Long Description [LONG_DESCRIPTION]\r\n    LONG_TEXT = generate_long_text()\r\n\r\n    # Responsible Person [REFERENCE]\r\n    RESPONSIBLE_PERSON = get_valid_responsible_person()\r\n\r\n\r\n    # Transaction KS01\r\n\r\n    session.findById("wnd[0]/tbar[0]/okcd").text = "/nKS01"\r\n    session.findById("wnd[0]").sendVKey(0)\r\n\r\n    # Cost Center\r\n    session.findById("wnd[0]/usr/ctxtCSKSZ-KOSTL").text = COSTCENTER\r\n\r\n    # Cost Center Name\r\n    session.findById("wnd[0]/usr/tabsTABSTRIP_EINZEL/tabpGRUN/ssubSUBSCREEN_EINZEL:SAPLKMA1:0300/txtCSKSZ-KTEXT").text = COSTCENTER_NAME\r\n\r\n    # Long Description\r\n    session.findById("wnd[0]/usr/tabsTABSTRIP_EINZEL/tabpGRUN/ssubSUBSCREEN_EINZEL:SAPLKMA1:0300/txtCSKSZ-LTEXT").text = LONG_TEXT\r\n\r\n    # Responsible Person\r\n    session.findById("wnd[0]/usr/tabsTABSTRIP_EINZEL/tabpGRUN/ssubSUBSCREEN_EINZEL:SAPLKMA1:0300/txtCSKSZ-VERAK").text = RESPONSIBLE_PERSON\r\n\r\n\r\n    # SAVE\r\n    session.findById("wnd[0]").sendVKey(11)\r\n\r\n\r\n    # LOGOFF\r\n    session.findById("wnd[0]/tbar[0]/okcd").text = "/nex"\r\n    session.findById("wnd[0]").sendVKey(0)\r\n
+6	KS01	Generated By MC STAP	CO	1	Draft	Biranchi Das	2026-08-12 13:25:43.311459	2026-08-12 13:25:43.311459	KS01	\N	# -*- coding: utf-8 -*-\r\n\r\nimport time\r\nfrom sap.sap_login import SAPLogin\r\n\r\ndef generate_costcenter():\r\n    return '9' + str(int(time.time()))[-5:]\r\n\r\ndef generate_name():\r\n    return 'AUTO COST CENTER'\r\n\r\ndef generate_long_text():\r\n    return 'Generated By MC STAP'\r\n\r\ndef get_valid_responsible_person():\r\n    return 'Biranchi Das'\r\n\r\ndef get_valid_profit_center():\r\n    return '1030'\r\n\r\ndef test_ks01(sap_session):\r\n\r\n    # LOGIN\r\n    login = SAPLogin(sap_session)\r\n    login.login()\r\n\r\n    session = sap_session\r\n\r\n    # TEST DATA\r\n\r\n    # Cost Center [BUSINESS_KEY]\r\n    COSTCENTER = generate_costcenter()\r\n\r\n    # Cost Center Name [DESCRIPTION]\r\n    COSTCENTER_NAME = generate_name()\r\n\r\n    # Long Description [LONG_DESCRIPTION]\r\n    LONG_TEXT = generate_long_text()\r\n\r\n    # Responsible Person [REFERENCE]\r\n    RESPONSIBLE_PERSON = get_valid_responsible_person()\r\n\r\n\r\n    # Transaction KS01\r\n\r\n    session.findById("wnd[0]/tbar[0]/okcd").text = "/nKS01"\r\n    session.findById("wnd[0]").sendVKey(0)\r\n\r\n    # Cost Center\r\n    session.findById("wnd[0]/usr/ctxtCSKSZ-KOSTL").text = COSTCENTER\r\n\r\n    # Cost Center Name\r\n    session.findById("wnd[0]/usr/tabsTABSTRIP_EINZEL/tabpGRUN/ssubSUBSCREEN_EINZEL:SAPLKMA1:0300/txtCSKSZ-KTEXT").text = COSTCENTER_NAME\r\n\r\n    # Long Description\r\n    session.findById("wnd[0]/usr/tabsTABSTRIP_EINZEL/tabpGRUN/ssubSUBSCREEN_EINZEL:SAPLKMA1:0300/txtCSKSZ-LTEXT").text = LONG_TEXT\r\n\r\n    # Responsible Person\r\n    session.findById("wnd[0]/usr/tabsTABSTRIP_EINZEL/tabpGRUN/ssubSUBSCREEN_EINZEL:SAPLKMA1:0300/txtCSKSZ-VERAK").text = RESPONSIBLE_PERSON\r\n\r\n\r\n    # SAVE\r\n    session.findById("wnd[0]").sendVKey(11)\r\n\r\n\r\n    # LOGOFF\r\n    session.findById("wnd[0]/tbar[0]/okcd").text = "/nex"\r\n    session.findById("wnd[0]").sendVKey(0)\r\n
+7	Creat Master record 	Ready to run the test	CO	1	Draft	Biranchi Das	2026-08-12 13:42:10.601501	2026-08-12 13:42:10.601501		\N	
+8	Modify Master record	Run test to modify master record	CO	1	Draft	Biranchi Das	2026-08-12 13:46:12.278573	2026-08-12 13:46:12.278573		\N	
+9	Creat Master record KS01	Generated By MC STAP	PM	1	Draft	Biranchi Das	2026-08-12 14:50:55.533467	2026-08-12 14:50:55.533467	KS01	\N	# -*- coding: utf-8 -*-\r\n\r\nimport time\r\nfrom sap.sap_login import SAPLogin\r\n\r\ndef generate_costcenter():\r\n    return '9' + str(int(time.time()))[-5:]\r\n\r\ndef generate_name():\r\n    return 'AUTO COST CENTER'\r\n\r\ndef generate_long_text():\r\n    return 'Generated By MC STAP'\r\n\r\ndef get_valid_responsible_person():\r\n    return 'Biranchi Das'\r\n\r\ndef get_valid_profit_center():\r\n    return '1030'\r\n\r\ndef test_ks01(sap_session):\r\n\r\n    # LOGIN\r\n    login = SAPLogin(sap_session)\r\n    login.login()\r\n\r\n    session = sap_session\r\n\r\n    # TEST DATA\r\n\r\n    # Cost Center [BUSINESS_KEY]\r\n    COSTCENTER = generate_costcenter()\r\n\r\n    # Cost Center Name [DESCRIPTION]\r\n    COSTCENTER_NAME = generate_name()\r\n\r\n    # Long Description [LONG_DESCRIPTION]\r\n    LONG_TEXT = generate_long_text()\r\n\r\n    # Responsible Person [REFERENCE]\r\n    RESPONSIBLE_PERSON = get_valid_responsible_person()\r\n\r\n\r\n    # Transaction KS01\r\n\r\n    session.findById("wnd[0]/tbar[0]/okcd").text = "/nKS01"\r\n    session.findById("wnd[0]").sendVKey(0)\r\n\r\n    # Cost Center\r\n    session.findById("wnd[0]/usr/ctxtCSKSZ-KOSTL").text = COSTCENTER\r\n\r\n    # Cost Center Name\r\n    session.findById("wnd[0]/usr/tabsTABSTRIP_EINZEL/tabpGRUN/ssubSUBSCREEN_EINZEL:SAPLKMA1:0300/txtCSKSZ-KTEXT").text = COSTCENTER_NAME\r\n\r\n    # Long Description\r\n    session.findById("wnd[0]/usr/tabsTABSTRIP_EINZEL/tabpGRUN/ssubSUBSCREEN_EINZEL:SAPLKMA1:0300/txtCSKSZ-LTEXT").text = LONG_TEXT\r\n\r\n    # Responsible Person\r\n    session.findById("wnd[0]/usr/tabsTABSTRIP_EINZEL/tabpGRUN/ssubSUBSCREEN_EINZEL:SAPLKMA1:0300/txtCSKSZ-VERAK").text = RESPONSIBLE_PERSON\r\n\r\n\r\n    # SAVE\r\n    session.findById("wnd[0]").sendVKey(11)\r\n\r\n\r\n    # LOGOFF\r\n    session.findById("wnd[0]/tbar[0]/okcd").text = "/nex"\r\n    session.findById("wnd[0]").sendVKey(0)\r\n
 \.
 
 
@@ -2511,6 +2671,57 @@ COPY public.script_steps (id, script_id, step_sequence, action_type, parameter_n
 16	4	6	EXECUTE_FLOW	FLOW	ME51N
 18	4	7	LOGOUT	Logout from SAP	None
 19	101	1	START_TRANSACTION	TCODE	IW31
+23	6	1	LOGIN		
+24	6	2	START_TRANSACTION	TCODE	KS01
+25	6	3	LOGOUT		
+29	8	1	LOGIN		
+30	8	2	START_TRANSACTION	TCODE	
+31	8	3	LOGOUT		
+37	9	1	LOGIN		
+38	9	2	START_TRANSACTION	TCODE	KS01
+39	9	3	SEND_VKEY	KEY	0
+41	9	5	SEND_VKEY	KEY	5
+42	9	6	SET_TEXT	wnd[0]/usr/tabsTABSTRIP_EINZEL/tabpGRUN/ssubSUBSCREEN_EINZEL:SAPLKMA1:0300/txtCSKSZ-KTEXT	Create Test cost cen
+43	9	7	SET_TEXT	wnd[0]/usr/tabsTABSTRIP_EINZEL/tabpGRUN/ssubSUBSCREEN_EINZEL:SAPLKMA1:0300/txtCSKSZ-LTEXT	For test automation
+44	9	8	SET_TEXT	wnd[0]/usr/tabsTABSTRIP_EINZEL/tabpGRUN/ssubSUBSCREEN_EINZEL:SAPLKMA1:0300/txtCSKSZ-VERAK	Biranchi Das
+45	9	9	SEND_VKEY	KEY	4
+46	9	10	SEND_VKEY	KEY	0
+47	9	11	SEND_VKEY	KEY	4
+48	9	12	SEND_VKEY	KEY	0
+49	9	13	SEND_VKEY	KEY	4
+50	9	14	SEND_VKEY	KEY	0
+51	9	15	SEND_VKEY	KEY	4
+52	9	16	SEND_VKEY	KEY	4
+53	9	17	SEND_VKEY	KEY	0
+54	9	18	SEND_VKEY	KEY	0
+55	9	19	SEND_VKEY	KEY	0
+56	9	20	SEND_VKEY	KEY	11
+57	9	21	LOGOUT		
+40	9	4	LOGIN	wnd[0]/usr/ctxtCSKSZ-KOSTL	
+\.
+
+
+--
+-- Data for Name: tdc_master; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.tdc_master (tdc_id, tdc_name, business_object, description, status, created_on) FROM stdin;
+1	COSTCENTER_DEFAULT	COSTCENTER	Default Cost Center Data	Active	2026-08-14 11:30:11.419206
+\.
+
+
+--
+-- Data for Name: tdc_values; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.tdc_values (value_id, tdc_id, parameter_name, parameter_value) FROM stdin;
+1	1	RESPONSIBLE_PERSON	Biranchi Das
+4	1	COSTCENTER_NAME	Test Cost Center
+5	1	LONG_TEXT	Test Cost Center
+9	1	COSTCENTER_CATEGORY	A
+10	1	HIERARCHY_AREA	1030-IT
+12	1	PROFIT_CENTER	1030
+13	1	COMPANY_CODE	PODD
 \.
 
 
@@ -2518,17 +2729,25 @@ COPY public.script_steps (id, script_id, step_sequence, action_type, parameter_n
 -- Data for Name: test_cases; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.test_cases (id, test_case_id, title, module, company_code, e2e_process, scenario, transaction_code, process_step, priority, automation_status, created_date, script_path, asset_name) FROM stdin;
-22	TC0003	KS03_DISPLAY_COST_CENTER3	CO	\N	\N	\N	KS03	Description: Display Cost Center\r\nSteps:\r\n1.\tExecute KS03\r\n2.\tEnter Cost Center\r\n3.\tDisplay Master Data\r\n4.\tVerify Organization Assignment\r\n5.\tVerify Validity Dates\r\n6.\tVerify Cost Center Status\r\n	\N	Automated	2026-07-21 14:46:54.714918	KS03_DISPLAY_COST_CENTER.py	\N
-23	TC0004	KS04_BLOCK_COST_CENTER3	CO	\N	\N	\N	KS04	Description: Block Cost Center\r\nSteps:\r\n1.\tExecute KS04\r\n2.\tEnter Cost Center\r\n3.\tDisplay Master Data\r\n4.\tDelete \r\n	\N	Automated	2026-07-21 14:47:29.072942	KS04_BLOCK_COST_CENTER.py	\N
-24	TC0005	HELLO_WORLD_TEST	E2E	\N	\N	\N	HELLO	MCSTAP Execution Test	\N	Automated	2026-07-21 15:18:08.3486	HELLO_WORLD_TEST.py	\N
-25	TC0006	Test day and time	E2E	\N	\N	\N	DATE	Date and time	\N	Automated	2026-07-22 07:37:54.03672	REPOSITORY_ENGINE_TEST.py	\N
-20	TC0001	KS01_CREATE_COST_CENTER	CO	\N	\N	\N	KS01	Description: Create Cost Center\r\nSteps:\r\n1.\tExecute KS01\r\n2.\tEnter Controlling Area\r\n3.\tEnter Cost Center ID\r\n4.\tEnter Name and Description\r\n5.\tEnter Valid From Date\r\n6.\tAssign Cost Center Category\r\n7.\tAssign Profit Center\r\n8.\tSave\r\n9.\tVerify Cost Center created successfully\r\n	\N	Automated	2026-07-21 14:45:06.8352	KS01_CREATE_COST_CENTER.py	\N
-27	TC0008	ME21N Create Purchase Order	MM	\N	\N	\N	ME21N	Description: Create Purchase Order\r\nSteps:\r\n1.\tExecute ME21N\r\n2.\tSelect Vendor\r\n3.\tReference Purchase Requisition\r\n4.\tVerify pricing\r\n5.\tVerify delivery schedule\r\n6.\tSave\r\n7.\tVerify PO Number created\r\n	\N	Automated	2026-07-22 09:35:15.836436	ME21N_CREATE_PURCHAGE_ORDER.py	\N
-26	TC0007	ME51N Create Purchase Requisition	MM	\N	\N	\N	ME51N	Description: Create Purchase Requisition\r\nSteps:\r\n1.\tExecute ME51N\r\n2.\tEnter Material\r\n3.\tEnter Quantity\r\n4.\tEnter Plant\r\n5.\tEnter Delivery Date\r\n6.\tSave\r\n7.\tVerify PR Number generated\r\n	\N	Automated	2026-07-22 09:34:07.328954	ME51N_CREATE_PURCHASE_REQISITION.py	\N
-28	TC0009	ME22N Change Purchase Order	MM	\N	\N	\N	ME22N	Description: Change Purchase Order\r\nSteps:\r\n1.\tExecute ME22N\r\n2.\tEnter PO Number\r\n3.\tModify quantity\r\n4.\tUpdate delivery date\r\n5.\tSave\r\n6.\tVerify changes\r\n\r\n	\N	Automated	2026-07-22 09:37:03.622502	ME22N_CHANGE_PURCHAGE_ORDER.py	\N
-29	TC0010	ME23N Display Purchase Order	MM	\N	\N	\N	ME23N	Description: Display Purchase Order\r\nSteps:\r\n1.\tExecute ME23N\r\n2.\tEnter PO Number\r\n3.\tValidate Header\r\n4.\tValidate Items\r\n5.\tValidate Conditions\r\n6.\tValidate History\r\n	\N	Automated	2026-07-22 09:40:05.11645	ME51N_DISPLAY_PURCHASE_ORDER.py	\N
-21	TC0002	KS02_MODIFY_COST_CENTER	CO	\N	\N	\N	KS02	Description: Change Cost Center\r\nSteps:\r\n1.\tExecute KS02\r\n2.\tEnter Cost Center\r\n3.\tSelect Change\r\n4.\tModify Description\r\n5.\tModify Responsible Person\r\n6.\tSave\r\n7.\tVerify changes updated\r\n	\N	Automated	2026-07-21 14:45:48.275047	KS02_MODIFY_COST_CENTER.py	\N
+COPY public.test_cases (id, test_case_id, title, module, company_code, e2e_process, scenario, transaction_code, process_step, priority, automation_status, created_date, script_path, asset_name, flow_id, tdc_id) FROM stdin;
+22	TC0003	KS03_DISPLAY_COST_CENTER3	CO	\N	\N	\N	KS03	Description: Display Cost Center\r\nSteps:\r\n1.\tExecute KS03\r\n2.\tEnter Cost Center\r\n3.\tDisplay Master Data\r\n4.\tVerify Organization Assignment\r\n5.\tVerify Validity Dates\r\n6.\tVerify Cost Center Status\r\n	\N	Automated	2026-07-21 14:46:54.714918	KS03_DISPLAY_COST_CENTER.py	\N	\N	\N
+23	TC0004	KS04_BLOCK_COST_CENTER3	CO	\N	\N	\N	KS04	Description: Block Cost Center\r\nSteps:\r\n1.\tExecute KS04\r\n2.\tEnter Cost Center\r\n3.\tDisplay Master Data\r\n4.\tDelete \r\n	\N	Automated	2026-07-21 14:47:29.072942	KS04_BLOCK_COST_CENTER.py	\N	\N	\N
+24	TC0005	HELLO_WORLD_TEST	E2E	\N	\N	\N	HELLO	MCSTAP Execution Test	\N	Automated	2026-07-21 15:18:08.3486	HELLO_WORLD_TEST.py	\N	\N	\N
+25	TC0006	Test day and time	E2E	\N	\N	\N	DATE	Date and time	\N	Automated	2026-07-22 07:37:54.03672	REPOSITORY_ENGINE_TEST.py	\N	\N	\N
+20	TC0001	KS01_CREATE_COST_CENTER	CO	\N	\N	\N	KS01	Description: Create Cost Center\r\nSteps:\r\n1.\tExecute KS01\r\n2.\tEnter Controlling Area\r\n3.\tEnter Cost Center ID\r\n4.\tEnter Name and Description\r\n5.\tEnter Valid From Date\r\n6.\tAssign Cost Center Category\r\n7.\tAssign Profit Center\r\n8.\tSave\r\n9.\tVerify Cost Center created successfully\r\n	\N	Automated	2026-07-21 14:45:06.8352	KS01_CREATE_COST_CENTER.py	\N	\N	\N
+30	TC0011	Create Material	MM	\N	\N	\N	MM01	Create Material record	\N	Automated	2026-08-12 12:01:51.206379	MM01_CREATE_MATERIAL_REPORT.py	\N	\N	\N
+31	TC0012	Create Cost Center	CO	\N	\N	\N	\N	\N	High	Automated	2026-08-13 15:32:20.033476	\N	\N	59	\N
+32	TC0013	Create Cost Center	CO	\N	\N	\N	\N	\N	High	Automated	2026-08-13 15:34:35.584005	\N	\N	59	\N
+33	TC0014	Create Cost Center	CO	\N	\N	\N	\N	\N	High	Automated	2026-08-13 15:35:44.10814	\N	\N	59	\N
+27	TC0008	ME21N Create Purchase Order	MM	\N	\N	\N	ME21N	Description: Create Purchase Order\r\nSteps:\r\n1.\tExecute ME21N\r\n2.\tSelect Vendor\r\n3.\tReference Purchase Requisition\r\n4.\tVerify pricing\r\n5.\tVerify delivery schedule\r\n6.\tSave\r\n7.\tVerify PO Number created\r\n	\N	Automated	2026-07-22 09:35:15.836436	ME21N_CREATE_PURCHAGE_ORDER.py	\N	\N	\N
+26	TC0007	ME51N Create Purchase Requisition	MM	\N	\N	\N	ME51N	Description: Create Purchase Requisition\r\nSteps:\r\n1.\tExecute ME51N\r\n2.\tEnter Material\r\n3.\tEnter Quantity\r\n4.\tEnter Plant\r\n5.\tEnter Delivery Date\r\n6.\tSave\r\n7.\tVerify PR Number generated\r\n	\N	Automated	2026-07-22 09:34:07.328954	ME51N_CREATE_PURCHASE_REQISITION.py	\N	\N	\N
+28	TC0009	ME22N Change Purchase Order	MM	\N	\N	\N	ME22N	Description: Change Purchase Order\r\nSteps:\r\n1.\tExecute ME22N\r\n2.\tEnter PO Number\r\n3.\tModify quantity\r\n4.\tUpdate delivery date\r\n5.\tSave\r\n6.\tVerify changes\r\n\r\n	\N	Automated	2026-07-22 09:37:03.622502	ME22N_CHANGE_PURCHAGE_ORDER.py	\N	\N	\N
+29	TC0010	ME23N Display Purchase Order	MM	\N	\N	\N	ME23N	Description: Display Purchase Order\r\nSteps:\r\n1.\tExecute ME23N\r\n2.\tEnter PO Number\r\n3.\tValidate Header\r\n4.\tValidate Items\r\n5.\tValidate Conditions\r\n6.\tValidate History\r\n	\N	Automated	2026-07-22 09:40:05.11645	ME51N_DISPLAY_PURCHASE_ORDER.py	\N	\N	\N
+21	TC0002	KS02_MODIFY_COST_CENTER	CO	\N	\N	\N	KS02	Description: Change Cost Center\r\nSteps:\r\n1.\tExecute KS02\r\n2.\tEnter Cost Center\r\n3.\tSelect Change\r\n4.\tModify Description\r\n5.\tModify Responsible Person\r\n6.\tSave\r\n7.\tVerify changes updated\r\n	\N	Automated	2026-07-21 14:45:48.275047	KS02_MODIFY_COST_CENTER.py	\N	\N	\N
+34	TC0015	Create Cost Center	CO	\N	\N	\N	\N	\N	High	\N	2026-08-15 11:28:47.493724	\N	\N	59	1
+35	TC0016	Create Cost Center	CO	\N	\N	\N	\N	\N	Medium	\N	2026-08-15 11:29:31.907997	\N	\N	59	1
+36	TC0017	Create Cost Center	CO	\N	\N	\N	\N	\N	Low	\N	2026-08-15 11:33:25.249279	\N	\N	59	1
+37	TC0018	Create Cost Center V2	CO	\N	\N	\N	\N	\N	High	\N	2026-08-16 09:47:47.163433	\N	\N	59	1
 \.
 
 
@@ -4300,28 +4519,35 @@ COPY public.test_templates (id, module, country_code, test_type, e2e_process, sc
 -- Name: ai_command_history_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.ai_command_history_id_seq', 65, true);
+SELECT pg_catalog.setval('public.ai_command_history_id_seq', 76, true);
+
+
+--
+-- Name: execution_context_execution_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.execution_context_execution_id_seq', 1, false);
 
 
 --
 -- Name: flow_master_flow_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.flow_master_flow_id_seq', 115, true);
+SELECT pg_catalog.setval('public.flow_master_flow_id_seq', 118, true);
 
 
 --
 -- Name: flow_steps_step_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.flow_steps_step_id_seq', 87, true);
+SELECT pg_catalog.setval('public.flow_steps_step_id_seq', 109, true);
 
 
 --
 -- Name: repository_assets_asset_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.repository_assets_asset_id_seq', 42, true);
+SELECT pg_catalog.setval('public.repository_assets_asset_id_seq', 43, true);
 
 
 --
@@ -4342,21 +4568,35 @@ SELECT pg_catalog.setval('public.sap_process_steps_process_step_id_seq', 1093, t
 -- Name: script_master_script_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.script_master_script_id_seq', 4, true);
+SELECT pg_catalog.setval('public.script_master_script_id_seq', 10, true);
 
 
 --
 -- Name: script_steps_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.script_steps_id_seq', 19, true);
+SELECT pg_catalog.setval('public.script_steps_id_seq', 65, true);
+
+
+--
+-- Name: tdc_master_tdc_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.tdc_master_tdc_id_seq', 1, true);
+
+
+--
+-- Name: tdc_values_value_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.tdc_values_value_id_seq', 13, true);
 
 
 --
 -- Name: test_cases_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.test_cases_id_seq', 29, true);
+SELECT pg_catalog.setval('public.test_cases_id_seq', 37, true);
 
 
 --
@@ -4424,6 +4664,14 @@ ALTER TABLE ONLY public.ai_command_history
 
 
 --
+-- Name: execution_context execution_context_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.execution_context
+    ADD CONSTRAINT execution_context_pkey PRIMARY KEY (execution_id);
+
+
+--
 -- Name: flow_master flow_master_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -4477,6 +4725,22 @@ ALTER TABLE ONLY public.script_master
 
 ALTER TABLE ONLY public.script_steps
     ADD CONSTRAINT script_steps_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: tdc_master tdc_master_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.tdc_master
+    ADD CONSTRAINT tdc_master_pkey PRIMARY KEY (tdc_id);
+
+
+--
+-- Name: tdc_values tdc_values_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.tdc_values
+    ADD CONSTRAINT tdc_values_pkey PRIMARY KEY (value_id);
 
 
 --
@@ -4536,6 +4800,14 @@ ALTER TABLE ONLY public.test_templates
 
 
 --
+-- Name: flow_steps fk_flow_asset; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.flow_steps
+    ADD CONSTRAINT fk_flow_asset FOREIGN KEY (asset_id) REFERENCES public.repository_assets(asset_id);
+
+
+--
 -- Name: flow_steps fk_flow_steps; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -4552,8 +4824,32 @@ ALTER TABLE ONLY public.sap_process_steps
 
 
 --
+-- Name: tdc_values fk_tdc_master; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.tdc_values
+    ADD CONSTRAINT fk_tdc_master FOREIGN KEY (tdc_id) REFERENCES public.tdc_master(tdc_id);
+
+
+--
+-- Name: test_cases fk_test_case_flow; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.test_cases
+    ADD CONSTRAINT fk_test_case_flow FOREIGN KEY (flow_id) REFERENCES public.flow_master(flow_id);
+
+
+--
+-- Name: test_cases fk_test_case_tdc; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.test_cases
+    ADD CONSTRAINT fk_test_case_tdc FOREIGN KEY (tdc_id) REFERENCES public.tdc_master(tdc_id);
+
+
+--
 -- PostgreSQL database dump complete
 --
 
-\unrestrict zLrWw6xeGASwv9J5ueyG1cGV3RZtLDlVvHgxwZQQV7edZyPzFSEzdPFe0BnygAQ
+\unrestrict 4EsOsKIG2Z5bc82B3e5azj5We5ZjCV6QMTnHflUozL7xh45Te1XvJE95aabe9nA
 

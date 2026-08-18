@@ -3,27 +3,28 @@
 
 class AssetRunner:
 
-    def run_asset(
-        self,
-        asset_script,
-        session,
-        test_data
-    ):
+	def run_asset(
+	    self,
+	    asset_script,
+	    session,
+	    test_data,
+	    runtime
+	):
+		scope = {}
 
-        scope = {}
+		exec(
+		    asset_script,
+		    scope,
+		    scope
+		)
 
-        exec(
-            asset_script,
-            scope,
-            scope
-        )
+		if "run" not in scope:
+			raise Exception(
+			    "Asset script does not contain run()"
+			)
 
-        if "run" not in scope:
-            raise Exception(
-                "Asset script does not contain run()"
-            )
-
-        return scope["run"](
-            session,
-            test_data
-        )
+		return scope["run"](
+		    session,
+		    test_data,
+            runtime
+		)

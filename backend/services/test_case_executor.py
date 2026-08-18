@@ -62,12 +62,8 @@ class TestCaseExecutor:
             result = runner.run_asset(
                 asset_script,
                 session,
-                context["test_data"],
-                context["runtime"]
+                context["test_data"]
             )
-
-            print("RUNTIME:")
-            print(context["runtime"])
 
             results.append(
                 {
