@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Execution Result | MC STAP</title>
+    <link rel="stylesheet" href="/static/css/test_execution_result.css">
+</head>
+
+<body>
+
+<div class="page-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+    <h1 class="page-title" style="font-size: 28px; font-weight: bold; margin: 0;">Execution Result</h1>
+    
+    <a href="/test-cases" style="
+        display: inline-flex;
+        align-items: center;
+        text-decoration: none;
+        background-color: #1f2937;
+        color: #ffffff;
+        padding: 10px 18px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 600;
+    ">← Back to Test Cases</a>
+</div>
+
+    <div class="card">
+        <h2>Summary</h2>
+
+        <p>
+            <strong>Test Case Database ID:</strong>
+            {{ execution.test_case_id }}
+        </p>
+	  
+	  <p>
+	      <strong>Execution Evidence ID:</strong>
+	      {{ execution.execution_id }}
+	</p>
+
+        <p>
+            <strong>Overall Status:</strong>
+
+            {% if execution.status == "SUCCESS" %}
+                <span class="status-success">✅ SUCCESS</span>
+            {% else %}
+                <span class="status-failed">❌ {{ execution.status }}</span>
+            {% endif %}
+        </p>
+    </div>
+
+    <div class="card">
+        <h2>Asset Execution Results</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Asset</th>
+                    <th>Status</th>
+                    <th>Details</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for item in execution.results %}
+                <tr>
+                    <td>
+                        {{ item.asset }}
+                    </td>
+
+                    <td>
+                        <span class="asset-success">✅ Completed</span>
+                    </td>
+
+                    <td>
+                        <div class="json-box">
+{{ item.status }}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card">
+        <h2>Runtime Context</h2>
+
+        {% if execution.runtime %}
+            <div class="runtime-box">
+                {% for key, value in execution.runtime.items() %}
+{{ key }} = {{ value }}
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>No runtime context was produced.</p>
+        {% endif %}
+    </div>
+
+</body>
+
+</html>

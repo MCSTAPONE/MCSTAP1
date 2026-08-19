@@ -23,6 +23,7 @@ from api.flow_library import router as flow_router
 from api.script_studio import router as script_router
 from api.tdc import router as tdc_router
 from api.test_execution import router as test_execution_router
+from api.reports import router as reports_router
 
 from services.script_executor import ScriptExecutor
 from services.coverage_intelligence import get_coverage_dashboard
@@ -41,6 +42,7 @@ app.include_router(flow_router)
 app.include_router(script_router)
 app.include_router(tdc_router)
 app.include_router(test_execution_router)
+app.include_router(reports_router)
 
 templates = Jinja2Templates(directory="templates")
 app.mount(
@@ -129,22 +131,6 @@ def pm_execution(request: Request):
         request=request,
         name="pm_execution.html",
         context={}
-    )
-    
-@app.get("/reports")
-def reports(request: Request):
-
-    return templates.TemplateResponse(
-        request=request,
-        name="reports.html",
-        context={}
-    )
-    
-@app.get("/reports/allure")
-def allure_report():
-
-    return RedirectResponse(
-        url="/allure/index.html"
     )
     
 @app.get("/Coverage")

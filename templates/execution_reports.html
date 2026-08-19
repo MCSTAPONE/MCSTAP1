@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Execution Evidence | MC STAP</title>
+
+    <link rel="stylesheet" href="/static/css/execution_reports.css">
+</head>
+
+<body>
+
+    <div class="page-header">
+
+        <div class="page-title">
+            Execution Evidence
+        </div>
+
+        <a href="/reports" class="back-btn">
+            ← Back to Reports
+        </a>
+
+    </div>
+
+    <div class="card">
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>Execution ID</th>
+                    <th>Test Case</th>
+                    <th>Title</th>
+                    <th>Status</th>
+                    <th>Runtime Context</th>
+                    <th>Created At</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for row in rows %}
+                <tr>
+
+                    <td>
+                        {{ row[0] }}
+                    </td>
+
+                    <td>
+                        {{ row[2] or row[1] }}
+                    </td>
+
+                    <td>
+                        {{ row[3] or "-" }}
+                    </td>
+
+                    <td>
+                        {% if row[4] == "SUCCESS" %}
+                            <span class="status-success">
+                                ✅ SUCCESS
+                            </span>
+                        {% else %}
+                            {{ row[4] }}
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {% if row[5] %}
+                            <div class="runtime-box">
+                                {{ row[5] }}
+                            </div>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {{ row[6] }}
+                    </td>
+
+                    <td>
+                        <a href="/reports/executions/{{ row[0] }}" class="view-link">
+                            View
+                        </a>
+                    </td>
+
+                </tr>
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</body>
+
+</html>

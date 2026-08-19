@@ -1,0 +1,83 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #f3f6fb;
+    margin: 0;
+    padding: 24px;
+    color: #111827;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.page-title {
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.back-btn {
+    background: #1f2937;
+    color: white !important;
+    padding: 10px 16px;
+    border-radius: 6px;
+    text-decoration: none !important;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    transition: background 0.2s ease;
+}
+
+.back-btn:hover {
+    background: #374151;
+}
+
+.card {
+    background: white;
+    border-radius: 10px;
+    padding: 22px;
+    margin-bottom: 22px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.status-success {
+    color: #15803d;
+    font-weight: 700;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    background: #e5e7eb;
+    text-align: left;
+    padding: 12px;
+}
+
+td {
+    border-bottom: 1px solid #e5e7eb;
+    padding: 12px;
+    vertical-align: top;
+}
+
+.json-box {
+    background: #f3f4f6;
+    padding: 10px;
+    border-radius: 6px;
+    font-family: Consolas, monospace;
+    white-space: pre-wrap;
+}
+
+.runtime-box {
+    background: #111827;
+    color: #d1fae5;
+    padding: 14px;
+    border-radius: 8px;
+    font-family: Consolas, monospace;
+    white-space: pre-wrap;
+    overflow-x: auto;
+}

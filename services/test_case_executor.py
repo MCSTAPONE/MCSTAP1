@@ -78,4 +78,8 @@ class TestCaseExecutor:
 
         sap.logout()
 
-        return results
+        return {
+            "status": "SUCCESS",
+            "results": results,
+            "runtime": context["runtime"]
+        }

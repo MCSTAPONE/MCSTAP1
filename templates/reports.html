@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reports Center</title>
+    <title>Reporting Center | MC STAP</title>
 
     <link rel="stylesheet" href="/static/css/pm.css">
 </head>
@@ -12,46 +12,38 @@
 <body>
 
     <div class="header">
+        <h1>Reporting Center</h1>
 
-        Reports Center
-
+        <a href="/dashboard" class="back-btn">
+            ← Dashboard
+        </a>
     </div>
 
-    <a href="/dashboard" class="back-btn">
-		← Dashboard
-	</a>
+    <div class="section">
 
+        <h2>Available Reports</h2>
 
-    
-	<div class="section">
+        <div class="tiles">
 
-		<h2>Available Reports</h2>
+            <a href="/reports/executions" class="tile-link">
+                <div class="tile">
 
-		<div class="tiles">
+                    <div class="tile-title">
+                        Execution Evidence
+                    </div>
 
-			<a href="/reports/allure" class="tile-link">
+                    <div class="tile-desc">
+                        Historical SAP test execution results and runtime context
+                    </div>
 
-				<div class="tile">
+                </div>
+            </a>
 
-					<div class="tile-title">
-						Allure Reports
-					</div>
+        </div>
 
-					<div class="tile-desc">
-						Automation Execution Results
-					</div>
-
-				</div>
-
-			</a>
-
-		</div>
-
-	</div>
-
-
-
+    </div>
 
 </body>
 
 </html>
+

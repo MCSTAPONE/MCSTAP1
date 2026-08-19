@@ -5,34 +5,59 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Test Case Management | MC STAP</title>
-    <link rel="stylesheet"
-          href="/static/css/test_cases.css">
+
+    <link rel="stylesheet" href="/static/css/test_cases.css">
 </head>
 
 <body>
 
     <div class="header">
         <h1>Test Case Management</h1>
-        <a href="/dashboard" class="back-btn">← Dashboard</a>
+
+        <a href="/dashboard" class="back-btn">
+            ← Dashboard
+        </a>
     </div>
 
     <div class="main-container">
 
         <!-- Form Panel -->
         <div class="card">
-            <h2 class="card-title">Create New Test Case</h2>
+            <h2 class="card-title">
+                Create New Test Case
+            </h2>
 
-            <form action="/test-cases/save" method="POST">
+            <form action="/test-cases/save" method="post">
                 <div class="form-grid">
+
                     <div class="form-group">
-                        <label for="title">Title *</label>
-                        <input type="text" id="title" name="title" placeholder="e.g. Create Purchase Order" required>
+                        <label for="title">
+                            Title *
+                        </label>
+
+                        <input
+                            type="text"
+                            id="title"
+                            name="title"
+                            placeholder="e.g. Create Purchase Order"
+                            required
+                        >
                     </div>
 
                     <div class="form-group">
-                        <label for="module">Module *</label>
-                        <select id="module" name="module" required>
-                            <option value="">Select Module</option>
+                        <label for="module">
+                            Module *
+                        </label>
+
+                        <select
+                            id="module"
+                            name="module"
+                            required
+                        >
+                            <option value="">
+                                Select Module
+                            </option>
+
                             <option value="PM">PM</option>
                             <option value="MM">MM</option>
                             <option value="FI">FI</option>
@@ -50,107 +75,108 @@
                         </select>
                     </div>
 
-			  <div class="form-group">
+                    <div class="form-group">
+                        <label for="flow_id">
+                            Flow *
+                        </label>
 
-			    <label for="flow_id">Flow *</label>
+                        <select
+                            id="flow_id"
+                            name="flow_id"
+                            required
+                        >
+                            <option value="">
+                                Select Flow
+                            </option>
 
-			    <select
-				  id="flow_id"
-				  name="flow_id"
-				  required>
+                            {% for flow in flows %}
+                            <option value="{{ flow[0] }}">
+                                {{ flow[1] }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
 
-				  <option value="">
-					Select Flow
-				  </option>
+                    <div class="form-group">
+                        <label for="tdc_id">
+                            Test Data Container *
+                        </label>
 
-				  {% for flow in flows %}
+                        <select
+                            id="tdc_id"
+                            name="tdc_id"
+                            required
+                        >
+                            <option value="">
+                                Select TDC
+                            </option>
 
-				  <option value="{{ flow[0] }}">
-
-					{{ flow[1] }}
-
-				  </option>
-
-				  {% endfor %}
-
-			    </select>
-
-			</div>
-			
-			<div class="form-group">
-
-			    <label for="tdc_id">
-
-				  Test Data Container *
-
-			    </label>
-
-			    <select
-				  id="tdc_id"
-				  name="tdc_id"
-				  required>
-
-				  <option value="">
-					Select TDC
-				  </option>
-
-				  {% for tdc in tdcs %}
-
-				  <option value="{{ tdc[0] }}">
-
-					{{ tdc[1] }}
-
-				  </option>
-
-				  {% endfor %}
-
-			    </select>
-
-			</div>
+                            {% for tdc in tdcs %}
+                            <option value="{{ tdc[0] }}">
+                                {{ tdc[1] }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
 
                 </div>
-			  <div class="form-group">
 
-			    <label for="priority">
+                <div class="form-group">
+                    <label for="priority">
+                        Priority
+                    </label>
 
-				  Priority
+                    <select
+                        id="priority"
+                        name="priority"
+                    >
+                        <option value="High">
+                            High
+                        </option>
 
-			    </label>
+                        <option value="Medium">
+                            Medium
+                        </option>
 
-			    <select
-				  id="priority"
-				  name="priority">
-
-				  <option value="High">
-					High
-				  </option>
-
-				  <option value="Medium">
-					Medium
-				  </option>
-
-				  <option value="Low">
-					Low
-				  </option>
-
-			    </select>
-
-			</div>
+                        <option value="Low">
+                            Low
+                        </option>
+                    </select>
+                </div>
 
                 <div class="form-actions">
-                    <button type="submit" class="btn-submit">Save Test Case</button>
+                    <button
+                        type="submit"
+                        class="btn-submit"
+                    >
+                        Save Test Case
+                    </button>
                 </div>
             </form>
         </div>
 
         <!-- Data Table Panel -->
         <div class="card">
-            <h2 class="card-title">Available Test Cases</h2>
+            <h2 class="card-title">
+                Available Test Cases
+            </h2>
 
             <div class="filter-bar">
-                <input type="text" id="searchInput" class="search-input" placeholder="🔍 Search test cases...">
-                <select id="moduleFilter" class="filter-select">
-                    <option value="">All Modules</option>
+                <input
+                    type="text"
+                    id="searchInput"
+                    class="search-input"
+                    placeholder="🔍 Search test cases..."
+                >
+
+                <select
+                    id="moduleFilter"
+                    class="filter-select"
+                >
+                    <option value="">
+                        All Modules
+                    </option>
+
                     <option value="PM">PM</option>
                     <option value="MM">MM</option>
                     <option value="FI">FI</option>
@@ -170,37 +196,79 @@
 
             <div class="table-responsive">
                 <table class="test-table">
+
                     <thead>
                         <tr>
-                            <tr>
-					    <th>Test Case ID</th>
-					    <th>Title</th>
-					    <th>Module</th>
-					    <th>Flow</th>
-					    <th>TDC</th>
-					    <th>Priority</th>
-					    <th>Actions</th>
-					</tr>
+                            <th>Test Case ID</th>
+                            <th>Title</th>
+                            <th>Module</th>
+                            <th>Flow</th>
+                            <th>TDC</th>
+                            <th>Priority</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
+
                     <tbody id="testCaseTable">
+
                         {% for row in rows %}
                         <tr>
-					<td>{{ row[1] }}</td>
-					<td>{{ row[2] }}</td>
-					<td>{{ row[3] }}</td>
-					<td>{{ row[4] }}</td>
-					<td>{{ row[5] }}</td>
-					<td>{{ row[6] }}</td>
-                            <td class="action-cell" style="justify-content: center;">
-                                <a href="/test-cases/view/{{ row[1] }}" class="action-icon" title="View">👁️</a>
-                                <a href="/test-cases/edit/{{ row[0] }}" class="action-icon" title="Edit">✏️</a>
-                                <a href="/test-cases/delete/{{ row[1] }}" class="action-icon" title="Delete" onclick="return confirm('Are you sure you want to delete this test case?');">🗑️</a>
-					  <a href="#" class="action-icon" title="Execute" onclick="executeTestCase({{ row[0] }}); return false;">▶️</a>
+                            <td>
+                                {{ row[1] }}
+                            </td>
+
+                            <td>
+                                {{ row[2] }}
+                            </td>
+
+                            <td>
+                                {{ row[3] }}
+                            </td>
+
+                            <td>
+                                {{ row[4] }}
+                            </td>
+
+                            <td>
+                                {{ row[5] }}
+                            </td>
+
+                            <td>
+                                {{ row[6] }}
+                            </td>
+
+                            <td
+                                class="action-cell"
+                                style="justify-content: center;"
+                            >
+                                <a href="/test-cases/view/{{ row[1] }}" title="View">
+                                    👁️
+                                </a>
+
+                                <a href="/test-cases/edit/{{ row[0] }}" title="Edit">
+                                    ✏️
+                                </a>
+
+                                <a href="/test-cases/delete/{{ row[1] }}" title="Delete">
+                                    🗑️
+                                </a>
+
+                                <form action="/test-cases/{{ row[0] }}/execute-result" method="post" style="display: inline;">
+                                    <button
+                                        type="submit"
+                                        class="action-icon"
+                                        title="Execute"
+                                        style="border: none; background: none; cursor: pointer; padding: 0;"
+                                    >
+                                        ▶️
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                         {% endfor %}
+
                     </tbody>
+
                 </table>
             </div>
         </div>
@@ -208,107 +276,69 @@
     </div>
 
     <script>
+        const searchInput =
+            document.getElementById(
+                "searchInput"
+            );
 
-	const searchInput =
-	    document.getElementById(
-		  "searchInput"
-	    );
+        const moduleFilter =
+            document.getElementById(
+                "moduleFilter"
+            );
 
-	const moduleFilter =
-	    document.getElementById(
-		  "moduleFilter"
-	    );
+        function filterTable()
+        {
+            const searchValue =
+                searchInput.value.toLowerCase();
 
-	function filterTable()
-	{
-	    const searchValue =
-		  searchInput.value.toLowerCase();
+            const selectedModule =
+                moduleFilter.value;
 
-	    const selectedModule =
-		  moduleFilter.value;
+            const rows =
+                document.querySelectorAll(
+                    "#testCaseTable tr"
+                );
 
-	    const rows =
-		  document.querySelectorAll(
-			"#testCaseTable tr"
-		  );
+            rows.forEach(
+                row =>
+                {
+                    const text =
+                        row.innerText.toLowerCase();
 
-	    rows.forEach(
-		  row =>
-		  {
+                    const module =
+                        row.children[2]
+                        ?.innerText
+                        .trim();
 
-			const text =
-			    row.innerText.toLowerCase();
+                    const searchMatch =
+                        text.includes(
+                            searchValue
+                        );
 
-			const module =
-			    row.children[2]
-			    ?.innerText
-			    .trim();
+                    const moduleMatch =
+                        selectedModule === ""
+                        ||
+                        module === selectedModule;
 
-			const searchMatch =
-			    text.includes(
-				  searchValue
-			    );
+                    row.style.display =
+                        searchMatch &&
+                        moduleMatch
+                            ? ""
+                            : "none";
+                }
+            );
+        }
 
-			const moduleMatch =
-			    selectedModule === ""
-			    ||
-			    module === selectedModule;
+        searchInput.addEventListener(
+            "keyup",
+            filterTable
+        );
 
-			row.style.display =
-			    searchMatch &&
-			    moduleMatch
-				  ? ""
-				  : "none";
-
-		  }
-	    );
-	}
-
-	searchInput.addEventListener(
-	    "keyup",
-	    filterTable
-	);
-
-	moduleFilter.addEventListener(
-	    "change",
-	    filterTable
-	);
-	
-	async function executeTestCase(
-	    testCaseId
-	)
-	{
-	    try
-	    {
-		  const response =
-			await fetch(
-			    `/api/testcases/${testCaseId}/execute`,
-			    {
-				  method: "POST"
-			    }
-			);
-
-		  const result =
-			await response.json();
-
-		  console.log(result);
-
-		  alert(
-			"Execution completed successfully."
-		  );
-
-	    }
-	    catch (error)
-	    {
-		  console.error(error);
-
-		  alert(
-			"Execution failed."
-		  );
-	    }
-	}
-
-</script>
+        moduleFilter.addEventListener(
+            "change",
+            filterTable
+        );
+    </script>
 
 </body>
 
