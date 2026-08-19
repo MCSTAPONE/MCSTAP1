@@ -39,7 +39,19 @@ def execution_reports(
             tc.title,
             ter.execution_status,
             ter.runtime_context,
-            ter.created_at
+            ter.created_at,
+            CASE
+                WHEN ter.started_at IS NOT NULL
+                 AND ter.ended_at IS NOT NULL
+                THEN
+                    EXTRACT(
+                        EPOCH FROM (
+                            ter.ended_at - ter.started_at
+                        )
+                    )::INTEGER
+                ELSE
+                    NULL
+            END AS duration_seconds
         FROM test_execution_runs ter
         LEFT JOIN test_cases tc
             ON ter.test_case_db_id = tc.id
@@ -81,7 +93,19 @@ def execution_report_detail(
             ter.runtime_context,
             ter.started_at,
             ter.ended_at,
-            ter.created_at
+            ter.created_at,
+            CASE
+                WHEN ter.started_at IS NOT NULL
+                 AND ter.ended_at IS NOT NULL
+                THEN
+                    EXTRACT(
+                        EPOCH FROM (
+                            ter.ended_at - ter.started_at
+                        )
+                    )::INTEGER
+                ELSE
+                    NULL
+            END AS duration_seconds
         FROM test_execution_runs ter
         LEFT JOIN test_cases tc
             ON ter.test_case_db_id = tc.id

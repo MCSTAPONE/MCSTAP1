@@ -33,7 +33,8 @@
                     <th>Test Case</th>
                     <th>Title</th>
                     <th>Status</th>
-                    <th>Runtime Context</th>
+                    <th>Runtime Object</th>
+                    <th>Duration</th>
                     <th>Created At</th>
                     <th>Action</th>
                 </tr>
@@ -69,10 +70,26 @@
                     <td>
                         {% if row[5] %}
                             <div class="runtime-box">
-                                {{ row[5] }}
+                                {% for key, value in row[5].items() %}
+						{{ key }} = {{ value }}
+                                {% endfor %}
                             </div>
                         {% else %}
-                            -
+                            <span class="empty-text">
+                                -
+                            </span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {% if row[7] is not none %}
+                            <span class="duration-badge">
+                                {{ row[7] }} sec
+                            </span>
+                        {% else %}
+                            <span class="empty-text">
+                                -
+                            </span>
                         {% endif %}
                     </td>
 

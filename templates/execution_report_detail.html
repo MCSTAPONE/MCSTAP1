@@ -23,7 +23,7 @@
         </a>
 
     </div>
-
+    
     {% if execution %}
 
     <div class="card">
@@ -61,6 +61,20 @@
                 </span>
             {% else %}
                 {{ execution[4] }}
+            {% endif %}
+        </p>
+
+        <p>
+            <strong>Duration:</strong>
+
+            {% if execution[9] is not none %}
+                <span class="duration-badge">
+                    {{ execution[9] }} sec
+                </span>
+            {% else %}
+                <span class="empty-text">
+                    -
+                </span>
             {% endif %}
         </p>
 
@@ -123,7 +137,7 @@
 
                     <td>
                         <div class="json-box">
-{{ asset[3] }}
+					{{ asset[3] }}
                         </div>
                     </td>
 
@@ -144,10 +158,12 @@
 
         {% if execution[5] %}
             <div class="runtime-box">
-                {{ execution[5] }}
+                {% for key, value in execution[5].items() %}
+			{{ key }} = {{ value }}
+                {% endfor %}
             </div>
         {% else %}
-            <p>
+            <p class="empty-text">
                 No runtime context was saved.
             </p>
         {% endif %}
