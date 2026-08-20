@@ -11,172 +11,247 @@ class ExecutionContextService:
     ):
 
         conn = get_connection()
-
         cur = conn.cursor()
 
-        # ==============================
-        # TEST CASE
-        # ==============================
+        try:
 
-        cur.execute(
-            """
-            SELECT
+            # ==========================================
+            # TEST CASE
+            # ==========================================
 
-                tc.id,
-
-                tc.test_case_id,
-
-                tc.title,
-
-                tc.flow_id,
-
-                tc.tdc_id
-
-            FROM test_cases tc
-
-            WHERE tc.id = %s
-            """,
-            (test_case_id,)
-        )
-
-        test_case = cur.fetchone()
-
-        if not test_case:
-
-            cur.close()
-            conn.close()
-
-            raise Exception(
-                f"Test Case {test_case_id} not found"
+            cur.execute(
+                """
+                SELECT
+                    tc.id,
+                    tc.test_case_id,
+                    tc.title,
+                    tc.flow_id,
+                    tc.tdc_id,
+                    tc.sdc_id
+                FROM test_cases tc
+                WHERE tc.id = %s
+                """,
+                (
+                    test_case_id,
+                )
             )
 
-        flow_id = test_case[3]
+            test_case = cur.fetchone()
 
-        tdc_id = test_case[4]
+            if not test_case:
+                raise ValueError(
+                    f"Test Case {test_case_id} "
+                    "was not found."
+                )
 
-        # ==============================
-        # FLOW
-        # ==============================
+            flow_id = test_case[3]
+            tdc_id = test_case[4]
+            sdc_id = test_case[5]
 
-        cur.execute(
-            """
-            SELECT
+            if not flow_id:
+                raise ValueError(
+                    f"Test Case {test_case_id} "
+                    "does not have a Flow assigned."
+                )
 
-                flow_id,
+            if not tdc_id:
+                raise ValueError(
+                    f"Test Case {test_case_id} "
+                    "does not have a TDC assigned."
+                )
 
-                flow_name,
+            if not sdc_id:
+                raise ValueError(
+                    f"Test Case {test_case_id} "
+                    "does not have an SDC assigned."
+                )
 
-                module
+            # ==========================================
+            # FLOW
+            # ==========================================
 
-            FROM flow_master
+            cur.execute(
+                """
+                SELECT
+                    flow_id,
+                    flow_name,
+                    module
+                FROM flow_master
+                WHERE flow_id = %s
+                """,
+                (
+                    flow_id,
+                )
+            )
 
-            WHERE flow_id = %s
-            """,
-            (flow_id,)
-        )
+            flow = cur.fetchone()
 
-        flow = cur.fetchone()
+            if not flow:
+                raise ValueError(
+                    f"Flow {flow_id} assigned to "
+                    f"Test Case {test_case_id} "
+                    "was not found."
+                )
 
-        # ==============================
-        # FLOW STEPS
-        # ==============================
+            # ==========================================
+            # FLOW STEPS
+            # ==========================================
 
-        cur.execute(
-            """
-            SELECT
+            cur.execute(
+                """
+                SELECT
+                    fs.step_id,
+                    fs.sequence_no,
+                    ra.asset_name,
+                    ra.business_object,
+                    ra.operation,
+                    ra.asset_script
+                FROM flow_steps fs
+                INNER JOIN repository_assets ra
+                    ON fs.asset_id = ra.asset_id
+                WHERE fs.flow_id = %s
+                ORDER BY fs.sequence_no
+                """,
+                (
+                    flow_id,
+                )
+            )
 
-                fs.step_id,
+            flow_steps = cur.fetchall()
 
-                fs.sequence_no,
+            if not flow_steps:
+                raise ValueError(
+                    f"Flow {flow_id} does not contain "
+                    "any executable steps."
+                )
 
-                ra.asset_name,
+            # ==========================================
+            # TDC HEADER
+            # ==========================================
 
-                ra.business_object,
+            cur.execute(
+                """
+                SELECT
+                    tdc_id,
+                    tdc_name,
+                    business_object
+                FROM tdc_master
+                WHERE tdc_id = %s
+                """,
+                (
+                    tdc_id,
+                )
+            )
 
-                ra.operation,
+            tdc = cur.fetchone()
 
-                ra.asset_script
+            if not tdc:
+                raise ValueError(
+                    f"TDC {tdc_id} assigned to "
+                    f"Test Case {test_case_id} "
+                    "was not found."
+                )
 
-            FROM flow_steps fs
+            # ==========================================
+            # TDC VALUES
+            # ==========================================
 
-            INNER JOIN repository_assets ra
+            cur.execute(
+                """
+                SELECT
+                    parameter_name,
+                    parameter_value
+                FROM tdc_values
+                WHERE tdc_id = %s
+                """,
+                (
+                    tdc_id,
+                )
+            )
 
-                ON fs.asset_id =
-                   ra.asset_id
+            tdc_rows = cur.fetchall()
 
-            WHERE fs.flow_id = %s
+            test_data = {}
 
-            ORDER BY fs.sequence_no
-            """,
-            (flow_id,)
-        )
+            for row in tdc_rows:
+                parameter_name = row[0]
+                parameter_value = row[1]
 
-        flow_steps = cur.fetchall()
+                test_data[
+                    parameter_name
+                ] = parameter_value
 
-        # ==============================
-        # TDC HEADER
-        # ==============================
+            # ==========================================
+            # SDC
+            # ==========================================
 
-        cur.execute(
-            """
-            SELECT
+            cur.execute(
+                """
+                SELECT
+                    sdc_id,
+                    sdc_name,
+                    environment,
+                    sap_logon_entry,
+                    sap_system_id,
+                    client,
+                    language,
+                    description,
+                    status
+                FROM sdc_master
+                WHERE sdc_id = %s
+                """,
+                (
+                    sdc_id,
+                )
+            )
 
-                tdc_id,
+            sdc = cur.fetchone()
 
-                tdc_name,
+            if not sdc:
+                raise ValueError(
+                    f"SDC {sdc_id} assigned to "
+                    f"Test Case {test_case_id} "
+                    "was not found."
+                )
 
-                business_object
+            if sdc[8] != "Active":
+                raise ValueError(
+                    f"SDC '{sdc[1]}' is not active."
+                )
 
-            FROM tdc_master
+            # ==========================================
+            # SYSTEM DATA
+            # ==========================================
 
-            WHERE tdc_id = %s
-            """,
-            (tdc_id,)
-        )
+            system_data = {
+                "sdc_id": sdc[0],
+                "sdc_name": sdc[1],
+                "environment": sdc[2],
+                "sap_logon_entry": sdc[3],
+                "sap_system_id": sdc[4],
+                "client": sdc[5],
+                "language": sdc[6],
+                "description": sdc[7],
+                "status": sdc[8]
+            }
 
-        tdc = cur.fetchone()
+            # ==========================================
+            # EXECUTION CONTEXT
+            # ==========================================
 
-        # ==============================
-        # TDC VALUES
-        # ==============================
+            context = {
+                "test_case": test_case,
+                "flow": flow,
+                "flow_steps": flow_steps,
+                "tdc": tdc,
+                "test_data": test_data,
+                "sdc": sdc,
+                "system_data": system_data,
+                "runtime": {}
+            }
 
-        cur.execute(
-            """
-            SELECT
+            return context
 
-                parameter_name,
-
-                parameter_value
-
-            FROM tdc_values
-
-            WHERE tdc_id = %s
-            """,
-            (tdc_id,)
-        )
-
-        rows = cur.fetchall()
-
-        test_data = {}
-
-        for row in rows:
-
-            parameter_name = row[0]
-
-            parameter_value = row[1]
-
-            test_data[
-                parameter_name
-            ] = parameter_value
-
-        cur.close()
-        conn.close()
-
-        return {
-	    "test_case": test_case,
-	    "flow": flow,
-	    "flow_steps": flow_steps,
-	    "tdc": tdc,
-	    "test_data": test_data,
-	    "runtime": {}
-	  }
+        finally:
+            cur.close()
+            conn.close()

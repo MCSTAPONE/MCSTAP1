@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Data Containers | MC STAP</title>
+    
+    <link rel="stylesheet" href="/static/css/sdc.css">
+</head>
+
+<body>
+
+    <header class="page-header">
+        <div>
+            <h1 class="page-title">
+                System Data Containers
+            </h1>
+
+            <p class="page-subtitle">
+                Manage SAP target systems, environments, clients and login-language configuration.
+            </p>
+        </div>
+
+        <a href="/dashboard" class="back-btn">
+            ← Dashboard
+        </a>
+    </header>
+
+    <main class="main-container">
+
+        <div id="pageMessage" class="message"></div>
+
+        <section class="card">
+            <h2 class="card-title">
+                Create New SDC
+            </h2>
+
+            <form id="sdcForm">
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+                        <label for="sdcName">
+                            SDC Name *
+                        </label>
+
+                        <input
+                            type="text"
+                            id="sdcName"
+                            name="sdc_name"
+                            placeholder="SDC_S4Q_QA_400"
+                            maxlength="100"
+                            required
+                        >
+
+                        <div class="form-note">
+                            Recommended format: SDC_SYSTEM_ENVIRONMENT_CLIENT
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="environment">
+                            Environment *
+                        </label>
+
+                        <select
+                            id="environment"
+                            name="environment"
+                            required
+                        >
+                            <option value="">
+                                Select Environment
+                            </option>
+
+                            <option value="DEV">DEV</option>
+                            <option value="QA">QA</option>
+                            <option value="UAT">UAT</option>
+                            <option value="PREPROD">PREPROD</option>
+                            <option value="PROD">PROD</option>
+                            <option value="SANDBOX">SANDBOX</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sapLogonEntry">
+                            SAP Logon Entry *
+                        </label>
+
+                        <input
+                            type="text"
+                            id="sapLogonEntry"
+                            name="sap_logon_entry"
+                            placeholder="S4Q"
+                            maxlength="100"
+                            required
+                        >
+
+                        <div class="form-note">
+                            Exact connection name displayed in SAP Logon.
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sapSystemId">
+                            SAP System ID
+                        </label>
+
+                        <input
+                            type="text"
+                            id="sapSystemId"
+                            name="sap_system_id"
+                            placeholder="S4Q"
+                            maxlength="20"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="client">
+                            SAP Client *
+                        </label>
+
+                        <input
+                            type="text"
+                            id="client"
+                            name="client"
+                            placeholder="400"
+                            maxlength="10"
+                            inputmode="numeric"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="language">
+                            Language *
+                        </label>
+
+                        <input
+                            type="text"
+                            id="language"
+                            name="language"
+                            value="EN"
+                            maxlength="10"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="status">
+                            Status *
+                        </label>
+
+                        <select
+                            id="status"
+                            name="status"
+                            required
+                        >
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="description">
+                            Description
+                        </label>
+
+                        <textarea
+                            id="description"
+                            name="description"
+                            placeholder="Describe the SAP system and intended testing purpose."
+                        ></textarea>
+                    </div>
+
+                </div>
+
+                <div class="security-note">
+                    SDC stores system-selection metadata only. Do not enter SAP usernames, passwords, Windows passwords or access tokens.
+                </div>
+
+                <div class="form-actions">
+                    <button
+                        type="submit"
+                        id="saveButton"
+                        class="btn btn-primary"
+                    >
+                        Save SDC
+                    </button>
+
+                    <button
+                        type="reset"
+                        class="btn btn-secondary"
+                    >
+                        Reset
+                    </button>
+                </div>
+
+            </form>
+        </section>
+
+        <section class="card">
+
+            <div class="table-toolbar">
+                <h2 class="card-title">
+                    Available System Data Containers
+                </h2>
+
+                <div>
+                    <input
+                        type="text"
+                        id="searchInput"
+                        class="search-input"
+                        placeholder="Search SDCs..."
+                    >
+
+                    <button
+                        type="button"
+                        id="refreshButton"
+                        class="btn btn-secondary"
+                    >
+                        Refresh
+                    </button>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>SDC Name</th>
+                            <th>Environment</th>
+                            <th>SAP Logon Entry</th>
+                            <th>System ID</th>
+                            <th>Client</th>
+                            <th>Language</th>
+                            <th>Description</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="sdcTableBody">
+                        <tr>
+                            <td colspan="10" class="loading-row">
+                                Loading System Data Containers...
+                            </td>
+                        </tr>
+                    </tbody>
+
+                </table>
+            </div>
+
+        </section>
+
+    </main>
+
+    <script>
+	    const sdcForm =
+		  document.getElementById("sdcForm");
+
+	    const saveButton =
+		  document.getElementById("saveButton");
+
+	    const refreshButton =
+		  document.getElementById("refreshButton");
+
+	    const searchInput =
+		  document.getElementById("searchInput");
+
+	    const sdcTableBody =
+		  document.getElementById("sdcTableBody");
+
+	    const pageMessage =
+		  document.getElementById("pageMessage");
+
+	    let sdcItems = [];
+
+
+	    function showMessage(message, type) {
+		  pageMessage.textContent = message;
+
+		  pageMessage.className =
+			type === "success"
+			    ? "message message-success"
+			    : "message message-error";
+
+		  window.scrollTo({
+			top: 0,
+			behavior: "smooth"
+		  });
+	    }
+
+
+	    function clearMessage() {
+		  pageMessage.textContent = "";
+		  pageMessage.className = "message";
+	    }
+
+
+	    function escapeHtml(value) {
+		  const text =
+			value === null ||
+			value === undefined
+			    ? ""
+			    : String(value);
+
+		  const element =
+			document.createElement("div");
+
+		  element.textContent = text;
+
+		  return element.innerHTML;
+	    }
+
+
+	    function renderSdcTable(items) {
+		  sdcTableBody.innerHTML = "";
+
+		  if (!Array.isArray(items) || items.length === 0) {
+			sdcTableBody.innerHTML = `
+			    <tr>
+				  <td
+					colspan="10"
+					class="empty-row"
+				  >
+					No System Data Containers found.
+				  </td>
+			    </tr>
+			`;
+
+			return;
+		  }
+
+		  items.forEach(item => {
+			const isActive =
+			    item.status === "Active";
+
+			const statusClass =
+			    isActive
+				  ? "status-active"
+				  : "status-inactive";
+
+			const nextStatus =
+			    isActive
+				  ? "Inactive"
+				  : "Active";
+
+			const actionClass =
+			    isActive
+				  ? "btn-warning"
+				  : "btn-success";
+
+			const actionText =
+			    isActive
+				  ? "Deactivate"
+				  : "Activate";
+
+			const row =
+			    document.createElement("tr");
+
+			row.innerHTML = `
+			    <td>
+				  ${escapeHtml(item.sdc_id)}
+			    </td>
+
+			    <td>
+				  <strong>
+					${escapeHtml(item.sdc_name)}
+				  </strong>
+			    </td>
+
+			    <td>
+				  <span class="environment-badge">
+					${escapeHtml(item.environment)}
+				  </span>
+			    </td>
+
+			    <td class="system-value">
+				  ${escapeHtml(item.sap_logon_entry)}
+			    </td>
+
+			    <td class="system-value">
+				  ${escapeHtml(item.sap_system_id || "-")}
+			    </td>
+
+			    <td class="system-value">
+				  ${escapeHtml(item.client)}
+			    </td>
+
+			    <td>
+				  ${escapeHtml(item.language)}
+			    </td>
+
+			    <td class="description-cell">
+				  ${escapeHtml(item.description || "-")}
+			    </td>
+
+			    <td>
+				  <span class="status-badge ${statusClass}">
+					${escapeHtml(item.status)}
+				  </span>
+			    </td>
+
+			    <td>
+				  <button
+					type="button"
+					class="btn ${actionClass}"
+					data-sdc-id="${Number(item.sdc_id)}"
+					data-next-status="${escapeHtml(nextStatus)}"
+				  >
+					${actionText}
+				  </button>
+			    </td>
+			`;
+
+			const statusButton =
+			    row.querySelector("button");
+
+			statusButton.addEventListener(
+			    "click",
+			    () => {
+				  changeSdcStatus(
+					Number(item.sdc_id),
+					nextStatus
+				  );
+			    }
+			);
+
+			sdcTableBody.appendChild(row);
+		  });
+	    }
+
+
+	    async function loadSdcs() {
+		  sdcTableBody.innerHTML = `
+			<tr>
+			    <td
+				  colspan="10"
+				  class="loading-row"
+			    >
+				  Loading System Data Containers...
+			    </td>
+			</tr>
+		  `;
+
+		  try {
+			const response =
+			    await fetch(
+				  "/api/sdc",
+				  {
+					method: "GET",
+					headers: {
+					    "Accept": "application/json"
+					},
+					cache: "no-store"
+				  }
+			    );
+
+			const data =
+			    await response.json();
+
+			if (!response.ok) {
+			    throw new Error(
+				  data.detail ||
+				  "SDC list could not be loaded."
+			    );
+			}
+
+			console.log(
+			    "SDC API response:",
+			    data
+			);
+
+			sdcItems =
+			    Array.isArray(data.items)
+				  ? data.items
+				  : [];
+
+			applySearchFilter();
+		  }
+		  catch (error) {
+			console.error(
+			    "SDC loading error:",
+			    error
+			);
+
+			sdcTableBody.innerHTML = `
+			    <tr>
+				  <td
+					colspan="10"
+					class="empty-row"
+				  >
+					SDC data could not be loaded.
+				  </td>
+			    </tr>
+			`;
+
+			showMessage(
+			    error.message,
+			    "error"
+			);
+		  }
+	    }
+
+
+	    function applySearchFilter() {
+		  const query =
+			searchInput.value
+			    .trim()
+			    .toLowerCase();
+
+		  if (!query) {
+			renderSdcTable(sdcItems);
+			return;
+		  }
+
+		  const filteredItems =
+			sdcItems.filter(item => {
+			    const searchableText = [
+				  item.sdc_name,
+				  item.environment,
+				  item.sap_logon_entry,
+				  item.sap_system_id,
+				  item.client,
+				  item.language,
+				  item.description,
+				  item.status
+			    ]
+				  .filter(value => {
+					return (
+					    value !== null &&
+					    value !== undefined
+					);
+				  })
+				  .join(" ")
+				  .toLowerCase();
+
+			    return searchableText.includes(
+				  query
+			    );
+			});
+
+		  renderSdcTable(filteredItems);
+	    }
+
+
+	    async function changeSdcStatus(
+		  sdcId,
+		  newStatus
+	    ) {
+		  const confirmed =
+			window.confirm(
+			    `Change SDC status to ${newStatus}?`
+			);
+
+		  if (!confirmed) {
+			return;
+		  }
+
+		  clearMessage();
+
+		  try {
+			const response =
+			    await fetch(
+				  `/api/sdc/${sdcId}/status`,
+				  {
+					method: "PUT",
+					headers: {
+					    "Content-Type":
+						  "application/json",
+					    "Accept":
+						  "application/json"
+					},
+					body: JSON.stringify({
+					    status: newStatus
+					})
+				  }
+			    );
+
+			const data =
+			    await response.json();
+
+			if (!response.ok) {
+			    throw new Error(
+				  data.detail ||
+				  "SDC status could not be updated."
+			    );
+			}
+
+			showMessage(
+			    `SDC '${data.sdc_name}' is now ${data.status}.`,
+			    "success"
+			);
+
+			await loadSdcs();
+		  }
+		  catch (error) {
+			console.error(
+			    "SDC status error:",
+			    error
+			);
+
+			showMessage(
+			    error.message,
+			    "error"
+			);
+		  }
+	    }
+
+
+	    sdcForm.addEventListener(
+		  "submit",
+		  async event => {
+			event.preventDefault();
+
+			clearMessage();
+
+			saveButton.disabled = true;
+			saveButton.textContent = "Saving...";
+
+			const requestBody = {
+			    sdc_name:
+				  document
+					.getElementById("sdcName")
+					.value
+					.trim(),
+
+			    environment:
+				  document
+					.getElementById("environment")
+					.value,
+
+			    sap_logon_entry:
+				  document
+					.getElementById("sapLogonEntry")
+					.value
+					.trim(),
+
+			    sap_system_id:
+				  document
+					.getElementById("sapSystemId")
+					.value
+					.trim()
+				  || null,
+
+			    client:
+				  document
+					.getElementById("client")
+					.value
+					.trim(),
+
+			    language:
+				  document
+					.getElementById("language")
+					.value
+					.trim(),
+
+			    description:
+				  document
+					.getElementById("description")
+					.value
+					.trim()
+				  || null,
+
+			    status:
+				  document
+					.getElementById("status")
+					.value
+			};
+
+			try {
+			    const response =
+				  await fetch(
+					"/api/sdc",
+					{
+					    method: "POST",
+					    headers: {
+						  "Content-Type":
+							"application/json",
+						  "Accept":
+							"application/json"
+					    },
+					    body: JSON.stringify(
+						  requestBody
+					    )
+					}
+				  );
+
+			    const data =
+				  await response.json();
+
+			    if (!response.ok) {
+				  throw new Error(
+					data.detail ||
+					"SDC could not be created."
+				  );
+			    }
+
+			    showMessage(
+				  `SDC '${data.sdc_name}' was created successfully.`,
+				  "success"
+			    );
+
+			    sdcForm.reset();
+
+			    document
+				  .getElementById("language")
+				  .value = "EN";
+
+			    document
+				  .getElementById("status")
+				  .value = "Active";
+
+			    await loadSdcs();
+			}
+			catch (error) {
+			    console.error(
+				  "SDC save error:",
+				  error
+			    );
+
+			    showMessage(
+				  error.message,
+				  "error"
+			    );
+			}
+			finally {
+			    saveButton.disabled = false;
+			    saveButton.textContent = "Save SDC";
+			}
+		  }
+	    );
+
+
+	    searchInput.addEventListener(
+		  "input",
+		  applySearchFilter
+	    );
+
+
+	    refreshButton.addEventListener(
+		  "click",
+		  async () => {
+			clearMessage();
+			await loadSdcs();
+		  }
+	    );
+
+
+	    loadSdcs();
+	</script>
+
+</body>
+
+</html>

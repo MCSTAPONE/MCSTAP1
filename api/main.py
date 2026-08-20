@@ -22,6 +22,7 @@ from api.test_cases import router as test_cases_router
 from api.flow_library import router as flow_router
 from api.script_studio import router as script_router
 from api.tdc import router as tdc_router
+from api.sdc import (router as sdc_router, page_router as sdc_page_router)
 from api.test_execution import router as test_execution_router
 from api.reports import router as reports_router
 
@@ -41,6 +42,8 @@ app.include_router(test_cases_router)
 app.include_router(flow_router)
 app.include_router(script_router)
 app.include_router(tdc_router)
+app.include_router(sdc_router)
+app.include_router(sdc_page_router)
 app.include_router(test_execution_router)
 app.include_router(reports_router)
 

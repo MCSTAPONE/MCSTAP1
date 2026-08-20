@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from sap.sap_client import SAPClient
 from sap.sap_login import SAPLogin
 
@@ -12,31 +14,67 @@ from services.sap_flows import (
 
 class SAPExecutor:
 
-    def __init__(self):
+    def __init__(
+        self,
+        system_data=None
+    ):
+
         self.session = None
+
+        self.system_data = (
+            system_data
+            if system_data
+            else {}
+        )
 
     def connect(self):
 
-        client = SAPClient()
+        if not isinstance(
+            self.system_data,
+            dict
+        ):
 
-        self.session = client.attach_to_sap()
+            raise TypeError(
+                "system_data must be a dictionary."
+            )
+
+        sap_logon_entry = (
+            self.system_data.get(
+                "sap_logon_entry"
+            )
+        )
+
+        if self.system_data and not sap_logon_entry:
+
+            raise ValueError(
+                "SDC system data does not contain "
+                "sap_logon_entry."
+            )
+
+        client = SAPClient(
+            system_data=self.system_data
+        )
+
+        self.session = (
+            client.attach_to_sap()
+        )
 
         return self.session
 
     def login(self):
 
         if self.session is None:
-            raise Exception(
-                "No SAP session available"
+
+            raise RuntimeError(
+                "No SAP session is available."
             )
 
         login = SAPLogin(
-            self.session
+            session=self.session,
+            system_data=self.system_data
         )
 
-        login.login()
-
-        return True
+        return login.login()
 
     def start_transaction(
         self,
@@ -44,13 +82,16 @@ class SAPExecutor:
     ):
 
         if self.session is None:
-            raise Exception(
-                "No SAP session available"
+
+            raise RuntimeError(
+                "No SAP session is available."
             )
 
         self.session.findById(
             "wnd[0]/tbar[0]/okcd"
-        ).text = f"/n{transaction_code}"
+        ).text = (
+            f"/n{transaction_code}"
+        )
 
         self.session.findById(
             "wnd[0]"
@@ -64,20 +105,24 @@ class SAPExecutor:
     ):
 
         if self.session is None:
-            raise Exception(
-                "No SAP session available"
+
+            raise RuntimeError(
+                "No SAP session is available."
             )
 
         flow_name = flow_name.upper()
 
         print(
-            f"EXECUTE_FLOW CALLED: {flow_name}"
+            f"EXECUTE_FLOW CALLED: "
+            f"{flow_name}"
         )
 
         if flow_name == "IW31":
 
-            result = run_iw31_create_order(
-                self.session
+            result = (
+                run_iw31_create_order(
+                    self.session
+                )
             )
 
             print(
@@ -86,10 +131,12 @@ class SAPExecutor:
 
             return result
 
-        elif flow_name == "IW32":
+        if flow_name == "IW32":
 
-            result = run_iw32_change_order(
-                self.session
+            result = (
+                run_iw32_change_order(
+                    self.session
+                )
             )
 
             print(
@@ -98,10 +145,12 @@ class SAPExecutor:
 
             return result
 
-        elif flow_name == "IW33":
+        if flow_name == "IW33":
 
-            result = run_iw33_display_order(
-                self.session
+            result = (
+                run_iw33_display_order(
+                    self.session
+                )
             )
 
             print(
@@ -109,11 +158,13 @@ class SAPExecutor:
             )
 
             return result
-            
-        elif flow_name == "IW41":
 
-            result = run_iw41_confirm_order(
-                self.session
+        if flow_name == "IW41":
+
+            result = (
+                run_iw41_confirm_order(
+                    self.session
+                )
             )
 
             print(
@@ -121,11 +172,13 @@ class SAPExecutor:
             )
 
             return result
-        
-        elif flow_name == "ME51N":
 
-            result = run_me51n_create_pr(
-                self.session
+        if flow_name == "ME51N":
+
+            result = (
+                run_me51n_create_pr(
+                    self.session
+                )
             )
 
             print(
@@ -133,32 +186,54 @@ class SAPExecutor:
             )
 
             return result
-            
 
-        else:
-
-            raise Exception(
-                f"Unknown flow: {flow_name}"
-            )
+        raise ValueError(
+            f"Unknown flow: {flow_name}"
+        )
 
     def logout(self):
 
         if self.session is None:
-            raise Exception(
-                "No SAP session available"
-            )
+
+            return False
 
         try:
 
             self.session.findById(
-                "wnd[1]/usr/btnSPOP-OPTION1"
-            ).press()
+                "wnd[0]/tbar[0]/okcd"
+            ).text = "/nex"
+
+            self.session.findById(
+                "wnd[0]"
+            ).sendVKey(0)
+
+            return True
 
         except Exception:
-            pass
 
-        self.session.findById(
-            "wnd[0]"
-        ).close()
+            try:
 
-        return True
+                self.session.findById(
+                    "wnd[0]"
+                ).close()
+
+                try:
+
+                    self.session.findById(
+                        "wnd[1]/usr/"
+                        "btnSPOP-OPTION1"
+                    ).press()
+
+                except Exception:
+                    pass
+
+                return True
+
+            except Exception as error:
+
+                print(
+                    f"SAP logout warning: "
+                    f"{error}"
+                )
+
+                return False

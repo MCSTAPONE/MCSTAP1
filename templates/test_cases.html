@@ -12,7 +12,9 @@
 <body>
 
     <div class="header">
-        <h1>Test Case Management</h1>
+        <h1>
+            Test Case Management
+        </h1>
 
         <a href="/dashboard" class="back-btn">
             ← Dashboard
@@ -21,16 +23,22 @@
 
     <div class="main-container">
 
-        <!-- Form Panel -->
+        <!-- Create Test Case Panel -->
+
         <div class="card">
+
             <h2 class="card-title">
                 Create New Test Case
             </h2>
 
-            <form action="/test-cases/save" method="post">
+            <form action="/test-cases/save" method="POST">
+
                 <div class="form-grid">
 
+                    <!-- Title -->
+
                     <div class="form-group">
+
                         <label for="title">
                             Title *
                         </label>
@@ -42,9 +50,13 @@
                             placeholder="e.g. Create Purchase Order"
                             required
                         >
+
                     </div>
 
+                    <!-- Module -->
+
                     <div class="form-group">
+
                         <label for="module">
                             Module *
                         </label>
@@ -54,6 +66,7 @@
                             name="module"
                             required
                         >
+
                             <option value="">
                                 Select Module
                             </option>
@@ -72,10 +85,15 @@
                             <option value="PLM">PLM</option>
                             <option value="PROC">PROC</option>
                             <option value="E2E">E2E</option>
+
                         </select>
+
                     </div>
 
+                    <!-- Flow -->
+
                     <div class="form-group">
+
                         <label for="flow_id">
                             Flow *
                         </label>
@@ -85,19 +103,27 @@
                             name="flow_id"
                             required
                         >
+
                             <option value="">
                                 Select Flow
                             </option>
 
                             {% for flow in flows %}
+
                             <option value="{{ flow[0] }}">
                                 {{ flow[1] }}
                             </option>
+
                             {% endfor %}
+
                         </select>
+
                     </div>
 
+                    <!-- TDC -->
+
                     <div class="form-group">
+
                         <label for="tdc_id">
                             Test Data Container *
                         </label>
@@ -107,61 +133,123 @@
                             name="tdc_id"
                             required
                         >
+
                             <option value="">
                                 Select TDC
                             </option>
 
                             {% for tdc in tdcs %}
+
                             <option value="{{ tdc[0] }}">
                                 {{ tdc[1] }}
                             </option>
+
                             {% endfor %}
+
                         </select>
+
+                    </div>
+
+                    <!-- SDC -->
+
+                    <div class="form-group">
+
+                        <label for="sdc_id">
+                            System Data Container *
+                        </label>
+
+                        <select
+                            id="sdc_id"
+                            name="sdc_id"
+                            required
+                        >
+
+                            <option value="">
+                                Select SDC
+                            </option>
+
+                            {% for sdc in sdcs %}
+
+                            <option value="{{ sdc[0] }}">
+                                {{ sdc[1] }}
+                                | {{ sdc[2] }}
+                                | Client {{ sdc[3] }}
+                            </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                        <div
+                            style="
+                                margin-top: 6px;
+                                color: #6b7280;
+                                font-size: 12px;
+                            "
+                        >
+                            Select the SAP system and client where the
+                            Test Case should execute.
+                        </div>
+
+                    </div>
+
+                    <!-- Priority -->
+
+                    <div class="form-group">
+
+                        <label for="priority">
+                            Priority *
+                        </label>
+
+                        <select
+                            id="priority"
+                            name="priority"
+                            required
+                        >
+
+                            <option value="High">
+                                High
+                            </option>
+
+                            <option value="Medium">
+                                Medium
+                            </option>
+
+                            <option value="Low">
+                                Low
+                            </option>
+
+                        </select>
+
                     </div>
 
                 </div>
 
-                <div class="form-group">
-                    <label for="priority">
-                        Priority
-                    </label>
-
-                    <select
-                        id="priority"
-                        name="priority"
-                    >
-                        <option value="High">
-                            High
-                        </option>
-
-                        <option value="Medium">
-                            Medium
-                        </option>
-
-                        <option value="Low">
-                            Low
-                        </option>
-                    </select>
-                </div>
-
                 <div class="form-actions">
+
                     <button
                         type="submit"
                         class="btn-submit"
                     >
                         Save Test Case
                     </button>
+
                 </div>
+
             </form>
+
         </div>
 
-        <!-- Data Table Panel -->
+        <!-- Test Case List Panel -->
+
         <div class="card">
+
             <h2 class="card-title">
                 Available Test Cases
             </h2>
 
             <div class="filter-bar">
+
                 <input
                     type="text"
                     id="searchInput"
@@ -173,6 +261,7 @@
                     id="moduleFilter"
                     class="filter-select"
                 >
+
                     <option value="">
                         All Modules
                     </option>
@@ -191,86 +280,172 @@
                     <option value="PLM">PLM</option>
                     <option value="PROC">PROC</option>
                     <option value="E2E">E2E</option>
+
                 </select>
+
             </div>
 
             <div class="table-responsive">
+
                 <table class="test-table">
 
                     <thead>
+
                         <tr>
                             <th>Test Case ID</th>
                             <th>Title</th>
                             <th>Module</th>
                             <th>Flow</th>
                             <th>TDC</th>
+                            <th>SDC</th>
                             <th>Priority</th>
                             <th>Actions</th>
                         </tr>
+
                     </thead>
 
                     <tbody id="testCaseTable">
 
                         {% for row in rows %}
+
                         <tr>
+
+                            <!-- Test Case ID -->
+
                             <td>
                                 {{ row[1] }}
                             </td>
+
+                            <!-- Title -->
 
                             <td>
                                 {{ row[2] }}
                             </td>
 
+                            <!-- Module -->
+
                             <td>
                                 {{ row[3] }}
                             </td>
 
-                            <td>
-                                {{ row[4] }}
-                            </td>
+                            <!-- Flow -->
 
                             <td>
-                                {{ row[5] }}
+                                {% if row[4] %}
+                                    {{ row[4] }}
+                                {% else %}
+                                    <span style="color: #9ca3af;">
+                                        Not assigned
+                                    </span>
+                                {% endif %}
                             </td>
 
+                            <!-- TDC -->
+
                             <td>
-                                {{ row[6] }}
+                                {% if row[5] %}
+                                    {{ row[5] }}
+                                {% else %}
+                                    <span style="color: #9ca3af;">
+                                        Not assigned
+                                    </span>
+                                {% endif %}
                             </td>
+
+                            <!-- SDC -->
+
+                            <td>
+
+                                {% if row[6] %}
+
+                                    <span
+                                        style="
+                                            display: inline-block;
+                                            padding: 5px 9px;
+                                            border-radius: 999px;
+                                            background-color: #eef2ff;
+                                            color: #3730a3;
+                                            font-size: 12px;
+                                            font-weight: 700;
+                                            white-space: nowrap;
+                                        "
+                                    >
+                                        {{ row[6] }}
+                                    </span>
+
+                                {% else %}
+
+                                    <span
+                                        style="
+                                            color: #b45309;
+                                            font-weight: 600;
+                                        "
+                                    >
+                                        Not assigned
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                            <!-- Priority -->
+
+                            <td>
+                                {{ row[7] }}
+                            </td>
+
+                            <!-- Actions -->
 
                             <td
                                 class="action-cell"
                                 style="justify-content: center;"
                             >
-                                <a href="/test-cases/view/{{ row[1] }}" title="View">
+
+                                <a href="/test-cases/view/{{ row[1] }}" class="action-icon" title="View">
                                     👁️
                                 </a>
 
-                                <a href="/test-cases/edit/{{ row[0] }}" title="Edit">
+                                <a href="/test-cases/edit/{{ row[0] }}" class="action-icon" title="Edit">
                                     ✏️
                                 </a>
 
-                                <a href="/test-cases/delete/{{ row[1] }}" title="Delete">
+                                <a href="/test-cases/delete/{{ row[1] }}" class="action-icon" title="Delete" onclick="return confirm('Are you sure you want to delete this test case?');">
                                     🗑️
                                 </a>
 
-                                <form action="/test-cases/{{ row[0] }}/execute-result" method="post" style="display: inline;">
+                                <form action="/test-cases/{{ row[0] }}/execute-result" method="POST" style="display: inline;">
+
                                     <button
                                         type="submit"
                                         class="action-icon"
                                         title="Execute"
-                                        style="border: none; background: none; cursor: pointer; padding: 0;"
+                                        style="
+                                            border: none;
+                                            background: none;
+                                            cursor: pointer;
+                                            padding: 0;
+                                        "
+                                        {% if not row[6] %}
+                                            disabled
+                                        {% endif %}
                                     >
                                         ▶️
                                     </button>
+
                                 </form>
+
                             </td>
+
                         </tr>
+
                         {% endfor %}
 
                     </tbody>
 
                 </table>
+
             </div>
+
         </div>
 
     </div>
@@ -286,10 +461,12 @@
                 "moduleFilter"
             );
 
-        function filterTable()
-        {
+
+        function filterTable() {
             const searchValue =
-                searchInput.value.toLowerCase();
+                searchInput.value
+                    .trim()
+                    .toLowerCase();
 
             const selectedModule =
                 moduleFilter.value;
@@ -299,40 +476,39 @@
                     "#testCaseTable tr"
                 );
 
-            rows.forEach(
-                row =>
-                {
-                    const text =
-                        row.innerText.toLowerCase();
+            rows.forEach(row => {
+                const rowText =
+                    row.innerText.toLowerCase();
 
-                    const module =
-                        row.children[2]
+                const moduleValue =
+                    row.children[2]
                         ?.innerText
                         .trim();
 
-                    const searchMatch =
-                        text.includes(
-                            searchValue
-                        );
+                const searchMatches =
+                    rowText.includes(
+                        searchValue
+                    );
 
-                    const moduleMatch =
-                        selectedModule === ""
-                        ||
-                        module === selectedModule;
+                const moduleMatches =
+                    selectedModule === ""
+                    ||
+                    moduleValue === selectedModule;
 
-                    row.style.display =
-                        searchMatch &&
-                        moduleMatch
-                            ? ""
-                            : "none";
-                }
-            );
+                row.style.display =
+                    searchMatches &&
+                    moduleMatches
+                        ? ""
+                        : "none";
+            });
         }
+
 
         searchInput.addEventListener(
             "keyup",
             filterTable
         );
+
 
         moduleFilter.addEventListener(
             "change",
