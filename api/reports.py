@@ -30,39 +30,51 @@ def execution_reports(
     conn = get_connection()
     cur = conn.cursor()
 
-    cur.execute(
-        """
-        SELECT
-            ter.execution_id,
-            ter.test_case_db_id,
-            tc.test_case_id,
-            tc.title,
-            ter.execution_status,
-            ter.runtime_context,
-            ter.created_at,
-            CASE
-                WHEN ter.started_at IS NOT NULL
-                 AND ter.ended_at IS NOT NULL
-                THEN
-                    EXTRACT(
-                        EPOCH FROM (
-                            ter.ended_at - ter.started_at
-                        )
-                    )::INTEGER
-                ELSE
-                    NULL
-            END AS duration_seconds
-        FROM test_execution_runs ter
-        LEFT JOIN test_cases tc
-            ON ter.test_case_db_id = tc.id
-        ORDER BY ter.execution_id DESC
-        """
-    )
+    try:
 
-    rows = cur.fetchall()
+        cur.execute(
+            """
+            SELECT
+                ter.execution_id,
+                ter.test_case_db_id,
+                tc.test_case_id,
+                tc.title,
+                ter.execution_status,
+                ter.runtime_context,
+                ter.created_at,
+                CASE
+                    WHEN ter.started_at IS NOT NULL
+                     AND ter.ended_at IS NOT NULL
+                    THEN
+                        EXTRACT(
+                            EPOCH FROM (
+                                ter.ended_at
+                                -
+                                ter.started_at
+                            )
+                        )::INTEGER
+                    ELSE
+                        NULL
+                END AS duration_seconds,
+                ter.sdc_name,
+                ter.environment,
+                ter.sap_system_id,
+                ter.client,
+                ter.language,
+                ter.sap_logon_entry
+            FROM test_execution_runs ter
+            LEFT JOIN test_cases tc
+                ON ter.test_case_db_id = tc.id
+            ORDER BY ter.execution_id DESC
+            """
+        )
 
-    cur.close()
-    conn.close()
+        rows = cur.fetchall()
+
+    finally:
+
+        cur.close()
+        conn.close()
 
     return templates.TemplateResponse(
         request=request,
@@ -73,7 +85,9 @@ def execution_reports(
     )
 
 
-@router.get("/reports/executions/{execution_id}")
+@router.get(
+    "/reports/executions/{execution_id}"
+)
 def execution_report_detail(
     request: Request,
     execution_id: int
@@ -82,63 +96,80 @@ def execution_report_detail(
     conn = get_connection()
     cur = conn.cursor()
 
-    cur.execute(
-        """
-        SELECT
-            ter.execution_id,
-            ter.test_case_db_id,
-            tc.test_case_id,
-            tc.title,
-            ter.execution_status,
-            ter.runtime_context,
-            ter.started_at,
-            ter.ended_at,
-            ter.created_at,
-            CASE
-                WHEN ter.started_at IS NOT NULL
-                 AND ter.ended_at IS NOT NULL
-                THEN
-                    EXTRACT(
-                        EPOCH FROM (
-                            ter.ended_at - ter.started_at
-                        )
-                    )::INTEGER
-                ELSE
-                    NULL
-            END AS duration_seconds
-        FROM test_execution_runs ter
-        LEFT JOIN test_cases tc
-            ON ter.test_case_db_id = tc.id
-        WHERE ter.execution_id = %s
-        """,
-        (
-            execution_id,
+    try:
+
+        cur.execute(
+            """
+            SELECT
+                ter.execution_id,
+                ter.test_case_db_id,
+                tc.test_case_id,
+                tc.title,
+                ter.execution_status,
+                ter.runtime_context,
+                ter.started_at,
+                ter.ended_at,
+                ter.created_at,
+                CASE
+                    WHEN ter.started_at IS NOT NULL
+                     AND ter.ended_at IS NOT NULL
+                    THEN
+                        EXTRACT(
+                            EPOCH FROM (
+                                ter.ended_at
+                                -
+                                ter.started_at
+                            )
+                        )::INTEGER
+                    ELSE
+                        NULL
+                END AS duration_seconds,
+                ter.sdc_id,
+                ter.sdc_name,
+                ter.environment,
+                ter.sap_logon_entry,
+                ter.sap_system_id,
+                ter.client,
+                ter.language
+            FROM test_execution_runs ter
+            LEFT JOIN test_cases tc
+                ON ter.test_case_db_id = tc.id
+            WHERE ter.execution_id = %s
+            """,
+            (
+                execution_id,
+            )
         )
-    )
 
-    execution = cur.fetchone()
+        execution = cur.fetchone()
 
-    cur.execute(
-        """
-        SELECT
-            sequence_no,
-            asset_name,
-            asset_status,
-            asset_details,
-            created_at
-        FROM test_execution_assets
-        WHERE execution_id = %s
-        ORDER BY sequence_no
-        """,
-        (
-            execution_id,
-        )
-    )
+        assets = []
 
-    assets = cur.fetchall()
+        if execution:
 
-    cur.close()
-    conn.close()
+            cur.execute(
+                """
+                SELECT
+                    sequence_no,
+                    asset_name,
+                    asset_status,
+                    asset_details,
+                    created_at
+                FROM test_execution_assets
+                WHERE execution_id = %s
+                ORDER BY sequence_no
+                """,
+                (
+                    execution_id,
+                )
+            )
+
+            assets = cur.fetchall()
+
+    finally:
+
+        cur.close()
+        conn.close()
 
     return templates.TemplateResponse(
         request=request,

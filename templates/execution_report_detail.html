@@ -23,160 +23,234 @@
         </a>
 
     </div>
-    
+
     {% if execution %}
 
-    <div class="card">
+        <div class="card">
 
-        <h2>
-            Summary
-        </h2>
+            <h2>
+                Summary
+            </h2>
 
-        <p>
-            <strong>Execution Evidence ID:</strong>
-            {{ execution[0] }}
-        </p>
-
-        <p>
-            <strong>Test Case Database ID:</strong>
-            {{ execution[1] }}
-        </p>
-
-        <p>
-            <strong>Test Case:</strong>
-            {{ execution[2] or "-" }}
-        </p>
-
-        <p>
-            <strong>Title:</strong>
-            {{ execution[3] or "-" }}
-        </p>
-
-        <p>
-            <strong>Status:</strong>
-
-            {% if execution[4] == "SUCCESS" %}
-                <span class="status-success">
-                    ✅ SUCCESS
-                </span>
-            {% else %}
-                {{ execution[4] }}
-            {% endif %}
-        </p>
-
-        <p>
-            <strong>Duration:</strong>
-
-            {% if execution[9] is not none %}
-                <span class="duration-badge">
-                    {{ execution[9] }} sec
-                </span>
-            {% else %}
-                <span class="empty-text">
-                    -
-                </span>
-            {% endif %}
-        </p>
-
-        <p>
-            <strong>Started At:</strong>
-            {{ execution[6] }}
-        </p>
-
-        <p>
-            <strong>Ended At:</strong>
-            {{ execution[7] }}
-        </p>
-
-        <p>
-            <strong>Created At:</strong>
-            {{ execution[8] }}
-        </p>
-
-    </div>
-
-    <div class="card">
-
-        <h2>
-            Asset Execution Results
-        </h2>
-
-        <table>
-
-            <thead>
-                <tr>
-                    <th>Sequence</th>
-                    <th>Asset</th>
-                    <th>Status</th>
-                    <th>Details</th>
-                </tr>
-            </thead>
-
-            <tbody>
-
-                {% for asset in assets %}
-                <tr>
-
-                    <td>
-                        {{ asset[0] }}
-                    </td>
-
-                    <td>
-                        {{ asset[1] }}
-                    </td>
-
-                    <td>
-                        {% if asset[2] == "SUCCESS" %}
-                            <span class="status-success">
-                                ✅ SUCCESS
-                            </span>
-                        {% else %}
-                            {{ asset[2] }}
-                        {% endif %}
-                    </td>
-
-                    <td>
-                        <div class="json-box">
-					{{ asset[3] }}
-                        </div>
-                    </td>
-
-                </tr>
-                {% endfor %}
-
-            </tbody>
-
-        </table>
-
-    </div>
-
-    <div class="card">
-
-        <h2>
-            Runtime Context
-        </h2>
-
-        {% if execution[5] %}
-            <div class="runtime-box">
-                {% for key, value in execution[5].items() %}
-			{{ key }} = {{ value }}
-                {% endfor %}
-            </div>
-        {% else %}
-            <p class="empty-text">
-                No runtime context was saved.
+            <p>
+                <strong>Execution Evidence ID:</strong>
+                {{ execution[0] }}
             </p>
-        {% endif %}
 
-    </div>
+            <p>
+                <strong>Test Case Database ID:</strong>
+                {{ execution[1] }}
+            </p>
+
+            <p>
+                <strong>Test Case:</strong>
+                {{ execution[2] or "-" }}
+            </p>
+
+            <p>
+                <strong>Title:</strong>
+                {{ execution[3] or "-" }}
+            </p>
+
+            <p>
+                <strong>Status:</strong>
+
+                {% if execution[4] == "SUCCESS" %}
+
+                    <span class="status-success">
+                        ✅ SUCCESS
+                    </span>
+
+                {% else %}
+
+                    {{ execution[4] }}
+
+                {% endif %}
+
+            </p>
+
+            <p>
+                <strong>Duration:</strong>
+
+                {% if execution[9] is not none %}
+
+                    <span class="duration-badge">
+                        {{ execution[9] }} sec
+                    </span>
+
+                {% else %}
+
+                    <span class="empty-text">
+                        -
+                    </span>
+
+                {% endif %}
+
+            </p>
+
+            <p>
+                <strong>Started At:</strong>
+                {{ execution[6] }}
+            </p>
+
+            <p>
+                <strong>Ended At:</strong>
+                {{ execution[7] }}
+            </p>
+
+            <p>
+                <strong>Created At:</strong>
+                {{ execution[8] }}
+            </p>
+
+        </div>
+
+        <div class="card">
+
+            <h2>
+                Execution Target
+            </h2>
+
+            {% if execution[11] %}
+
+                <p>
+                    <strong>SDC ID:</strong>
+                    {{ execution[10] }}
+                </p>
+
+                <p>
+                    <strong>SDC Name:</strong>
+                    {{ execution[11] }}
+                </p>
+
+                <p>
+                    <strong>Environment:</strong>
+                    {{ execution[12] }}
+                </p>
+
+                <p>
+                    <strong>SAP Logon Entry:</strong>
+                    {{ execution[13] }}
+                </p>
+
+                <p>
+                    <strong>SAP System ID:</strong>
+                    {{ execution[14] or "-" }}
+                </p>
+
+                <p>
+                    <strong>Client:</strong>
+                    {{ execution[15] }}
+                </p>
+
+                <p>
+                    <strong>Language:</strong>
+                    {{ execution[16] }}
+                </p>
+
+            {% else %}
+
+                <div class="legacy-message">
+                    This execution was created before SDC-aware
+                    evidence was introduced. No verified system
+                    snapshot is available.
+                </div>
+
+            {% endif %}
+
+        </div>
+
+        <div class="card">
+
+            <h2>
+                Asset Execution Results
+            </h2>
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Sequence</th>
+                        <th>Asset</th>
+                        <th>Status</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for asset in assets %}
+
+                    <tr>
+
+                        <td>
+                            {{ asset[0] }}
+                        </td>
+
+                        <td>
+                            {{ asset[1] }}
+                        </td>
+
+                        <td>
+
+                            {% if asset[2] == "SUCCESS" %}
+
+                                <span class="status-success">
+                                    ✅ SUCCESS
+                                </span>
+
+                            {% else %}
+
+                                {{ asset[2] }}
+
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+                            <div class="json-box">
+                                {{ asset[3] }}
+                            </div>
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        <div class="card">
+
+            <h2>
+                Runtime Context
+            </h2>
+
+            {% if execution[5] %}
+
+                <div class="runtime-box">{% for key, value in execution[5].items() %}{{ key }} = {{ value }}{% if not loop.last %}
+{% endif %}{% endfor %}</div>
+
+            {% else %}
+
+                <p class="empty-text">
+                    No runtime context was saved.
+                </p>
+
+            {% endif %}
+
+        </div>
 
     {% else %}
 
-    <div class="card">
-        <h2>
-            Execution not found.
-        </h2>
-    </div>
+        <div class="card">
+            <h2>
+                Execution not found.
+            </h2>
+        </div>
 
     {% endif %}
 

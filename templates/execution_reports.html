@@ -25,90 +25,162 @@
 
     <div class="card">
 
-        <table>
+        <div class="table-responsive">
 
-            <thead>
-                <tr>
-                    <th>Execution ID</th>
-                    <th>Test Case</th>
-                    <th>Title</th>
-                    <th>Status</th>
-                    <th>Runtime Object</th>
-                    <th>Duration</th>
-                    <th>Created At</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
+            <table>
 
-            <tbody>
+                <thead>
+                    <tr>
+                        <th>Execution ID</th>
+                        <th>Test Case</th>
+                        <th>Title</th>
+                        <th>Target System</th>
+                        <th>Status</th>
+                        <th>Runtime Object</th>
+                        <th>Duration</th>
+                        <th>Created At</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
 
-                {% for row in rows %}
-                <tr>
+                <tbody>
 
-                    <td>
-                        {{ row[0] }}
-                    </td>
+                    {% for row in rows %}
 
-                    <td>
-                        {{ row[2] or row[1] }}
-                    </td>
+                    <tr>
 
-                    <td>
-                        {{ row[3] or "-" }}
-                    </td>
+                        <td>
+                            {{ row[0] }}
+                        </td>
 
-                    <td>
-                        {% if row[4] == "SUCCESS" %}
-                            <span class="status-success">
-                                ✅ SUCCESS
-                            </span>
-                        {% else %}
-                            {{ row[4] }}
-                        {% endif %}
-                    </td>
+                        <td>
+                            {{ row[2] or row[1] }}
+                        </td>
 
-                    <td>
-                        {% if row[5] %}
-                            <div class="runtime-box">
-                                {% for key, value in row[5].items() %}
-						{{ key }} = {{ value }}
-                                {% endfor %}
-                            </div>
-                        {% else %}
-                            <span class="empty-text">
-                                -
-                            </span>
-                        {% endif %}
-                    </td>
+                        <td>
+                            {{ row[3] or "-" }}
+                        </td>
 
-                    <td>
-                        {% if row[7] is not none %}
-                            <span class="duration-badge">
-                                {{ row[7] }} sec
-                            </span>
-                        {% else %}
-                            <span class="empty-text">
-                                -
-                            </span>
-                        {% endif %}
-                    </td>
+                        <td>
 
-                    <td>
-                        {{ row[6] }}
-                    </td>
+                            {% if row[8] %}
 
-                    <td>
-                        <a href="/reports/executions/{{ row[0] }}" class="view-link">
-                            View
-                        </a>
-                    </td>
+                                <div class="system-box">
 
-                </tr>
-                {% endfor %}
+                                    <div class="system-name">
+                                        {{ row[8] }}
+                                    </div>
 
-            </tbody>
+                                    <div>
+                                        System:
+                                        {{ row[10] or row[13] or "-" }}
+                                    </div>
 
-        </table>
+                                    <div>
+                                        Client:
+                                        {{ row[11] or "-" }}
+                                    </div>
+
+                                    <div>
+                                        Language:
+                                        {{ row[12] or "-" }}
+                                    </div>
+
+                                    <span class="environment-badge">
+                                        {{ row[9] or "-" }}
+                                    </span>
+
+                                </div>
+
+                            {% else %}
+
+                                <span class="legacy-evidence">
+                                    Pre-SDC evidence
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+
+                            {% if row[4] == "SUCCESS" %}
+
+                                <span class="status-success">
+                                    ✅ SUCCESS
+                                </span>
+
+                            {% else %}
+
+                                {{ row[4] }}
+
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+
+                            {% if row[5] %}
+
+                                <div class="runtime-box">
+
+                                    {% for key, value in row[5].items() %}
+
+                                        <div>
+                                            {{ key }} = {{ value }}
+                                        </div>
+
+                                    {% endfor %}
+
+                                </div>
+
+                            {% else %}
+
+                                <span class="empty-text">
+                                    -
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+
+                            {% if row[7] is not none %}
+
+                                <span class="duration-badge">
+                                    {{ row[7] }} sec
+                                </span>
+
+                            {% else %}
+
+                                <span class="empty-text">
+                                    -
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+                            {{ row[6] }}
+                        </td>
+
+                        <td>
+					<a href="/reports/executions/{{ row[0] }}" class="view-link">
+					    View
+					</a>
+				</td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
 
     </div>
 

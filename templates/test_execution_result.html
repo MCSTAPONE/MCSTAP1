@@ -27,33 +27,132 @@
 </div>
 
     <div class="card">
-        <h2>Summary</h2>
+
+        <h2>
+            Summary
+        </h2>
+
+        <p>
+            <strong>Execution Evidence ID:</strong>
+            {{ execution.execution_id }}
+        </p>
 
         <p>
             <strong>Test Case Database ID:</strong>
             {{ execution.test_case_id }}
         </p>
-	  
-	  <p>
-	      <strong>Execution Evidence ID:</strong>
-	      {{ execution.execution_id }}
-	</p>
 
         <p>
             <strong>Overall Status:</strong>
 
             {% if execution.status == "SUCCESS" %}
-                <span class="status-success">✅ SUCCESS</span>
+
+                <span class="status-success">
+                    ✅ SUCCESS
+                </span>
+
             {% else %}
-                <span class="status-failed">❌ {{ execution.status }}</span>
+
+                <span class="status-failed">
+                    ❌ {{ execution.status }}
+                </span>
+
             {% endif %}
+
         </p>
+
     </div>
 
     <div class="card">
-        <h2>Asset Execution Results</h2>
+
+        <h2>
+            Execution Target
+        </h2>
+
+        {% if execution.system_data %}
+
+            <div class="system-grid">
+
+                <div class="system-item">
+                    <div class="system-label">
+                        SDC Name
+                    </div>
+
+                    <div class="system-value">
+                        {{ execution.system_data.sdc_name }}
+                    </div>
+                </div>
+
+                <div class="system-item">
+                    <div class="system-label">
+                        Environment
+                    </div>
+
+                    <div class="system-value">
+                        {{ execution.system_data.environment }}
+                    </div>
+                </div>
+
+                <div class="system-item">
+                    <div class="system-label">
+                        SAP Logon Entry
+                    </div>
+
+                    <div class="system-value">
+                        {{ execution.system_data.sap_logon_entry }}
+                    </div>
+                </div>
+
+                <div class="system-item">
+                    <div class="system-label">
+                        SAP System ID
+                    </div>
+
+                    <div class="system-value">
+                        {{ execution.system_data.sap_system_id or "-" }}
+                    </div>
+                </div>
+
+                <div class="system-item">
+                    <div class="system-label">
+                        Client
+                    </div>
+
+                    <div class="system-value">
+                        {{ execution.system_data.client }}
+                    </div>
+                </div>
+
+                <div class="system-item">
+                    <div class="system-label">
+                        Language
+                    </div>
+
+                    <div class="system-value">
+                        {{ execution.system_data.language }}
+                    </div>
+                </div>
+
+            </div>
+
+        {% else %}
+
+            <p>
+                No SDC execution target was provided.
+            </p>
+
+        {% endif %}
+
+    </div>
+
+    <div class="card">
+
+        <h2>
+            Asset Execution Results
+        </h2>
 
         <table>
+
             <thead>
                 <tr>
                     <th>Asset</th>
@@ -63,39 +162,65 @@
             </thead>
 
             <tbody>
+
                 {% for item in execution.results %}
+
                 <tr>
+
                     <td>
                         {{ item.asset }}
                     </td>
 
                     <td>
-                        <span class="asset-success">✅ Completed</span>
+                        <span class="asset-success">
+                            ✅ Completed
+                        </span>
                     </td>
 
                     <td>
                         <div class="json-box">
-{{ item.status }}
+                            {{ item.status }}
                         </div>
                     </td>
+
                 </tr>
+
                 {% endfor %}
+
             </tbody>
+
         </table>
+
     </div>
 
     <div class="card">
-        <h2>Runtime Context</h2>
+
+        <h2>
+            Runtime Context
+        </h2>
 
         {% if execution.runtime %}
+
             <div class="runtime-box">
+
                 {% for key, value in execution.runtime.items() %}
-{{ key }} = {{ value }}
+
+                    <div>
+                        {{ key }} = {{ value }}
+                    </div>
+
                 {% endfor %}
+
             </div>
+
         {% else %}
-            <p>No runtime context was produced.</p>
+
+            <p>
+                No runtime context was produced.
+            </p>
+
         {% endif %}
+
     </div>
 
 </body>
