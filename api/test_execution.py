@@ -6,15 +6,15 @@ from datetime import timezone
 from fastapi import APIRouter
 from fastapi import Request
 
-from services.test_execution_service import (
-    TestExecutionService
-)
+from api.shared import templates
 
 from services.execution_evidence_service import (
     ExecutionEvidenceService
 )
 
-from api.shared import templates
+from services.test_execution_service import (
+    TestExecutionService
+)
 
 
 router = APIRouter()
@@ -43,14 +43,32 @@ def normalize_execution_response(
             "runtime": execution_result.get(
                 "runtime",
                 {}
+            ),
+            "system_data": execution_result.get(
+                "system_data",
+                {}
             )
+        }
+
+    if isinstance(
+        execution_result,
+        list
+    ):
+
+        return {
+            "test_case_id": test_case_id,
+            "status": "SUCCESS",
+            "results": execution_result,
+            "runtime": {},
+            "system_data": {}
         }
 
     return {
         "test_case_id": test_case_id,
         "status": "SUCCESS",
-        "results": execution_result,
-        "runtime": {}
+        "results": [],
+        "runtime": {},
+        "system_data": {}
     }
 
 
@@ -62,7 +80,9 @@ def execute_and_save_evidence(
         timezone.utc
     )
 
-    execution_service = TestExecutionService()
+    execution_service = (
+        TestExecutionService()
+    )
 
     execution_result = (
         execution_service.execute_test_case(
@@ -79,7 +99,9 @@ def execute_and_save_evidence(
         execution_result
     )
 
-    evidence_service = ExecutionEvidenceService()
+    evidence_service = (
+        ExecutionEvidenceService()
+    )
 
     evidence = evidence_service.save_execution(
         test_case_id,
@@ -88,8 +110,10 @@ def execute_and_save_evidence(
         ended_at
     )
 
-    response["execution_id"] = evidence.get(
-        "execution_id"
+    response["execution_id"] = (
+        evidence.get(
+            "execution_id"
+        )
     )
 
     return response
